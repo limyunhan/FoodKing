@@ -4,7 +4,7 @@
 <script>
 function fn_selectCategory(catId) {
     window.location.href = "/board/list?catId=" + catId;
-}
+} 
 </script>
 
 <header>
@@ -45,22 +45,3 @@ function fn_selectCategory(catId) {
     </c:forEach>
   </ul>
 </div>
-
-<!-- 컨트롤러단 or 서비스 단에서 처리 (어차피 어디서 가공하든 model로 추가해야함)
-    public List<MainCategory> mainCateList() {
-        return cateDao.mainCateList();
-    }
-
-    public Map<String, List<SubCategory>> subCateMap() {
-        List<SubCategory> subCateList = cateDao.subCateList();
-        Map<String, List<SubCategory>> subCateMap = new HashMap<>();
-
-        for (SubCate subCate : subCateList) {
-            subCateMap
-                .computeIfAbsent(subCate.getmainCateNum(), k -> new ArrayList<>()) // .computeIfAbsent (
-                .add(subCate);
-        }
-        
-        return subCateMap;
-    }
- -->

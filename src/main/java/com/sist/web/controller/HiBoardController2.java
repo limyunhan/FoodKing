@@ -90,6 +90,8 @@ public class HiBoardController2 {
 		model.addAttribute("curPage", curPage);
 			
 		return "/board/list2";
+		
+
 	}
 	
 	@RequestMapping(value = "/board/writeForm2", method = RequestMethod.POST)

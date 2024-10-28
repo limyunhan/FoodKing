@@ -1,34 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sist.web.dao.UserDao">
-    <resultMap type="com.sist.web.model.User" id="userResultMap">
-        <id column="USER_ID" property="userId"></id>
-        <result column="USER_PWD" property="userPwd"></result>
-        <result column="USER_NAME" property="userName"></result>
-        <result column="USER_EMAIL" property="userEmail"></result>
-        <result column="STATUS" property="status"></result>
-        <result column="REG_DATE" property="regDate"></result>
-    </resultMap>
-    
-    <select id="userSelect" parameterType="String" resultMap="userResultMap"> 
-        SELECT USER_ID,
-	        NVL(USER_PWD, '') USER_PWD,
-	        NVL(USER_NAME, '') USER_NAME,
-	        NVL(USER_EMAIL, '') USER_EMAIL,
-	        NVL(STATUS, 'N') STATUS,
-	        NVL(TO_CHAR(REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') REG_DATE
-	    FROM TBL_USER
-	    WHERE USER_ID = #{value}
+	<resultMap type="com.sist.web.model.User" id="userResultMap">
+		<id column="USER_ID" property="userId" />
+		<result column="USER_PWD" property="userPwd" />
+		<result column="USER_NAME" property="userName" />
+		<result column="USER_EMAIL" property="userEmail" />
+		<result column="USER_GENDER" property="userGender" />
+		<result column="USER_STATUS" property="userStatus" />
+		<result column="USER_REGION" property="userRegion" />
+		<result column="USER_FOOD" property="userFood" />
+		<result column="USER_TEL" property="userTel" />
+		<result column="USER_REG_DATE" property="userRegDate" />
+		<result column="USER_IMAGE_NAME" property="userImageName" />
+		<result column="USER_IMAGE_ORG_NAME" property="userImageOrgName" />
+		<result column="USER_IMAGE_EXT" property="userImageExt" />
+		<result column="USER_IMAGE_SIZE" property="userImageSize" />
+	</resultMap>
+
+	<!-- 단일 유저 조회 -->
+	<select id="userSelect" parameterType="string"
+		resultMap="userResultMap">
+		SELECT USER_ID,
+		NVL(USER_PWD, '') USER_PWD,
+		NVL(USER_NAME, '') USER_NAME,
+		NVL(USER_EMAIL, '') USER_EMAIL,
+		NVL(USER_GENDER, '') USER_GENDER,
+		NVL(USER_STATUS, 'N') USER_STATUS,
+		NVL(USER_REGION, '') USER_REGION,
+		NVL(USER_FOOD, '') USER_FOOD,
+		NVL(USER_TEL, '') USER_TEL,
+		NVL(TO_CHAR(USER_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') USER_REG_DATE,
+		NVL(USER_IMAGE_NAME, '') USER_IMAGE_NAME,
+		NVL(USER_IMAGE_ORG_NAME, '') USER_IMAGE_ORG_NAME,
+		NVL(USER_IMAGE_EXT, '') USER_IMAGE_EXT,
+		NVL(USER_IMAGE_SIZE, 0) USER_IMAGE_SIZE
+		FROM USER_TABLE
+		WHERE USER_ID = #{value}
 	</select>
-	
+
+	<!-- 사용자 회원가입 -->
 	<insert id="userInsert" parameterType="com.sist.web.model.User">
-        INSERT INTO TBL_USER (USER_ID, USER_PWD, USER_NAME, USER_EMAIL, STATUS, REG_DATE) 
-        VALUES (#{userId}, #{userPwd}, #{userName}, #{userEmail}, #{status}, SYSDATE)
-    </insert>
-    
-    <update id="userUpdate" parameterType="com.sist.web.model.User">
-        UPDATE TBL_USER
-        SET USER_PWD = #{userPwd}, USER_NAME = #{userName}, USER_EMAIL = #{userEmail}
+		INSERT INTO USER_TABLE (
+		USER_ID,
+		USER_PWD,
+		USER_NAME,
+		USER_EMAIL,
+		USER_GENDER,
+		USER_STATUS,
+		USER_REGION,
+		USER_FOOD,
+		USER_TEL,
+		USER_REG_DATE,
+		USER_IMAGE_NAME,
+		USER_IMAGE_ORG_NAME,
+		USER_IMAGE_EXT,
+		USER_IMAGE_SIZE
+		) VALUES (
+		#{userId},
+		#{userPwd},
+		#{userName},
+		#{userEmail},
+		#{userGender},
+		#{userStatus},
+		#{userRegon},
+		#{userFood},
+		#{userTel},
+		SYSDATE,
+		#{userImageName},
+		#{userImageOrgName},
+		#{userImageExt},
+		#{userImageSize}
+		)
+	</insert>
+
+	<!-- 사용자 정보 업데이트 -->
+	<update id="userUpdate" parameterType="com.sist.web.model.User">
+		UPDATE USER_TABLE
+		SET USER_PWD = #{userPwd},
+		USER_NAME = #{userName},
+		USER_EMAIL = #{userEmail},
+		USER_GENDER = #{userGender},
+		USER_REGION = #{userRegion},
+		USER_FOOD = #{userFood},
+		USER_TEL = #{userTel},
+		USER_IMAGE_NAME = #{userImageName},
+		USER_IMAGE_ORG_NAME = #{userImageOrgName},
+		USER_IMAGE_EXT = #{userImageExt},
+		USER_IMAGE_SIZE = #{userImageSize}
+		WHERE USER_ID = #{userId}
+	</update>
+
+	<!-- 사용자 회원 탈퇴 -->
+	<update id="userWithdraw" parameterType="string">
+		UPDATE USER_TABLE
+		SET USER_STATUS = 'N'
+		WHERE USER_ID = #{value}
+	</update>
+
+	<!-- 사용자 비밀번호 변경 -->
+	<update id="userPwdUpdate" parameterType="map">
+        UPDATE USER_TABLE
+        SET USER_PWD = #{userPwd}
         WHERE USER_ID = #{userId}
-    </update>
+	</update>
 </mapper>

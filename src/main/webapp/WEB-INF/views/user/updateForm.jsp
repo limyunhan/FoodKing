@@ -1,26 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
-
-<!-- 컨트롤러에서 처리
-	Logger userUpdate_logger = LogManager.getLogger("/user/userUpdate.jsp");
-	HttpUtil.requestLogString(request, userUpdate_logger);
-
-	MiniUser userUpdate_user = null;
-	String userUpdate_cookieUserId = CookieUtil.getValue(request, "USER_ID");
-
-	if (!StringUtil.isEmpty(userUpdate_cookieUserId)) {
-		MiniUserDao userUpdate_userDao = new MiniUserDao();
-		userUpdate_user = userUpdate_userDao.userSelect(userUpdate_cookieUserId);
-
-		if (userUpdate_user == null || !StringUtil.equals(userUpdate_user.getUserStatus(), "Y")) {
-			CookieUtil.deleteCookie(request, response, "/", "USER_ID");
-			response.sendRedirect("/");
-			return; // Make sure to return after redirect to prevent further processing
-		}
-	}
-	userUpdate_logger.debug("userUpdate_user : " + userUpdate_user.getUserId());
-	if (userUpdate_user != null) {
--->
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -33,7 +12,7 @@ $(document).ready(function(){
 		var emptyCheck = /\s/g;
 		var telCheck = /^[0-9]{11}$/;
 
-		if ($.trim($("#userPwd1").val()).length <= 0) {
+		if ($.trim($("#userPwd1").val()).length === 0) {
 			alert("비밀번호를 입력하세요.");
 			$("#userPwd1").val("").focus();
 			return;
@@ -59,7 +38,7 @@ $(document).ready(function(){
 
 		$("#userPwd").val($("#userPwd1").val());
 
-		if ($.trim($("#userEmail").val()).length <= 0) {
+		if ($.trim($("#userEmail").val()).length === 0) {
 			alert("사용자 이메일을 입력하세요.");
 			$("#userEmail").val("").focus();
 			return;
@@ -71,7 +50,7 @@ $(document).ready(function(){
 			return;
 		}
 
-		if ($.trim($("#userTel").val()).length <= 0) {
+		if ($.trim($("#userTel").val()).length === 0) {
 			alert("전화번호를 입력하세요.");
 			$("#userTel").val("").focus();
 			return;
@@ -83,19 +62,19 @@ $(document).ready(function(){
 			return;
 		}
 		
-		if ($.trim($("#userName").val()).length <= 0) {
+		if ($.trim($("#userName").val()).length === 0) {
 			alert("사용자 이름을 입력하세요.");
 			$("#userName").val("").focus();
 			return;
 		}
 
-		if ($("#userRegion").val() == "") {
+		if ($("#userRegion").val() === "") {
 			alert("사는 지역을 선택해주세요.");
 			$("#userRegion").focus();
 			return;
 		}
 		
-		if ($("#userFood").val() == "") {
+		if ($("#userFood").val() === "") {
 			alert("테마별 음식을 선택해주세요.");
 			$("#userFood").focus();
 			return;
@@ -142,6 +121,7 @@ function closePasswordModal() {
     $('#passwordModal').hide();
     $('#inputPassword').val('');
 }
+
 </script>
 </head>
 <body id="index-body">

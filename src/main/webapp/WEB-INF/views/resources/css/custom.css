@@ -1,1431 +1,1483 @@
 * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 @font-face {
-	font-family: '을지로체';
-	font-style: normal;
-	font-weight: 400;
-	src: url('./fonts/BMEULJIROTTF.ttf') format('truetype');
+  font-family: '을지로체';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/resources/fonts/BMEULJIROTTF.ttf') format('truetype');
 }
 
 #index-body  p, h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dt, dd, table,
-	th, td, form, fieldset, legend, input, textarea, button, select {
-	margin: 0;
-	padding: 0;
-	font-size: 13px;
+  th, td, form, fieldset, legend, input, textarea, button, select {
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
 }
 
 body {
-	margin: 0;
-	padding: 0;
-	font-size: 13px;
-	font-weight: 400;
-	font-family: "을지로체", "Apple SD Gothic Neo", "맑은 고딕", "Malgun Gothic", 돋움,
-		dotum, sans-serif;
-	-webkit-text-size-adjust: none;
-	background-image: url("/img/고양이빵.jpg");
-	background-size: cover;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 400;
+  font-family: "을지로체", "Apple SD Gothic Neo", "맑은 고딕", "Malgun Gothic", 돋움,
+    dotum, sans-serif;
+  -webkit-text-size-adjust: none;
+  background-image: url("/resources/images/고양이빵.jpg");
+  background-size: cover;
 }
 
 .Board-Main {
-	margin: 0 auto;
-	width: 1080px;
+  margin: 0 auto;
+  width: 1080px;
 }
 
 .footer {
-	overflow: hidden;
-	position: relative;
-	margin: 60px auto 0;
-	padding: 24px 90px 0px 0;
-	border-top: 2px solid #333;
+  overflow: hidden;
+  position: relative;
+  margin: 60px auto 0;
+  padding: 24px 90px 0px 0;
+  border-top: 2px solid #333;
 }
 
 .footer p {
-	margin-right: 10px !important;
+  margin-right: 10px !important;
 }
 
 /* 헤더 스타일 */
 header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background-color: #be6d45;
-	color: white;
-	padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #be6d45;
+  color: white;
+  padding: 10px 20px;
 }
 
 ul li {
-	list-style: none;
+  list-style: none;
 }
 
 a {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 header button {
-	font-family: '을지로체';
-	background-color: #f2b048; /* 버튼의 배경색을 녹색으로 설정 */
-	color: black; /* 버튼 텍스트 색상을 흰색으로 설정 */
-	border: none; /* 테두리를 없앰 */
-	padding: 10px; /* 버튼 안의 여백 */
-	text-align: center; /* 텍스트 가운데 정렬 */
-	/*font-size: 16px;*/ /* 텍스트 크기 */
-	margin-left: 10px; /* 버튼 간의 간격 */
-	cursor: pointer; /* 마우스를 올렸을 때 포인터 모양으로 변경 */
-	border-radius: 5px; /* 모서리를 둥글게 */
-	transition: background-color 0.3s ease; /* 배경색 변경에 부드러운 애니메이션 추가 */
+  font-family: '을지로체';
+  background-color: #f2b048; /* 버튼의 배경색을 녹색으로 설정 */
+  color: black; /* 버튼 텍스트 색상을 흰색으로 설정 */
+  border: none; /* 테두리를 없앰 */
+  padding: 10px; /* 버튼 안의 여백 */
+  text-align: center; /* 텍스트 가운데 정렬 */
+  /*font-size: 16px;*/ /* 텍스트 크기 */
+  margin-left: 10px; /* 버튼 간의 간격 */
+  cursor: pointer; /* 마우스를 올렸을 때 포인터 모양으로 변경 */
+  border-radius: 5px; /* 모서리를 둥글게 */
+  transition: background-color 0.3s ease; /* 배경색 변경에 부드러운 애니메이션 추가 */
 }
 
 header button:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 header input {
-	margin-left: 10px;
-	padding: 5px;
+  margin-left: 10px;
+  padding: 5px;
 }
 
 /* 로고 섹션 */
 .logo {
-	position: relative;
-	height: 200px;
-	max-height: 340px;
-	background-color: rgba(245, 211, 169, 0.6);
-	display: flex; /* Flexbox 사용 */
-	justify-content: space-between; /* 좌우 정렬 */
-	align-items: center; /* 세로 정렬 */
-	overflow: hidden; /* 이미지가 영역 밖으로 나가지 않도록 */
+  position: relative;
+  height: 200px;
+  max-height: 340px;
+  background-color: rgba(245, 211, 169, 0.6);
+  display: flex; /* Flexbox 사용 */
+  justify-content: space-between; /* 좌우 정렬 */
+  align-items: center; /* 세로 정렬 */
+  overflow: hidden; /* 이미지가 영역 밖으로 나가지 않도록 */
 }
 
 .logo-left {
-	height: 100%; /* 왼쪽 이미지 최대 너비 */
+  height: 100%; /* 왼쪽 이미지 최대 너비 */
 }
 
 .logo-center {
-	max-height: 100%; /* 높이에 맞춰 크기 조정 */
-	height: auto; /* 가운데 이미지 최대 너비 */
+  max-height: 100%; /* 높이에 맞춰 크기 조정 */
+  height: auto; /* 가운데 이미지 최대 너비 */
 }
 
 .logo-right {
-	height: 100%; /* 오른쪽 이미지 최대 너비 */
+  height: 100%; /* 오른쪽 이미지 최대 너비 */
 }
 
 .navbar {
-	font: bold 16px "malgun gothic";
-	height: 50px;
-	background: #f5d3a9;
-	color: black;
-	line-height: 50px;
-	margin: 0 auto;
-	text-align: center;
-	display: flex;
-	justify-content: center;
+  font: bold 16px "malgun gothic";
+  height: 50px;
+  background: #f5d3a9;
+  color: black;
+  line-height: 50px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .navbar>ul>li {
-	z-index: 1;
-	float: left;
-	width: 150px;
-	position: relative;
+  z-index: 1;
+  float: left;
+  width: 150px;
+  position: relative;
 }
 
 .navbar>ul>li:hover {
-	background-color: #f2b048;
+  background-color: #f2b048;
 }
 
 .navbar>ul>li>a {
-	color: #3d2016;
-	font-family: "을지로체";
+  color: #3d2016;
+  font-family: "을지로체";
 }
 
 .navbar>ul>li>a:active {
-	color: red;
+  color: red;
 }
 
 .navbar>ul>li>ul {
-	width: 150px;
-	display: none;
-	position: absolute;
-	font-size: 14px;
-	background: #bf8b6b;
-	font-family: "을지로체";
+  width: 150px;
+  display: none;
+  position: absolute;
+  font-size: 14px;
+  background: #bf8b6b;
+  font-family: "을지로체";
 }
 
 .navbar>ul>li>ul a {
-	color: #3d2016;
+  color: #3d2016;
 }
 
 .navbar>ul>li>ul a:active {
-	color: red;
+  color: red;
 }
 
 .navbar>ul>li:hover>ul {
-	display: block;
+  display: block;
 }
 
 .navbar>ul>li>ul>li:hover {
-	background: #f2b048;
-	transition: ease 0.5s;
+  background: #f2b048;
+  transition: ease 0.5s;
 }
 
 .left-main-content {
-	background-color: rgba(245, 211, 169, 0.6);
-	display: flex;
-	flex-direction: column;
-	/* margin-left: 20px; */
-	width: 250px;
+  background-color: rgba(245, 211, 169, 0.6);
+  display: flex;
+  flex-direction: column;
+  /* margin-left: 20px; */
+  width: 250px;
 }
 
 .main-contanier {
-	display: flex;
-	justify-content: space-between; /* 공간을 양쪽으로 배치 */
-	background-color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  justify-content: space-between; /* 공간을 양쪽으로 배치 */
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
 /* 회원 정보 섹션 스타일 */
 .member-info {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	/* width: 200px; */
-	height: 250px; /* 추후 수정 가능 */
-	padding: 20px;
-	border-bottom: 1px solid #ddd;
-	/*border-radius: 10px;
-	margin-right: 20px;*/
-	text-align: center;
-	margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* width: 200px; */
+  height: 250px; /* 추후 수정 가능 */
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  /*border-radius: 10px;
+    margin-right: 20px;*/
+  text-align: center;
+  margin-top: 20px;
 }
 
 .member-info button {
-	font-family: '을지로체';
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 5px;
-	background-color: #f2b048;
-	color: black;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-bottom: 20px;
+  font-family: '을지로체';
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2b048;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
 }
 
 .member-info button:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 .member-links {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
 }
 
 .member-links a {
-	text-decoration: none;
-	color: #000FFF;
-	font-size: 14px;
+  text-decoration: none;
+  color: #000FFF;
+  font-size: 14px;
 }
 
 .member-links span {
-	font-size: 14px;
-	color: #333;
+  font-size: 14px;
+  color: #333;
 }
 
 .left-main-content-ad {
-	position: relative;
-	max-height: 340px;
-	display: flex; /* Flexbox 사용 */
-	justify-content: center;
-	align-items: center; /* 세로 정렬 */
-	overflow: hidden; /* 이미지가 영역 밖으로 나가지 않도록 */
-	flex-direction: column;
-	height: 250px; /* 추후 수정 */
-	padding: 10px;
-	/*border: 1px solid #ddd;
-	border-radius: 10px;
-	margin-right: 20px;*/
-	text-align: center;
-	margin-top: 20px;
-	flex-grow: 1;
+  position: relative;
+  max-height: 340px;
+  display: flex; /* Flexbox 사용 */
+  justify-content: center;
+  align-items: center; /* 세로 정렬 */
+  overflow: hidden; /* 이미지가 영역 밖으로 나가지 않도록 */
+  flex-direction: column;
+  height: 250px; /* 추후 수정 */
+  padding: 10px;
+  /*border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-right: 20px;*/
+  text-align: center;
+  margin-top: 20px;
+  flex-grow: 1;
 }
 
 .leftlogo {
-	width: 100%;
-	height: 100%;
-	margin-top: 10px;
+  width: 100%;
+  height: 100%;
+  margin-top: 10px;
 }
 
 .content {
-	width: 80%;
-	flex-direction: row;
-	gap: 20px;
-	flex-grow: 1;
-	margin-top: 20px;
-	flex-wrap: wrap;
-	display: flex;
+  width: 80%;
+  flex-direction: row;
+  gap: 20px;
+  flex-grow: 1;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  display: flex;
 }
 
 article.board {
-	padding: 20px;
-	flex-grow: 1;
-	width: calc(50% - 20px); /* 두 개의 board가 나란히 배치되도록 */
-	box-sizing: border-box;
+  padding: 20px;
+  flex-grow: 1;
+  width: calc(50% - 20px); /* 두 개의 board가 나란히 배치되도록 */
+  box-sizing: border-box;
 }
 
 article.board span {
-	float: right;
+  float: right;
 }
 
 article.board a {
-	color: black;
+  color: black;
 }
 
 article.board h3 {
-	/* margin-bottom: 15px; */
-	font-size: 16px;
-	font-weight: bold;
-	padding-bottom: 8px;
-	border-bottom: 1px solid #666;
+  /* margin-bottom: 15px; */
+  font-size: 16px;
+  font-weight: bold;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #666;
 }
 
 table {
-	width: 100%;
-	border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 table td {
-	padding: 8px;
-	border-bottom: 1px solid #ddd;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
 }
 
 .rightMain:hover {
-	background-color: rgba(0, 0, 0, 0.1);
-	cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 table td.category {
-	width: 50px;
+  width: 50px;
 }
 
 /* 로그인 페이지 css */
 #login-body {
-	font-family: "을지로체";
-	margin: 0;
-	background-color: #f5d3a9;
-	height: 100vh; /* 화면 높이를 100%로 설정 */
+  font-family: "을지로체";
+  margin: 0;
+  background-color: #f5d3a9;
+  height: 100vh; /* 화면 높이를 100%로 설정 */
 }
 
 /* 로그인 페이지 메인 컨테이너 */
 .login-main-page {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 100vh; /* 수직 및 수평 중앙 정렬을 위한 전체 높이 설정 */
-	font-family: "을지로체";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* 수직 및 수평 중앙 정렬을 위한 전체 높이 설정 */
+  font-family: "을지로체";
 }
 
 /* 로그인 박스 */
 .login-container {
-	background-color: rgb(255, 255, 255, 0.6);
-	padding: 40px;
-	border-radius: 10px;
-	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-	max-width: 400px;
-	width: 100%;
-	text-align: center;
+  background-color: rgb(255, 255, 255, 0.6);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
 }
 
 .login-header h2 {
-	margin-bottom: 10px;
-	font-size: 24px;
-	color: #9a5238;
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #9a5238;
 }
 
 .login-header p {
-	margin-bottom: 30px;
-	color: #777;
-	font-size: 14px;
+  margin-bottom: 30px;
+  color: #777;
+  font-size: 14px;
 }
 
 /* 입력 필드 스타일 */
 .input-groups {
-	margin-bottom: 20px;
-	text-align: left;
+  margin-bottom: 7px;
+  text-align: left;
 }
 
 .input-groups label {
-	font-size: 14px;
-	color: #9a5238;
-	font-weight: bold;
-	margin-bottom: 10px;
+  font-size: 14px;
+  color: #9a5238;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .input-groups input {
-	width: 100%;
-	padding: 12px;
-	border-radius: 5px;
-	border: 1px solid #ddd;
-	font-size: 14px;
-	margin-top: 5px;
-	background-color: white;
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin-top: 5px;
+  background-color: white;
 }
 
 .input-groups #userId {
-	font-family: "을지로체";
+  font-family: "을지로체";
 }
 
 .input-groups input:focus {
-	border-color: #9a5238;
-	outline: none;
-	box-shadow: 0 0 8px rgba(204, 204, 204, 0.3);
+  border-color: #9a5238;
+  outline: none;
+  box-shadow: 0 0 8px rgba(204, 204, 204, 0.3);
 }
 
 /* 로그인 버튼 스타일 */
 #login-btn {
-	font-family: "을지로체";
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 5px;
-	background-color: #f2b048;
-	color: black;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 20px;
+  font-family: "을지로체";
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2b048;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
 }
 
 #login-btn:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 /* 옵션 (체크박스와 비밀번호 찾기 링크) */
 .options {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	font-size: 14px;
-	margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 20px;
 }
 
 .options a {
-	color: #000FFF;
-	text-decoration: none;
+  color: #000FFF;
+  text-decoration: none;
 }
 
 .options a:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 /* 회원가입 링크 */
 .signup-link {
-	margin-top: 20px;
+  margin-top: 20px;
 }
 
 .signup-link p {
-	color: #9a5238;
-	font-size: 15px;
+  color: #9a5238;
+  font-size: 15px;
 }
 
 .signup-link a {
-	color: #000FFF;
-	text-decoration: none;
-	font-weight: bold;
+  color: #000FFF;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .signup-link a:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 /* 회원가입 페이지 css */
 #reg-body {
-	margin: 0;
-	background-color: #333;
-	height: 100vh;
+  margin: 0;
+  background-color: #333;
+  height: 100vh;
 }
 
 /* 회원가입 페이지 메인 컨테이너 */
 .signup-main-page {
-	display: flex;
-	height: 100vh;
-	justify-content: center;
-	align-items: center;
-	font-family: "Apple SD Gothic Neo", "맑은 고딕", "Malgun Gothic", 돋움, dotum,
-		sans-serif;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  font-family: "Apple SD Gothic Neo", "맑은 고딕", "Malgun Gothic", 돋움, dotum,
+    sans-serif;
 }
 
 /* 회원가입 박스 */
 .signup-container {
-	font-family: "을지로체";
-	background-color: rgba(255, 255, 255, 0.6); /* 메인 페이지의 회원 정보와 유사한 배경 */
-	padding: 40px;
-	border-radius: 10px;
-	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-	max-width: 400px;
-	width: 100%;
-	text-align: center;
-	max-height: 100vh;
+  font-family: "을지로체";
+  background-color: rgba(255, 255, 255, 0.6);
+  /* 메인 페이지의 회원 정보와 유사한 배경 */
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  max-height: 100vh;
 }
 
 .signup-header h2 {
-	margin-bottom: 10px;
-	font-size: 24px;
-	color: #9a5238; /* 어두운 텍스트 */
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #9a5238; /* 어두운 텍스트 */
 }
 
 .signup-header p {
-	margin-bottom: 30px;
-	color: #9a5238; /* 약간 밝은 회색 */
-	font-size: 14px;
+  margin-bottom: 30px;
+  color: #9a5238; /* 약간 밝은 회색 */
+  font-size: 14px;
 }
 
 /* 입력 필드 스타일 */
 .input-group {
-	margin-bottom: 10px;
-	text-align: left;
+  margin-bottom: 10px;
+  text-align: left;
 }
 
 .input-group label {
-	font-size: 14px;
-	color: #333; /* 어두운 텍스트 */
+  font-size: 14px;
+  color: #333; /* 어두운 텍스트 */
 }
 
 .input-group input[type=text], .input-group select {
-	font-family: "을지로체";
-	width: 100%;
-	padding: 12px;
-	border-radius: 5px;
-	border: 1px solid #ddd;
-	font-size: 14px;
-	margin-top: 5px;
-	background-color: white;
+  font-family: "을지로체";
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin-top: 5px;
+  background-color: white;
 }
 
 .input-group input[type=password] {
-	width: 100%;
-	padding: 12px;
-	border-radius: 5px;
-	border: 1px solid #ddd;
-	font-size: 14px;
-	margin-top: 5px;
-	background-color: white;
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin-top: 5px;
+  background-color: white;
 }
 
 .input-group input::placeholder {
-	font-family: "을지로체";
+  font-family: "을지로체";
 }
 
 .input-groups input::placeholder {
-	font-family: "을지로체";
+  font-family: "을지로체";
 }
 
 .form-group input::placeholder {
-	font-family: "을지로체";
+  font-family: "을지로체";
 }
 
 .input-group input:focus, .input-group select:focus {
-	border-color: #ccc;
-	outline: none;
-	box-shadow: 0 0 8px rgba(204, 204, 204, 0.3);
+  border-color: #ccc;
+  outline: none;
+  box-shadow: 0 0 8px rgba(204, 204, 204, 0.3);
 }
 
 .input-group #warningText {
-	margin: 0;
-	float: right;
-	color: red;
+  margin-top: 5px;
+  margin-bottom: 0;
+  margin-left: 5px;
+  float: left;
+  color: red;
 }
 
 /* 회원가입 버튼 스타일 */
 .signup-btn {
-	font-family: "을지로체";
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 5px;
-	background-color: #f2b048; /* 메인 페이지와 동일한 배경색 */
-	color: black;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 20px;
+  font-family: "을지로체";
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2b048; /* 메인 페이지와 동일한 배경색 */
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
 }
 
 .signup-btn:hover {
-	background-color: #eaad70; /* 살짝 더 밝은 배경 */
+  background-color: #eaad70; /* 살짝 더 밝은 배경 */
 }
 
 /* 게시판 페이지 css */
 .right-main-content {
-	width: 80%;
-	margin: 20px;
-	border-radius: 10px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	padding: 20px;
-	flex-grow: 1;
+  width: 80%;
+  margin: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex-grow: 1;
 }
 
 .right-main-content-header {
-	display: flex;
-	margin-top: 20px;
-	margin-bottom: 20px;
-	border-bottom: 2px solid #666;
-	padding-bottom: 10px;
-	flex-direction: row;
-	justify-content: space-between;
+  display: flex;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #666;
+  padding-bottom: 10px;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .right-main-content h1 {
-	font-size: 24px;
-	/*margin-top: 20px;
-	margin-bottom: 20px;
-	border-bottom: 2px solid #666;
-	padding-bottom: 10px;*/
+  font-size: 24px;
+  /*margin-top: 20px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #666;
+    padding-bottom: 10px;*/
 }
 
 .pagingSelect {
-	font-family: "을지로체";
-	padding: 5px;
-	margin-right: 5px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	background-color: #fff;
-	color: #333;
-	cursor: pointer;
+  font-family: "을지로체";
+  padding: 5px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
 }
 
 .sortSelect {
-	font-family: "을지로체";
-	padding: 5px;
-	margin-right: 5px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	background-color: #fff;
-	color: #333;
-	cursor: pointer;
+  font-family: "을지로체";
+  padding: 5px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
 }
 
 .notice-board {
-	width: 100%;
-	border-collapse: collapse;
-	margin-bottom: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
 }
 
 .text-center {
-	padding: 10px;
-	border-bottom: 1px solid #e0e0e0;
-	text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
 }
 
 .text-center-title {
-	padding: 10px;
-	border-bottom: 1px solid #e0e0e0;
-	text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: center;
 }
 
 .text-center-title a {
-	color: black;
+  color: black;
 }
 
 .text-center-view:hover {
-	background-color: rgba(0, 0, 0, 0.1);
-	cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .notice-board th {
-	background-color: #f1f1f1;
+  background-color: #f1f1f1;
 }
 
 .write-button-container {
-	position: relative;
-	text-align: right;
-	margin-top: 20px;
+  position: relative;
+  text-align: right;
+  margin-top: 20px;
 }
 
 .write-button {
-	font-family: "을지로체";
-	display: inline-block;
-	padding: 10px 20px;
-	background-color: #f2b048;;
-	color: black;
-	text-decoration: none;
-	border-radius: 5px;
-	font-size: 16px;
-	transition: background-color 0.3s;
+  font-family: "을지로체";
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #f2b048;;
+  color: black;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s;
 }
 
 .write-button:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 .pagination {
-	display: flex;
-	justify-content: center;
-	margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
 }
 
 .pagination ul {
-	list-style: none;
-	padding: 0;
-	display: flex;
+  list-style: none;
+  padding: 0;
+  display: flex;
 }
 
 .pagination ul li {
-	margin: 0 5px;
+  margin: 0 5px;
 }
 
 .pagination ul li a {
-	display: block;
-	padding: 10px 15px;
-	text-decoration: none;
-	background-color: #f5d3a9;
-	color: #333;
-	border-radius: 5px;
-	transition: background-color 0.3s;
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  background-color: #f5d3a9;
+  color: #333;
+  border-radius: 5px;
+  transition: background-color 0.3s;
 }
 
 .pagination ul li a:hover {
-	background-color: #eaad70;
-	color: #fff;
+  background-color: #eaad70;
+  color: #fff;
 }
 
 .pagination ul li a.active {
-	background-color: #333;
-	color: #fff;
+  background-color: #333;
+  color: #fff;
 }
 
 /* 검색 바 스타일 */
 .search-bar select {
-	font-family: "을지로체";
-	padding: 10px;
-	margin-right: 5px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	background-color: #fff;
-	color: #333;
-	/*appearance: none;
-	-moz-appearance: none;
-	-webkit-appearance: none;*/
-	cursor: pointer;
+  font-family: "을지로체";
+  padding: 10px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
+  /*appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;*/
+  cursor: pointer;
 }
 
 .search-bar select:focus {
-	outline: none;
-	border-color: #333;
+  outline: none;
+  border-color: #333;
 }
 
 /* 검색 바 스타일 */
 .search-bar {
-	margin-top: 20px;
-	text-align: center;
+  margin-top: 20px;
+  text-align: center;
 }
 
 .search-bar form {
-	display: inline-block;
-	position: relative;
+  display: inline-block;
+  position: relative;
 }
 
 .search-bar input[type="text"] {
-	font-family: "을지로체";
-	padding: 10px;
-	width: 250px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
+  font-family: "을지로체";
+  padding: 10px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .search-bar button {
-	font-family: "을지로체";
-	padding: 10px 15px;
-	background-color: #f2b048;
-	color: black;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-	margin-left: 5px;
-	transition: background-color 0.3s;
+  font-family: "을지로체";
+  padding: 10px 15px;
+  background-color: #f2b048;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: background-color 0.3s;
 }
 
 .search-bar button:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 /* 게시글 내용 페이지 css */
 .post-container {
-	width: 80%;
-	max-width: 1080px;
-	margin: 20px;
-	padding: 20px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	border-radius: 10px;
-	display: flex;
-	flex-direction: column;
-	height: 1000px; /* 필요에 따라 높이를 조절하세요 */
+  width: 80%;
+  max-width: 1080px;
+  margin: 20px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 1000px; /* 필요에 따라 높이를 조절하세요 */
 }
 
 .post-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	border-bottom: 1px solid #ddd;
-	padding-bottom: 10px;
-	margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .post-header-buttons {
-	display: flex;
-	gap: 10px; /* 버튼 간격 */
-	margin-bottom: auto;
+  display: flex;
+  gap: 10px; /* 버튼 간격 */
+  margin-bottom: auto;
 }
 
 .post-header-buttons button {
-	font-family: "을지로체";
-	padding: 8px 16px;
-	border: none;
-	border-radius: 5px;
-	font-size: 14px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
+  font-family: "을지로체";
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .edit-btn {
-	background-color: #f2b048;
-	color: black;
+  background-color: #f2b048;
+  color: black;
 }
 
 .edit-btn:hover {
-	background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .delete-btn {
-	background-color: #f2b048;
-	color: black;
+  background-color: #f2b048;
+  color: black;
 }
 
 .delete-btn:hover {
-	background-color: #c82333;
+  background-color: #c82333;
 }
 
 .list-btn {
-	background-color: #f2b048;
-	color: black;
+  background-color: #f2b048;
+  color: black;
 }
 
 .list-btn:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 .post-header-info {
-	
+  
 }
 
 .post-header h1 {
-	font-size: 24px;
-	color: #333;
-	margin: 0;
+  font-size: 24px;
+  color: #333;
+  margin: 0;
 }
 
 .post-header p {
-	color: #666;
-	font-size: 14px;
-	margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+  margin: 5px 0;
 }
 
 .post-content {
-	line-height: 1.6;
-	font-size: 16px;
-	color: #333;
-	height: 100%;
-	border-bottom: 1px solid #333;
+  line-height: 1.6;
+  font-size: 16px;
+  color: #333;
+  height: 100%;
+  border-bottom: 1px solid #333;
 }
 
 .comments-section {
-	margin-top: auto;
+  margin-top: auto;
 }
 
 .comments-section h2 {
-	font-size: 20px;
-	color: #333;
-	margin-bottom: 20px;
-	margin-top: 20px;
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .comments-section form {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .comments-section textarea {
-	font-family: "을지로체";
-	width: 100%;
-	padding: 12px;
-	border-radius: 5px;
-	border: 1px solid #ddd;
-	font-size: 14px;
-	margin-bottom: 10px;
-	background-color: #fff;
-	resize: none;
+  font-family: "을지로체";
+  width: 100%;
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  resize: none;
 }
 
 .comments-section button {
-	font-family: "을지로체";
-	width: 100px;
-	padding: 12px;
-	border: none;
-	border-radius: 5px;
-	background-color: #f2b048;
-	color: black;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	align-self: flex-end;
+  font-family: "을지로체";
+  width: 100px;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2b048;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-end;
 }
 
 .comments-section button:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 /* 로그인 시 회원정보 css */
 .member-info-user {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	/* width: 200px; */
-	padding: 20px;
-	/* background-color: #f0f0f0; 
-	border-radius: 10px;
-	margin-right: 20px;*/
-	border-bottom: 1px solid #ddd;
-	text-align: center;
-	margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* width: 200px; */
+  padding: 20px;
+  /* background-color: #f0f0f0; 
+    border-radius: 10px;
+    margin-right: 20px;*/
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  margin-top: 20px;
 }
 
 .user-info {
-	display: flex;
-	align-items: center; /* 이미지와 텍스트를 수직 가운데 정렬 */
-	width: 100%;
-	margin-bottom: 10px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid #ccc;
+  display: flex;
+  align-items: center; /* 이미지와 텍스트를 수직 가운데 정렬 */
+  width: 100%;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
 }
 
 .user-details {
-	flex-grow: 1;
+  flex-grow: 1;
 }
 
 .profile-image {
-	width: 60px; /* 이미지 크기 */
-	height: 60px;
-	border-radius: 22px;
-	margin-right: 10px; /* 이미지와 텍스트 간격 */
-	/* border: 1px solid rgba(0, 0, 0, 0.04); */
-	border: 1px solid #ccc;
+  width: 60px; /* 이미지 크기 */
+  height: 60px;
+  border-radius: 22px;
+  margin-right: 10px; /* 이미지와 텍스트 간격 */
+  /* border: 1px solid rgba(0, 0, 0, 0.04); */
+  border: 1px solid #ccc;
 }
 
 .user-info-h3 {
-	font-size: 13px;
-	margin-bottom: 5px;
+  font-size: 13px;
+  margin-bottom: 5px;
 }
 
 .user-info-p {
-	font-size: 10px !important;
-	color: #666;
+  font-size: 10px !important;
+  color: #666;
 }
 
 .member-info-user button {
-	font-family: '을지로체';
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 5px;
-	background-color: #f2b048;
-	color: black;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-bottom: 10px;
+  font-family: '을지로체';
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2b048;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px;
 }
 
 .member-info-user button:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 /* 글쓰기 페이지 css */
 .write-container {
-	padding: 20px;
-	border: 1px solid #ddd;
-	margin: 20px;
-	width: 80%;
-	border-radius: 10px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border: 1px solid #ddd;
+  margin: 20px;
+  width: 80%;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .write-header {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 20px;
-	border-bottom: 2px solid #ddd;
-	padding-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
 }
 
 .write-header h1 {
-	font-size: 24px;
-	margin-top: 10px;
+  font-size: 24px;
+  margin-top: 10px;
 }
 
 .write-category {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 10px;
-	align-items: center
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  align-items: center
 }
 
 .write-category select {
-	font-family: "을지로체";
-	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	width: 48%;
+  font-family: "을지로체";
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 48%;
 }
 
 .write-title input {
-	font-family: "을지로체";
-	width: 100%;
-	padding: 15px;
-	font-size: 16px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	margin-bottom: 20px;
+  font-family: "을지로체";
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
 }
 
 .write-content textarea {
-	font-family: "을지로체";
-	width: 100%;
-	height: 200px;
-	padding: 15px;
-	font-size: 16px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	margin-bottom: 20px;
-	resize: none;
+  font-family: "을지로체";
+  width: 100%;
+  height: 200px;
+  padding: 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  resize: none;
 }
 
 .write-section {
-	text-align: right;
+  text-align: right;
 }
 
 .listbtn {
-	font-family: '을지로체';
-	padding: 10px 20px;
-	background-color: #f2b048;
-	color: black;
-	border: none;
-	border-radius: 5px;
-	font-size: 16px;
-	transition: background-color 0.3s ease;
-	cursor: pointer;
+  font-family: '을지로체';
+  padding: 10px 20px;
+  background-color: #f2b048;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .listbtn:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 .updatebtn {
-	font-family: '을지로체';
-	padding: 10px 20px;
-	background-color: #f2b048;
-	color: black;
-	border: none;
-	border-radius: 5px;
-	font-size: 16px;
-	transition: background-color 0.3s ease;
-	cursor: pointer;
+  font-family: '을지로체';
+  padding: 10px 20px;
+  background-color: #f2b048;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .updatebtn:hover {
-	background-color: #007bff;
+  background-color: #007bff;
 }
 
 .write-btn {
-	font-family: '을지로체';
-	padding: 10px 20px;
-	background-color: #f2b048;
-	color: black;
-	border: none;
-	border-radius: 5px;
-	font-size: 16px;
-	transition: background-color 0.3s ease;
-	cursor: pointer;
+  font-family: '을지로체';
+  padding: 10px 20px;
+  background-color: #f2b048;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .write-btn:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 /* 마이페이지 */
 .profile-page {
-	width: 80%;
-	margin: 20px;
-	border-radius: 10px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	padding: 20px;
-	flex-grow: 1;
+  width: 80%;
+  margin: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  flex-grow: 1;
 }
 
 .profile-header {
-	display: flex;
-	align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .profile-picture img {
-	width: 80px;
-	height: 80px;
-	margin-right: 20px;
-	border-radius: 22px;
-	border: 1px solid #ccc;
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+  border-radius: 22px;
+  border: 1px solid #ccc;
 }
 
 /*.profile-nav {
-	border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
 }*/
 .post-table_title {
-	width: 80%;
+  width: 80%;
 }
 
 .post-table_title:hover {
-	background-color: rgba(0, 0, 0, 0.1);
-	cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .post-table_title a {
-	color: black;
+  color: black;
 }
 
 .post-table_view {
-	text-align: center;
+  text-align: center;
 }
 
 .profile-info h2 {
-	margin: 0;
-	font-size: 24px;
-	color: #333;
+  margin: 0;
+  font-size: 24px;
+  color: #333;
 }
 
 .profile-info p {
-	margin: 5px 0;
-	color: #777;
+  margin: 5px 0;
+  color: #777;
 }
 
 .profile-nav ul {
-	list-style: none;
-	padding: 0;
-	margin: 20px 0;
-	display: flex;
-	gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
 }
 
 .profile-nav ul li {
-	display: inline;
+  display: inline;
 }
 
 .profile-nav ul li a {
-	text-decoration: none;
-	color: #333;
-	padding: 10px;
-	border-bottom: 2px solid transparent;
+  text-decoration: none;
+  color: #333;
+  padding: 10px;
+  border-bottom: 2px solid transparent;
 }
 
 .post-table table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 5px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
 }
 
 .post-table th {
-	background-color: #f1f1f1;
-	padding: 10px;
-	text-align: left;
-	border-bottom: 1px solid #e5e5e5;
+  background-color: #f1f1f1;
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .post-table th {
-	text-align: center;
+  text-align: center;
 }
 
 /* 회원정보 수정 css */
 .profile-update-page {
-	width: 80%;
-	margin: 20px;
-	padding-bottom: 20px;
-	border-radius: 10px;
-	box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  margin: 20px;
+  padding-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .update-header {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: #be6d45;
-	color: white;
-	padding: 10px 20px;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #be6d45;
+  color: white;
+  padding: 10px 20px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  margin-bottom: 20px;
 }
 
 .update-header h1 {
-	font-weight: 100;
+  font-weight: 100;
 }
 
 form.profile-form {
-	width: 100%;
-	max-width: 600px;
-	margin: 0 auto;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .form-group {
-	margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .form-group label {
-	display: block;
-	font-weight: bold;
-	margin-bottom: 5px;
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
 .form-group input[type="text"] {
-	font-family: '을지로체';
-	width: 100%;
-	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
+  font-family: '을지로체';
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .form-group input[type="password"] {
-	width: 100%;
-	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .form-group #userRegion, #userFood {
-	font-family: '을지로체';
-	width: 100%;
-	padding: 10px;
-	border-radius: 5px;
-	border: 1px solid #ccc;
-	background-color: white;
+  font-family: '을지로체';
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: white;
 }
 
 .form-group input[readonly] {
-	font-family: '을지로체';
-	background-color: #e9ecef;
+  font-family: '을지로체';
+  background-color: #e9ecef;
 }
 
 .form-actions {
-	display: flex;
-	justify-content: space-between;
-	margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 .update-btn, .cancel-btn, .secession-btn {
-	font-family: '을지로체';
-	padding: 10px 20px;
-	border: none;
-	color: black;
-	border-radius: 5px;
-	cursor: pointer;
+  font-family: '을지로체';
+  padding: 10px 20px;
+  border: none;
+  color: black;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .secession-btn {
-	background-color: #f2b048;
+  background-color: #f2b048;
 }
 
 .secession-btn:hover {
-	background-color: #eaad70;
+  background-color: #eaad70;
 }
 
 .update-btn {
-	background-color: #f2b048;
+  background-color: #f2b048;
 }
 
 .cancel-btn {
-	background-color: #f2b048;
+  background-color: #f2b048;
 }
 
 .update-btn:hover {
-	background-color: #007bff;
+  background-color: #007bff;
 }
 
 .cancel-btn:hover {
-	background-color: #c82333;
+  background-color: #c82333;
 }
 
 /* 비밀글 체크박스와 비밀번호 입력 스타일 */
 .write-pwd {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	font-family: '을지로체', sans-serif;
-	color: #333;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-family: '을지로체', sans-serif;
+  color: #333;
 }
 
 .write-pwd label {
-	font-size: 18px;
-	font-weight: bold;
-	white-space: nowrap;
+  font-size: 18px;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .write-pwd input[type="checkbox"] {
-	width: 20px;
-	height: 20px;
-	margin-left: 10px;
-	margin-right: 10px;
-	cursor: pointer;
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .write-pwd input[type="password"] {
-	width: 100%;
-	padding: 10px;
-	font-size: 16px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	outline: none;
-	transition: border-color 0.3s ease;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease;
 }
 
 .write-pwd input[type="password"]:placeholder {
-	font-family: '을지로체', sans-serif;
+  font-family: '을지로체', sans-serif;
 }
 
 .write-pwd input[type="password"]:disabled {
-	background-color: #f2f2f2;
-	cursor: not-allowed;
+  background-color: #f2f2f2;
+  cursor: not-allowed;
 }
 
 .write-pwd input[type="password"]:focus {
-	border-color: #333;
+  border-color: #333;
 }
 
 #passwordModal, #profileModal {
-	display: flex; /* flexbox로 설정 */
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.5);
-	justify-content: center; /* 수평 중앙 정렬 */
-	align-items: center; /* 수직 중앙 정렬 */
+  display: flex; /* flexbox로 설정 */
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center; /* 수평 중앙 정렬 */
+  align-items: center; /* 수직 중앙 정렬 */
 }
 
 .modal-content {
-	background: white;
-	padding: 20px;
-	border-radius: 10px;
-	width: 300px;
-	text-align: center;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 약간의 그림자 추가 */
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 약간의 그림자 추가 */
 }
 
 .close {
-	color: #aaa;
-	float: right;
-	font-size: 28px;
-	font-weight: bold;
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .close:hover, .close:focus {
-	color: black;
-	text-decoration: none;
-	cursor: pointer;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .find-id-body {
-	display: flex;
-	height: 100vh;
-	justify-content: center;
-	align-items: center;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
 }
 
 .find-form-actions {
-	display: flex;
-	justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .find-id-container {
-	font-family: "을지로체";
-	background-color: rgba(255, 255, 255, 0.6);
-	padding: 40px;
-	border-radius: 10px;
-	box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-	max-width: 400px;
-	width: 100%;
-	text-align: center;
-	max-height: 100vh;
+  font-family: "을지로체";
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  max-height: 100vh;
 }
 
 .find-btn {
-	font-family: "을지로체";
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 5px;
-	background-color: #f2b048; /* 메인 페이지와 동일한 배경색 */
-	color: black;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 20px;
-	margin-right: 20px;
+  font-family: "을지로체";
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2b048; /* 메인 페이지와 동일한 배경색 */
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+  margin-right: 20px;
 }
 
 .find-btn:hover {
-	background-color: #eaad70; /* 살짝 더 밝은 배경 */
+  background-color: #eaad70; /* 살짝 더 밝은 배경 */
 }
 
 .find-cancel-btn {
-	font-family: "을지로체";
-	width: 100%;
-	padding: 12px;
-	border: none;
-	border-radius: 5px;
-	background-color: #f2b048; /* 메인 페이지와 동일한 배경색 */
-	color: black;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	margin-top: 20px;
+  font-family: "을지로체";
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2b048; /* 메인 페이지와 동일한 배경색 */
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
 }
 
 .find-cancel-btn:hover {
-	background-color: #c82333;
+  background-color: #c82333;
 }
 
 .find-id-header h2 {
-	margin: 0 0 10px;
-	font-size: 24px;
-	color: #9a5238;
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #9a5238;
 }
 
 .find-id-header p {
-	color: #9a5238;
-	margin-bottom: 20px;
+  color: #9a5238;
+  margin-bottom: 20px;
 }
 
 .viewTextarea {
-	font-family: "을지로체";
-	resize: none;
-	width: 100%;
-	height: 100%;
-	background-color: rgb(255, 255, 255, 0);
-	border: 0px;
+  font-family: "을지로체";
+  resize: none;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(255, 255, 255, 0);
+  border: 0px;
 }
 
 .viewTextarea:focus {
-	border: 0px;
-	outline: none;
+  border: 0px;
+  outline: none;
+}
+
+/* 기본 파일 입력 숨기기 */
+#userImage {
+  display: none;
+}
+
+/* 커스텀 파일 업로드 버튼 스타일 */
+.custom-file-upload {
+  padding: 10px 20px;
+  color: #fff;
+  background-color: #ffb74d;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 16px;
+  margin-top: 10px;
+  border: none;
+}
+
+.file-name {
+  margin-top: 10px;
+  margin-left: 5px;
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+.emailAuthBtn {
+  white-space: nowrap;
+  margin-left: 5px;
+  margin-top: 5px;
+  font-family: "을지로체";
+  padding: 10px;
+  background-color: #f2b048;
+  border: none;
+  color: black;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.emailAuthBtn:hover {
+  background-color: #eaad70;
 }

@@ -1,32 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="org.apache.logging.log4j.LogManager" %>
-<%@ page import="org.apache.logging.log4j.Logger" %>
-<%@ page import="com.sist.web.dao.MiniUserDao" %>
-<%@ page import="com.sist.web.model.MiniUser" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp" %>
+
 <%@ page import="com.sist.common.util.StringUtil" %>
 <%@ page import="com.sist.web.util.CookieUtil" %>
 <%@ page import="com.sist.web.util.HttpUtil" %>
 
 <div class="left-main-content">
-<%
-    Logger leftMainContent_logger = LogManager.getLogger("/leftMainContent.jsp");
-    HttpUtil.requestLogString(request, leftMainContent_logger);
-    String leftMainContent_cookieUserId = CookieUtil.getValue(request, "USER_ID");
-    request.setAttribute("cookieUserId", leftMainContent_cookieUserId);
-
-    if (StringUtil.isEmpty(leftMainContent_cookieUserId)) { 
-%>
-    <c:set var="isLoggedIn" value="false" />
-<%
-    } else { 
-        MiniUserDao leftMainContent_userDao = new MiniUserDao();
-        MiniUser leftMainContent_user = leftMainContent_userDao.userSelect(leftMainContent_cookieUserId);
-        request.setAttribute("user", leftMainContent_user);
-        request.setAttribute("isLoggedIn", "true");
-    }
-%>
-
 <c:choose>
     <c:when test="${isLoggedIn == 'false'}">
         <div class="member-info">
@@ -68,6 +47,6 @@
 
 <div class="left-main-content-ad">
     <h2>광고</h2>
-    <img class="leftlogo" src="/img/logo3.png">
+    <img class="leftlogo" src="resources/images/logo3.png">
 </div>
 </div>
