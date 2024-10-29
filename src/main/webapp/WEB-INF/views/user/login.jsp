@@ -63,34 +63,39 @@
                     if (code === 200) {
                         alert("로그인 성공");
                         location.href = "/index";
+                        
                     } else {
                         if (code === 401) {
                             alert("비밀번호가 올바르지 않습니다.");
                             $("#userPwd").focus();
                         } else if (code === 403) {
                             alert("정지된 사용자 입니다.");
+                            $("#userId").val("");
+                            $("#userPwd").val("");
                             $("#userId").focus();
+                            
                         } else if (code === 404) {
                             alert("아이디와 일치하는 사용자 정보가 없습니다.");
+                            $("#userId").val("");
+                            $("#userPwd").val("");
                             $("#userId").focus();
+                            
                         } else if (code === 400) {
-                            alert("파라미터 값이 올바르지 않습니다.");
-                            $("#userId").focus();
+                            alert("비정상적인 접근입니다.");
+                            
                         } else {
                             alert("서버 응답 오류가 발생하였습니다.");
-                            $("#userId").focus();
                         }
                     }
                     
                 } else {
                     alert("서버 응답 오류가 발생하였습니다.");
-                    $("#userId").focus();
                 }
             },
             complete: function () {
                 icia.common.log(data);
             },
-            error: function (xhr, status, error) {
+            error: function (error) {
                 icia.common.error(error);
             }
         });

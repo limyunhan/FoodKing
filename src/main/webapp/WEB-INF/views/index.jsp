@@ -12,7 +12,6 @@
 			<%@include file="/WEB-INF/views/include/navigation.jsp"%>
 			<div class="main-contanier">
 				<%@include file="/WEB-INF/views/leftMainContent.jsp"%>
-				<%@include file="/WEB-INF/views/bbs/rightMainContent.jsp"%>
 			</div>
 			<%@ include file="/WEB-INF/views/include/footer.jsp"%>
 		</div>

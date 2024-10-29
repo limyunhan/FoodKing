@@ -6,7 +6,7 @@
   font-family: '을지로체';
   font-style: normal;
   font-weight: 400;
-  src: url('/resources/fonts/BMEULJIROTTF.ttf') format('truetype');
+  src: url('/resources/css/fonts/BMEULJIROTTF.ttf') format('truetype');
 }
 
 #index-body  p, h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dt, dd, table,
@@ -507,6 +507,10 @@ table td.category {
   background-color: white;
 }
 
+input[type="password"] {
+  font-family: "sans-serif";
+}
+
 .input-group input[type=password] {
   width: 100%;
   padding: 12px;
@@ -535,7 +539,7 @@ table td.category {
   box-shadow: 0 0 8px rgba(204, 204, 204, 0.3);
 }
 
-.input-group #warningText {
+.warningText {
   margin-top: 5px;
   margin-bottom: 0;
   margin-left: 5px;

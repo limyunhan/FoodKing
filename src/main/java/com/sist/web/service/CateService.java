@@ -11,7 +11,7 @@ import com.sist.web.dao.CateDao;
 import com.sist.web.model.MainCate;
 import com.sist.web.model.SubCate;
 
-@Service("cateService")
+@Service
 public class CateService {
 	public static Logger logger = LoggerFactory.getLogger(CateService.class);
 	

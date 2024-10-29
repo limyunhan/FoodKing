@@ -22,8 +22,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.sist.common.util.StringUtil;
 import com.sist.web.model.Response;
-import com.sist.web.model.User2;
-import com.sist.web.service.UserService2;
+import com.sist.web.model.User;
+import com.sist.web.service.UserService;
 import com.sist.web.util.CookieUtil;
 import com.sist.web.util.HttpUtil;
 import com.sist.web.util.JsonUtil;
@@ -45,7 +45,7 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 	private String AJAX_HEADER_NAME;
 
 	@Autowired
-	private UserService2 userService;
+	private UserService userService;
 
 	// 인증체크 안해도 되는 url 리스트
 	private List<String> authExcludeUrlList;
@@ -145,9 +145,9 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
 					}
 
 					if (!StringUtil.isEmpty(cookieUserId)) {
-						User2 user = userService.userSelect(cookieUserId);
+						User user = userService.userSelect(cookieUserId);
 
-						if (user != null && StringUtil.equals(user.getStatus(), "Y")) {
+						if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
 							bFlag = true;
 						} else {
 							// 인증된 사용자가 아니면 쿠키 삭제

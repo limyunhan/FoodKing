@@ -8,7 +8,7 @@ import com.sist.web.model.User2;
 //2. 객체는 자바 빈으로 등록됨
 //3. 구현 클래스는 mybatis에 의하여 자동으로 만들어짐
 
-@Repository("userDao2")
+@Repository
 public interface UserDao2 {
 	public abstract User2 userSelect(String userId);
 	public abstract int userInsert(User2 user);

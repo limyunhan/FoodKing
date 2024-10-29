@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.sist.web.model.HiBoard2;
 import com.sist.web.model.HiBoardFile2;
 
-@Repository("hiBoardDao2")
+@Repository
 public interface HiBoardDao2 {
 	// 게시글 작성
 	public abstract int boardInsert(HiBoard2 hiBoard);

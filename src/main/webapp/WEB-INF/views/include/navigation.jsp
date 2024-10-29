@@ -2,8 +2,9 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp" %>
 
 <script>
-function fn_selectCategory(catId) {
-    window.location.href = "/board/list?catId=" + catId;
+function fn_selectCategory(cateId) {
+    window.location.href = "/board/list?cateId=" + cateId;
+    
 } 
 </script>
 
@@ -15,10 +16,10 @@ function fn_selectCategory(catId) {
 
   <div class="header-menu-btn">
     <% if (com.sist.web.util.CookieUtil.getCookie(request, (String)request.getAttribute("AUTH_COOKIE_NAME")) == null) { %>
-    <button id="btnLogin" onclick="location.href='/loginForm'">로그인</button>
-    <button id="btnReg" onclick="location.href='/user/userRegForm'">회원가입</button>
+    <button id="btnLogin" onclick="location.href='/user/login'">로그인</button>
+    <button id="btnReg" onclick="location.href='/user/regForm'">회원가입</button>
     <% } else { %>
-    <button id="btnLogin" onclick="location.href='/loginOutProc'">로그아웃</button>
+    <button id="btnLogin" onclick="location.href='/user/logOut'">로그아웃</button>
     <% } %>
   </div>
 </header>
@@ -33,9 +34,9 @@ function fn_selectCategory(catId) {
   <ul>
     <c:forEach var="mainCate" items="${mainCateList}" varStatus="status">
       <li>
-        <a href="javascript:void(0)" onclick="fn_selectCategory('${mainCate.cateNum}')">${mainCate.cateName}</a>
+        <a href="javascript:void(0)" onclick="fn_selectCategory('${mainCate.mainCateNum}')">${mainCate.mainCateName}</a>
         <ul>
-          <c:forEach var="subCate" items="${subCateMap[mainCate.cateNum]}" varStatus="status">
+          <c:forEach var="subCate" items="${subCateMap[mainCate.mainCateNum]}" varStatus="status">
             <li>
               <a href="javascript:void(0)" onclick="fn_selectCategory('${subCate.subCateNum}')">${subCate.subCateName}</a>
             </li>

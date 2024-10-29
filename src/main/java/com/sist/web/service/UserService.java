@@ -1,5 +1,6 @@
 package com.sist.web.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.sist.web.dao.UserDao;
 import com.sist.web.model.User;
 
-@Service("userService")
+@Service
 public class UserService {
 	public static Logger logger = LoggerFactory.getLogger(UserService.class);
 	
@@ -81,6 +82,19 @@ public class UserService {
 		}
 		
 		return (cnt == 1);
+	}
+	
+	// 유저 아이디 찾기
+	public boolean userIdFind(Map<String, String> hashMap) {
+		List<String> list = null;
+		
+		try {
+			list = userDao.userIdFind(hashMap);
+		} catch (Exception e) {
+			logger.error("[UserService] userIdFind Exception", e);
+		}
+		
+		return (list != null && list.size() == 1);
 	}
 	
 }

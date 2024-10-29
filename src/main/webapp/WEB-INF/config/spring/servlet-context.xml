@@ -13,7 +13,7 @@
 		 				   http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 		 				   
 	<!-- 어노테이션 service, controller 스캔 시작 -->
-    <context:component-scan base-package="com.sist.web.controller" />
+    <context:component-scan base-package="com.sist.web.controller, com.sist.web.advice" />
     <!-- 어노테이션 service, controller 스캔 종료 -->
     
     <mvc:annotation-driven>
@@ -64,6 +64,8 @@
             			<value>/user/regForm</value>
             			<value>/user/regProc</value>
             			<value>/user/idCheck</value>
+            			<value>/user/idFind</value>
+            			<value>/user/pwdFind</value>
             		</list>
             	</constructor-arg>
             </bean>
@@ -103,5 +105,30 @@
 		<property name="maxUploadSize" value="#{env['upload.max.size']}" /><!-- 파일 업로드 용량제한 (바이트단위) -->
 	</bean>
 	<!-- 파일 업로드 설정 종료 -->
+	
+	<!-- 이메일 인증 관련 등록 -->
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="smtp.naver.com"/>
+        <property name="port" value="465"/>
+        <property name="username" value="lim9807"/>
+        <property name="password" value="a9thelims2658"/>
+        <property name="javaMailProperties">    
+            <props>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.smtps.checkserveridentity">true</prop>
+                <prop key="mail.smtps.ssl.trust">*</prop>
+                <prop key="mail.smtps.ssl.checkserveridentity">true</prop>
+                <prop key="mail.smtp.ssl.enable">true</prop>
+                <prop key="mail.smtp.socketFactory.port">465</prop>
+                <prop key="mail.debug">true</prop>
+                <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+                <prop key="mail.transport.protocol">smtps</prop>
+                <prop key="mail.smtps.auth">true</prop>
+                <prop key="mail.smtps.ssl.protocols">TLSv1.2</prop>
+            </props>
+        </property>
+    </bean>
+    <!--  이메일 인증 관련 등록 해제 -->
 	 	
 </beans>

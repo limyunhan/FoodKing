@@ -42,7 +42,7 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
        <property name="configLocation" value="/WEB-INF/config/mybatis/mybatis-config.xml" />
        <property name="dataSource" ref="dataSource" />
-       <property name="mapperLocations" value="classpath*:com/sist/manager/mapper/**/*.xml" />
+       <property name="mapperLocations" value="classpath*:com/sist/web/mapper/**/*.xml" />
     </bean>
     <!-- SqlSessionFactoryBean 생성 종료 -->
     
@@ -54,7 +54,7 @@
     
     <!-- 어노테이션 mybatis dao 스캔 시작 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.sist.manager.dao" />
+        <property name="basePackage" value="com.sist.web.dao" />
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
     <!-- 어노테이션 mybatis dao 스캔 종료 -->
@@ -70,7 +70,6 @@
     <!-- 어노테이션 트랜잭션 사용 종료 -->
 	
 	<!-- 어노테이션 service 스캔 시작 -->
-    <context:component-scan base-package="com.sist.manager.service" />
+    <context:component-scan base-package="com.sist.web.service" />
     <!-- 어노테이션 service 스캔 종료 -->
-		
 </beans>
