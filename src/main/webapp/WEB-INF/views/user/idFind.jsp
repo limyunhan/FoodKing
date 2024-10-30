@@ -17,19 +17,104 @@
   </style>
   <script>
     $(document).ready(function() {
-    	var isAuthCodeSent = false; // 인증번호 발급 여부를 저장
+    	var isAuthCodeSent = false; 
+    	var isVerified = false;
     	
-        $("#find-btn").on("click", function() {
+        $("#emailAuthNum").on("click", function() {
+        	if ($.trim($("#userName").val()).length === 0) {
+        		alert("사용자 이름을 입력하세요.");
+        		$("#userName").val("");
+        		$("#userName").focus();
+        		return;
+        	}
+        	
+            if ($.trim($("#userTel").val()).length === 0) {
+                alert("전화번호를 입력하세요.");
+                $("#userTel").val("");
+                $("#userTel").focus();
+                return;
+            }
+
+            if (!fn_validateTel($("#userTel").val())) {
+                alert("전화번호 형식이 올바르지 않습니다. 11자리 숫자를 입력하세요.");
+                $("#userTel").focus();
+                return;
+            }
+        	
             if ($.trim($("#userEmail").val()).length === 0) {
                 alert("사용자 이메일을 입력하세요.");
                 $("#userEmail").val("");
                 $("#userEmail").focus();
                 return;
             }
-
+            
             if (!fn_validateEmail($("#userEmail").val())) {
                 alert("이메일 형식이 올바르지 않습니다.");
                 $("#userEmail").focus();
+                return;
+            }
+            
+            $.ajax({
+                type: "POST",
+                url: "/user/idFindSendAuth",
+                data: { 
+                	userName: $("#userName").val(),
+                	userTel: $("#userTel").val(),
+                    userEmail: $("#userEmail").val()
+                },
+                dataType: "JSON",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("AJAX", "true");
+                },
+                success: function(response) {
+                    if (response.code === 200) {
+                        alert("인증번호가 이메일로 발송되었습니다.");
+                        
+                        isAuthCodeSent = true;
+                        $("#emailAuthNum").prop("disabled", true); 
+                        let countdown = 300; 
+                        if (timer) clearInterval(timer); 
+                        
+                        timer = setInterval(function() {
+                            const minutes = Math.floor(countdown / 60);
+                            const seconds = countdown % 60;
+                            $("#timerText").text("남은 시간: " + minutes + ":" + (seconds < 10 ? '0' : '') + seconds);
+                            
+                            countdown--;
+
+                            if (countdown < 0) {
+                                clearInterval(timer);
+                                $("#emailAuthNum").prop('disabled', false); 
+                                $("#timerText").text('인증 시간이 만료되었습니다. 다시 요청해주세요.');
+                                isAuthCodeSent = false;
+                            }
+                        }, 1000);  
+
+                    } else if (response.code === 503) {
+                    	alert("메일 서버 오류로 인증코드 발송에 실패하였습니다.");
+                    
+                    } else if (response.code === 404) {
+                        alert("입력하신 정보에 해당하는 사용자가 없습니다.");
+                        
+                    } else if (response.code === 400) {
+                        alert("비정상적인 접근입니다.");
+                        
+                    } else {
+                        alert("서버 응답 오류로 이메일 발송에 실패했습니다.");
+                    }
+                },
+                error: function(error) {
+                	alert("서버 응답 오류로 이메일 발송에 실패했습니다.");
+                	icia.common.error(error);
+                }
+            });
+        });
+        
+        $("#emailAuth").on("click", function() {
+            if ($.trim($("#userName").val()).length === 0) {
+                alert("사용자 이름을 입력하세요.");
+                $("#userName").val("");
+                $("#userName").focus();
                 return;
             }
             
@@ -46,6 +131,19 @@
                 return;
             }
             
+            if ($.trim($("#userEmail").val()).length === 0) {
+                alert("사용자 이메일을 입력하세요.");
+                $("#userEmail").val("");
+                $("#userEmail").focus();
+                return;
+            }
+            
+            if (!fn_validateEmail($("#userEmail").val())) {
+                alert("이메일 형식이 올바르지 않습니다.");
+                $("#userEmail").focus();
+                return;
+            }
+            
             if (!isAuthCodeSent) {
                 alert("인증번호를 발급받아야 합니다.");
                 $("#emailAuth").focus();
@@ -57,23 +155,15 @@
                 $("#authCode").focus();
                 return;
             }
-
-            document.findIdForm.submit();
-        });
-
-        $("#emailAuth").on("click", function() {
-            var email = $("#userEmail").val();
-
-            if (!fn_validateEmail(email)) {
-                alert("이메일 형식이 올바르지 않습니다.");
-                return;
-            }
             
             $.ajax({
                 type: "POST",
-                url: "/user/idFindSendAuth",
+                url: "/user/idFindVerifyAuth",
                 data: { 
-                    userEmail: email 
+                    userName: $("#userName").val(),
+                    userTel: $("#userTel").val(),
+                	userEmail: $("#userEmail").val(),
+                    authCode: $("#authCode").val()
                 },
                 dataType: "JSON",
                 beforeSend: function(xhr) {
@@ -81,57 +171,150 @@
                 },
                 success: function(response) {
                     if (response.code === 200) {
-                        alert("인증번호가 이메일로 발송되었습니다.");
+                        alert("인증이 완료되었습니다.");
+                        $("#emailAuth").prop("disabled", true); 
+                        $("#emailAuth").text("인증 완료");
+                        isVerfied = true;
+                        if (timer) clearInterval(timer); 
                         
-                        isAuthCodeSent = true;
-                        $("#emailAuth").prop("disabled", true); // '인증번호 받기' 버튼 비활성화
+                    } else if (response.code === 403) {
+                        alert("인증 코드가 일치하지 않습니다.");
+                    
+                    } else if (response.code === 410) {
+                        alert("인증 코드가 만료되거나 존재하지 않습니다.");
                         
-                        let countdown = 300; // 타이머 300초(5분) 설정
-                        if (timer) clearInterval(timer); // 이전 타이머 정지
-                        
-                        timer = setInterval(function() {
-                            const minutes = Math.floor(countdown / 60);
-                            const seconds = countdown % 60;
-                            $("#timerText").text("남은 시간: " + minutes + ":" + (seconds < 10 ? '0' : '') + seconds);
-                            
-                            countdown--;
-
-                            // 타이머 종료 시 버튼 활성화 및 타이머 초기화
-                            if (countdown < 0) {
-                                clearInterval(timer);
-                                $("#emailAuth").prop('disabled', false); // 버튼 다시 활성화
-                                $("#timerText").text('인증 시간이 만료되었습니다. 다시 요청해주세요.');
-                            }
-                        }, 1000);  // 1초마다 업데이트
-
                     } else if (response.code === 404) {
-                        alert("입력하신 정보에 해당하는 사용자가 없습니다.");
-                        
+                    	alert("사용자가 존재하지 않습니다.");
+                    	
                     } else if (response.code === 400) {
                         alert("비정상적인 접근입니다.");
                         
                     } else {
-                        alert("서버 응답 오류로 이메일 발송에 실패했습니다.");
+                        alert("서버 응답 오류로 인증코드 확인에 실패하였습니다.");
                     }
                 },
                 error: function(error) {
-                    alert("인증번호 발송에 실패했습니다. 다시 시도해주세요.");
+                    alert("서버 응답 오류로 인증코드 확인에 실패하였습니다.");
+                    icia.common.error(error);
                 }
             });
         });
+        
+        $("#find-btn").on("click", function() {
+            if ($.trim($("#userName").val()).length === 0) {
+                alert("사용자 이름을 입력하세요.");
+                $("#userName").val("");
+                $("#userName").focus();
+                return;
+            }
+            
+            if ($.trim($("#userTel").val()).length === 0) {
+                alert("전화번호를 입력하세요.");
+                $("#userTel").val("");
+                $("#userTel").focus();
+                return;
+            }
 
+            if (!fn_validateTel($("#userTel").val())) {
+                alert("전화번호 형식이 올바르지 않습니다. 11자리 숫자를 입력하세요.");
+                $("#userTel").focus();
+                return;
+            }
+        	
+            if ($.trim($("#userEmail").val()).length === 0) {
+                alert("사용자 이메일을 입력하세요.");
+                $("#userEmail").val("");
+                $("#userEmail").focus();
+                return;
+            }
+
+            if (!fn_validateEmail($("#userEmail").val())) {
+                alert("이메일 형식이 올바르지 않습니다.");
+                $("#userEmail").focus();
+                return;
+            }
+            
+            if (!isVerifed) {
+            	alert("이메일 인증이 완료되지 않았습니다. 인증을 완료해주세요.");
+            	return;
+            }
+            
+            $.ajax({
+                type: "POST",
+                url: "/user/idFindProc",
+                data: { 
+                	userName: $("#userName").val(),
+                	userTel: $("#userTel").val(),
+                    userEmail: $("#userEmail").val()
+                },
+                dataType: "JSON",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("AJAX", "true");
+                },
+                success: function(response) {
+                    if (response.code === 200) {
+                    	alert("아이디를 찾았습니다. 아이디 : " + response.data);
+                    	location.href = "/";
+                    	
+                    } else if (response.code === 403) {
+                    	alert("이메일 인증이 완료되지 않았습니다.");
+                    	
+                    } else if (response.code === 428) {
+                    	alert("인증코드를 발급하지 않았습니다.");
+                    	
+                    } else if (response.code === 404) {
+                    	alert("입력하신 정보에 해당하는 사용자가 없습니다.");
+                    	
+                    } else if (response.code === 400) {
+                    	alert("비정상적인 접근입니다.");
+                    	
+                    } else{
+                    	alert("서버 응답 오류로 아이디 찾기에 실패하였습니다.");
+                    }
+                	
+                },
+                error: function(error) {
+                    alert("서버 응답 오류로 아이디 찾기에 실패하였습니다.");
+                    icia.common.error(error);
+                }
+            });
+        });
+        
+        $("#userName").on("input", function() {
+            var userName = $.trim($("#userName").val());
+            
+            if (userName.length === 0) {
+                $("#warningName").text("이름을 입력하세요.");
+            } else {
+                $("#warningName").text("");
+            }
+        });
+        
+        $("#userTel").on("input", function() {
+            var userTel = $.trim($("#userTel").val());
+
+            if (userTel.length === 0) {
+                $("#warningTel").text("전화번호를 입력하세요.");
+
+            } else if (!fn_validateTel(userTel)) {
+                $("#warningTel").text("전화번호는 11자리 숫자로 입력해주세요.");
+
+            } else {
+                $("#warningTel").text("");
+            }
+        });
         
         $("#userEmail").on("input", function() {
             var userEmail = $.trim($("#userEmail").val());
             
             if (userEmail.length === 0) {
-                $("#warningText").text("이메일을 입력하세요.").css("color", "red");
+                $("#warningEmail").text("이메일을 입력하세요.");
                 
             } else if (!fn_validateEmail(userEmail)) {
-                $("#warningText").text("이메일 형식이 올바르지 않습니다.").css("color", "red");
+                $("#warningEmail").text("이메일 형식이 올바르지 않습니다.");
             
             } else {
-                $("#warningText").text("");
+                $("#warningEmail").text("");
             }
         });
     });
@@ -158,24 +341,25 @@
       <form class="find-id-form" name="findIdForm" id="findIdForm" method="post">
         <div class="input-group">
           <input type="text" id="userName" name="userName" placeholder="이름">
+          <p class="warningText" id="warningName">이름을 입력하세요.</p>
         </div>
         <div class="input-group">
           <input type="text" id="userTel" name="userTel" placeholder="전화번호">
+          <p class="warningText" id="warningTel">전화번호를 입력하세요.</p>
         </div>
-        
         <div class="input-group" style="display: flex; flex-direction: column; align-items: flex-start;">
           <div style="display: flex; align-items: center; width: 100%;">
             <input type="text" id="userEmail" name="userEmail" placeholder="이메일" style="flex: 1;">
             <button type="button" id="emailAuthNum" class="emailAuthBtn">인증번호 받기</button>
           </div>
-          <p class="warningText" id="warningText">이메일을 입력하세요</p>
+          <p class="warningText" id="warningEmail">이메일을 입력하세요.</p>
         </div>
         <div class="input-group" style="display: flex; flex-direction: column; align-items: flex-start;">
           <div style="display: flex; align-items: center; width: 100%;">
             <input type="text" id="authCode" name="authCode" placeholder="인증번호 입력" style="flex: 1;">
             <button type="button" id="emailAuth" class="emailAuthBtn">인증하기</button>
           </div>
-          <p id="timerText" id="warstyle="margin-top: 5px;">남은 시간: 05:00</p>
+          <p id="timerText" style="margin-top: 5px;">남은 시간: 05:00</p>
         </div>
         <div class="find-form-actions">
           <button type="button" class="find-btn" id="find-btn">아이디 찾기</button>

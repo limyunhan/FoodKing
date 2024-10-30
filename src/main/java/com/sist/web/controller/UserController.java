@@ -1,6 +1,8 @@
 package com.sist.web.controller;
 
-import java.time.LocalDateTime;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.sist.common.model.FileData;
+import com.sist.common.util.FileUtil;
 import com.sist.common.util.StringUtil;
 import com.sist.web.model.Response;
 import com.sist.web.model.User;
@@ -30,6 +33,8 @@ import com.sist.web.service.UserService;
 import com.sist.web.util.CookieUtil;
 import com.sist.web.util.HttpUtil;
 import com.sist.web.util.JsonUtil;
+
+import io.lettuce.core.api.sync.RedisCommands;
 
 @Controller
 public class UserController {
@@ -41,8 +46,14 @@ public class UserController {
 	@Value("#{env['profile.img.dir']}")
 	private String PROFILE_IMG_DIR;
 	
+	@Value("#{env['mail.template.dir']}")
+	private String MAIL_TEMPLATE_DIR;
+	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private RedisCommands<String, String> redisCommands;
 	
 	@Autowired
 	JavaMailSenderImpl mailSender;
@@ -60,7 +71,7 @@ public class UserController {
 		}
 	}
 	
-	// 회원 가입시 ID 중복 체크 ajax 통신
+	// 회원 가입시 ID 중복 체크 ajax 
 	@RequestMapping(value = "/user/idCheck", method = RequestMethod.POST)
 	@ResponseBody
 	public Response<Object> idCheck(HttpServletRequest request, HttpSession session) {
@@ -71,7 +82,6 @@ public class UserController {
 		if (!StringUtil.isEmpty(userId)) {
 			if (userService.userSelect(userId) == null) {
 				ajaxResponse.setResponse(200, "사용 가능한 아이디");
-				session.setAttribute("userId", userId);
 				
 			} else {
 				ajaxResponse.setResponse(409, "아이디 중복");
@@ -87,13 +97,13 @@ public class UserController {
 		return ajaxResponse;
 	}
 	
-	// 회원가입 ajax 통신
+	// 회원가입 ajax 
 	@RequestMapping(value = "/user/regProc", method = RequestMethod.POST)
 	@ResponseBody
 	public Response<Object> regProc(MultipartHttpServletRequest request, HttpSession session) {
 		Response<Object> ajaxResponse = new Response<>();
 		
-		String userId = (String) session.getAttribute("userId");
+		String userId = HttpUtil.get(request, "userId", "");
 		String userPwd = HttpUtil.get(request, "userPwd", "");
 		String userEmail = HttpUtil.get(request, "userEmail", "");
 		String userTel = HttpUtil.get(request, "userTel", "");
@@ -104,8 +114,8 @@ public class UserController {
 		
 		FileData fileData = HttpUtil.getFile(request, "userImage", PROFILE_IMG_DIR);
 				
-		if (userId != null) {
-			if (!StringUtil.isEmpty(userId) && !StringUtil.isEmpty(userPwd) && !StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel) && !StringUtil.isEmpty(userName) && !StringUtil.isEmpty(userGender) && !StringUtil.isEmpty(userRegion) && !StringUtil.isEmpty(userFood)) {
+		if (!StringUtil.isEmpty(userId)) {
+			if (!StringUtil.isEmpty(userPwd) && !StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel) && !StringUtil.isEmpty(userName) && !StringUtil.isEmpty(userGender) && !StringUtil.isEmpty(userRegion) && !StringUtil.isEmpty(userFood)) {
 				if (userService.userSelect(userId) == null) {
 					User user = new User();
 					user.setUserId(userId);
@@ -144,7 +154,6 @@ public class UserController {
 			
 		}
 		
-		session.removeAttribute("userId"); 
 		return ajaxResponse;
 	}
 	
@@ -161,10 +170,10 @@ public class UserController {
 		}
 	}
 	
-	// 로그인 ajax 통신 
+	// 로그인 ajax  
 	@RequestMapping(value = "/user/loginProc", method = RequestMethod.POST) 
 	@ResponseBody
-	public Response<Object> loginProc(HttpServletRequest request, HttpServletResponse response) {
+	public Response<Object> loginProc(HttpServletRequest request) {
 		Response<Object> ajaxResponse = new Response<>();
 		
 		String userId = HttpUtil.get(request, "userId", "");
@@ -219,61 +228,258 @@ public class UserController {
 		}
 	}
 	
-	// email 인증번호 발송 ajax 통신
-	@RequestMapping(value = "/user/idFindSendAuth")
-	public Response<Object> idFindSendAuth(HttpServletRequest request, HttpSession session) {
+	// 이메일 인증번호 발송 ajax (아이디 찾기 페이지)
+	@RequestMapping(value = "/user/idFindSendAuth", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> idFindSendAuth(HttpServletRequest request) {
+	    Response<Object> ajaxResponse = new Response<>();
+	    
+	    String userName = HttpUtil.get(request, "userName", "");
+	    String userTel = HttpUtil.get(request, "userTel", "");
+	    String userEmail = HttpUtil.get(request, "userEmail", "");
+
+	    if (!StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel) && !StringUtil.isEmpty(userName)) {
+	        Map<String, String> hashMap = new HashMap<>();
+	        hashMap.put("userName", userName);
+	        hashMap.put("userEmail", userEmail);
+	        hashMap.put("userTel", userTel);
+	        
+	        String userId = userService.userIdFind(hashMap);
+	        if (!StringUtil.isEmpty(userId)) {
+	            String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	            StringBuilder authCode = new StringBuilder();
+	            Random random = new Random();
+
+	            for (int i = 0; i < 6; i++) {
+	                int idx = random.nextInt(chars.length());
+	                authCode.append(chars.charAt(idx));
+	            }
+
+	            // 이메일 보낼 양식
+	            String setFrom = "lim9807@naver.com";
+	            String title = "[FoodKing] 아이디 찾기 인증 메일";
+	            StringBuilder content = new StringBuilder();
+	     
+	            content.append("<div style='margin:100px;'>")
+		               .append("<h1> 안녕하세요</h1>")
+		               .append("<br>")
+		               .append("<p>아래 코드를 아이디 찾기 창으로 돌아가 입력해주세요<p>")
+		               .append("<br>")
+		               .append("<div align='center' style='border:1px solid black; font-family:verdana';>")
+		               .append("<h3 style='color:blue;'>아이디 찾기 인증 코드입니다.</h3>")
+		               .append("<div style='font-size:130%'>")
+		               .append("CODE : <strong>")
+		               .append(authCode.toString())
+		               .append("</strong>")
+		               .append("</div>");
+	           
+	            try {
+	                MimeMessage message = mailSender.createMimeMessage();
+	                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+	                helper.setFrom(setFrom);
+	                helper.setTo(userEmail);
+	                helper.setSubject(title);
+	                helper.setText(content.toString(), true);
+	                mailSender.send(message);
+
+	                // Redis에 인증 코드와 인증 여부 저장
+	                redisCommands.set("idFind:" + userId, "unverified");  
+	                String redisKey = "idFindAuthCode:" + userId; 
+	                redisCommands.set(redisKey, authCode.toString()); 
+	                redisCommands.expire(redisKey, 5 * 60); 
+	                ajaxResponse.setResponse(200, "인증 코드가 발송됨");
+
+	            } catch (Exception e) {
+	                logger.error("[UserController] idFindSendAuth Exception", e);
+	                ajaxResponse.setResponse(503, "메일 서버 오류");
+	            }
+	            
+	        } else {
+	            ajaxResponse.setResponse(404, "사용자 존재하지 않음");
+	        }
+
+	    } else {
+	        ajaxResponse.setResponse(400, "비정상적인 접근");
+	    }
+
+	    return ajaxResponse;
+	}
+	
+	// 이메일 인증번호 검증 ajax (아이디 찾기 페이지)
+	@RequestMapping(value = "/user/idFindVerifyAuth", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> idFindVerifyAuth(HttpServletRequest request) {
 		Response<Object> ajaxResponse = new Response<>();
 		
-		String userEmail = HttpUtil.get(request, "userEmail", "");
-		String userTel = HttpUtil.get(request, "userTel", "");
+	    String userName = HttpUtil.get(request, "userName", "");
+	    String userTel = HttpUtil.get(request, "userTel", "");
+	    String userEmail = HttpUtil.get(request, "userEmail", "");
+		String authCode = HttpUtil.get(request, "authCode", "");
 		
-		if (!StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel)) {
-			
+		if (!StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel) && !StringUtil.isEmpty(userName)) {
 			Map<String, String> hashMap = new HashMap<>();
-			hashMap.put("userEmail", userEmail);
-			hashMap.put("userTel", userTel);
+	        hashMap.put("userName", userName);
+	        hashMap.put("userEmail", userEmail);
+	        hashMap.put("userTel", userTel);
+	        
+	        String userId = userService.userIdFind(hashMap);
+	        
+			if (!StringUtil.isEmpty(userId)) {
+	        	String redisAuthCode = redisCommands.get("idFindAuthCode:" + userEmail);
+	        	
+	        	if (!StringUtil.isEmpty(redisAuthCode)) {
+	        		
+			        if (StringUtil.equals(authCode, redisAuthCode)) {
+			        	ajaxResponse.setResponse(200, "인증코드가 일치합니다.");
+			        	redisCommands.set("idFind:" + userId, "verified");
+			        	redisCommands.del("idFindAuthCode:" + userId);
+			        	
+			        } else {
+			        	ajaxResponse.setResponse(403, "인증코드 불일치");
+			        }
+			        
+	        	} else {
+	        		ajaxResponse.setResponse(410, "만료되거나 존재하지 않는 인증코드");
+	        	}
+	        	
+			} else {
+				ajaxResponse.setResponse(404, "사용자 존재하지 않음");
+			}
 			
-			if (userService.userIdFind(hashMap)) {
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+	
+		return ajaxResponse;
+	}
+	
+	// 아이디 찾기 Proc ajax 
+	@RequestMapping(value = "/user/idFindProc", method = RequestMethod.POST) 
+	@ResponseBody
+	public Response<Object> idFindProc(HttpServletRequest request) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		String userName = HttpUtil.get(request, "userName", "");
+	    String userTel = HttpUtil.get(request, "userTel", "");
+	    String userEmail = HttpUtil.get(request, "userEmail", "");
+	    
+	    
+	    if (!StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel) && !StringUtil.isEmpty(userName)) {
+	        Map<String, String> hashMap = new HashMap<>();
+	        hashMap.put("userName", userName);
+	        hashMap.put("userEmail", userEmail);
+	        hashMap.put("userTel", userTel);
+	        
+	        String userId = userService.userIdFind(hashMap);
+	        if (!StringUtil.isEmpty(userId)) {
+	        	
+	        	String isVerified = redisCommands.get("idFind:" + userId);
+	        	
+	        	if (!StringUtil.isEmpty(isVerified)) {
+	        		
+	        		if (StringUtil.equals(isVerified, "verified")) {
+		        		ajaxResponse.setResponse(200, "인증됨", userId);
+		        		redisCommands.del("idFind:" + userId);
+		        		
+	        		} else {
+	        			ajaxResponse.setResponse(403, "인증 되지 않음");
+	        		}
+	        		
+	        	} else {
+	        		ajaxResponse.setResponse(428, "인증코드를 발급하지 않음");
+	        	}
+	        	
+	        } else {
+	        	ajaxResponse.setResponse(404, "사용자 존재하지 않음");
+	        }
+	        
+	    } else {
+	    	ajaxResponse.setResponse(400, "비정상적인 접근");
+	    }
+		
+		return ajaxResponse;
+	}
+	
+	// 비밀번호 찾기 페이지
+	@RequestMapping(value = "/user/pwdFind")
+	public String pwdFind(HttpServletRequest request, HttpServletResponse response) {
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		
+		if (!StringUtil.isEmpty(cookieUserId)) {
+			CookieUtil.deleteCookie(request, response, "/", AUTH_COOKIE_NAME);
+			return "redirect:/";
+		} else {
+			return "/user/pwdFind";
+		}
+	}
+	
+	// 이메일 인증번호 발송 ajax (비밀번호 찾기 페이지)
+	@RequestMapping(value = "/user/pwdFindSendAuth", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> pwdFindSendAuth(HttpServletRequest request) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		String userId = HttpUtil.get(request, "userId", "");
+		String userEmail = HttpUtil.get(request, "userEmail", "");
+		
+		if (!StringUtil.isEmpty(userId) && !StringUtil.isEmpty(userEmail)) {
+			User user = userService.userSelect(userId);
+			
+			if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
+				if (StringUtil.equals(userEmail, user.getUserEmail())) {
 				
-		        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		        StringBuilder authCode = new StringBuilder();
-		        Random random = new Random();
-
-		        for (int i = 0; i < 6; i++) {
-		            int idx = random.nextInt(chars.length());
-		            authCode.append(chars.charAt(idx));
-		        }
+		            String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		            StringBuilder authCode = new StringBuilder();
+		            Random random = new Random();
+	
+		            for (int i = 0; i < 6; i++) {
+		                int idx = random.nextInt(chars.length());
+		                authCode.append(chars.charAt(idx));
+		            }
+		            
+		            String setFrom = "lim9807@naver.com";
+		            String title = "[FoodKing] 비밀번호 찾기 인증 메일";
+		            StringBuilder content = new StringBuilder();
+		     
+		            content.append("<div style='margin:100px;'>")
+			               .append("<h1> 안녕하세요</h1>")
+			               .append("<br>")
+			               .append("<p>아래 코드를 비밀번호 찾기 창으로 돌아가 입력해주세요<p>")
+			               .append("<br>")
+			               .append("<div align='center' style='border:1px solid black; font-family:verdana';>")
+			               .append("<h3 style='color:blue;'>비밀번호 찾기 인증 코드입니다.</h3>")
+			               .append("<div style='font-size:130%'>")
+			               .append("CODE : <strong>")
+			               .append(authCode.toString())
+			               .append("</strong>")
+			               .append("</div>");
+		           
+		            try {
+		                MimeMessage message = mailSender.createMimeMessage();
+		                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+		                helper.setFrom(setFrom);
+		                helper.setTo(userEmail);
+		                helper.setSubject(title);
+		                helper.setText(content.toString(), true);
+		                mailSender.send(message);
+		                
+		                // Redis에 인증 코드와 인증 여부 저장
+		                redisCommands.set("pwdFind:" + userId, "unverified");   
+		                String redisKey = "pwdFindAuthCode:" + userId; 
+		                redisCommands.set(redisKey, authCode.toString()); 
+		                redisCommands.expire(redisKey, 5 * 60); 
+		                
+		                ajaxResponse.setResponse(200, "인증 코드가 발송됨");
+	
+		            } catch (Exception e) {
+		                logger.error("[UserController] pwdFindSendAuth Exception", e);
+		                ajaxResponse.setResponse(503, "메일 서버 오류");
+		            }
+		            
+				} else {
+					ajaxResponse.setResponse(401, "이메일 일치하지 않음");
+				}
 				
-		        LocalDateTime expireTime = LocalDateTime.now().plusMinutes(5); // 만료 시간 5분 설정
-
-		        // 이메일 보낼 양식
-		        String setFrom = "lim9807@naver.com";
-		        String title = "[FoodKing] 아이디 찾기 인증 메일";
-		        String content = "인증 코드는 " + authCode.toString() + "입니다.";
-		        
-		        try {
-		        	MimeMessage message = mailSender.createMimeMessage();
-		        	MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-		        	helper.setFrom(setFrom);
-		        	helper.setTo(userEmail);
-		        	helper.setSubject(title);
-		        	helper.setText(content, true);
-		        	mailSender.send(message);
-		        	  	
-		        } catch (Exception e) {
-		        	logger.error("[UserController] idFindProc Exception", e);
-		        }
-		        
-	            // 세션의 기존 인증 코드와 만료 시간 초기화
-	            session.removeAttribute("authCode");
-	            session.removeAttribute("expireTime");
-	            
-	            // 새로운 인증 코드와 만료 시간 세션에 저장
-	            session.setAttribute("authCode", authCode.toString());
-	            session.setAttribute("expireTime", expireTime);
-		        
-		        ajaxResponse.setResponse(200, "인증 코드가 발송됨");
-		        
 			} else {
 				ajaxResponse.setResponse(404, "사용자 존재하지 않음");
 			}
@@ -285,7 +491,147 @@ public class UserController {
 		return ajaxResponse;
 	}
 	
-	// 아이디 찾기 
+	// 이메일 인증번호 검증 ajax (비밀번호 찾기 페이지)
+	@RequestMapping(value = "/user/pwdFindVerifyAuth", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> pwdFindVerifyAuth(HttpServletRequest request) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		String userId = HttpUtil.get(request, "userId", "");
+	    String userEmail = HttpUtil.get(request, "userEmail", "");
+		String authCode = HttpUtil.get(request, "authCode", "");
+		
+		if (!StringUtil.isEmpty(userId) && !StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(authCode)) {
+			User user = userService.userSelect(userId);
+			
+			if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
+				
+				if (StringUtil.equals(userEmail, user.getUserEmail())) {
+				
+					String redisAuthCode = redisCommands.get("pwdFindAuthCode:" + userId);
+					
+					if (!StringUtil.isEmpty(redisAuthCode)) {
+						
+						if (StringUtil.equals(authCode, redisAuthCode)) {
+				        	ajaxResponse.setResponse(200, "인증코드 일치");
+				        	redisCommands.set("pwdFind:" + userId, "verified");
+				        	redisCommands.del("pwdFindAuthCode:" + userId);
+				        	
+						} else {
+							ajaxResponse.setResponse(403, "인증코드 불일치");
+						}
+						
+					} else {
+						ajaxResponse.setResponse(410, "만료되거나 존재하지 않는 인증코드");
+					}
+					
+				} else {
+					ajaxResponse.setResponse(401, "이메일 일치하지 않음");
+				}
+				
+			} else {
+				ajaxResponse.setResponse(404, "사용자 존재하지 않음");
+			}
+
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
 	
+		return ajaxResponse;
+	}
+	
+	// 비밀번호 찾기 Proc ajax (임시 비밀번호 발급)
+	@RequestMapping(value = "/user/pwdFindProc", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> pwdFindProc(HttpServletRequest request) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		String userId = HttpUtil.get(request, "userId", "");
+		String userEmail = HttpUtil.get(request, "userEmail", "");
+		
+		if (!StringUtil.isEmpty(userId) && !StringUtil.isEmpty(userEmail)) {
+			User user = userService.userSelect(userId);
+			
+			if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
+				
+				if (StringUtil.equals(user.getUserEmail(), userEmail)) {
+		        	String isVerified = redisCommands.get("idFind:" + userId);
+		        	
+		        	if (!StringUtil.isEmpty(isVerified)) {
+		        		
+		        		if (StringUtil.equals(isVerified, "verified")) {
+		        			String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+				            Random random = new Random();
+			        		
+				            int length = random.nextInt(7) + 6; // 6 ~ 12자리 사이의 임시 비밀번호 발급
+				            
+				            StringBuilder password = new StringBuilder();
+				            for (int i = 0; i < length; i++) {
+				            	int index = random.nextInt(chars.length());
+				            	password.append(chars.charAt(index));
+				            }
+				            
+				            String setFrom = "lim9807@naver.com";
+				            String title = "[FoodKing] 임시 비밀번호 발급 메일";
+				            
+				            try {
+				            	String template = new String(Files.readAllBytes(Paths.get(MAIL_TEMPLATE_DIR + FileUtil.getFileSeparator() + "mail.html")), StandardCharsets.UTF_8);
+	                            template = template.replace("${type}", "임시 비밀번호")
+	                                               .replace("${value}", password.toString());
+
+				                MimeMessage message = mailSender.createMimeMessage();
+				                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+				                helper.setFrom(setFrom);
+				                helper.setTo(userEmail);
+				                helper.setSubject(title);
+				                helper.setText(template, true);
+				                mailSender.send(message);
+				                
+					            Map<String, String> hashMap = new HashMap<>();
+					            hashMap.put("userId", userId);
+					            hashMap.put("userPwd", password.toString());
+					            
+					            if (userService.userPwdUpdate(hashMap)) {
+					            	
+					            	ajaxResponse.setResponse(200, "임시 비밀번호가 발급됨");
+					            	
+					            } else {
+					            	ajaxResponse.setResponse(500, "DB 정합성 오류");
+					            }
+				                
+				            } catch (Exception e) {
+				                logger.error("[UserController] pwdFindProc Exception", e);
+				                ajaxResponse.setResponse(503, "메일 발송 오류");
+				            }
+				            
+		        		} else {
+		        			ajaxResponse.setResponse(403, "인증 되지 않음");
+		        		}
+		        		
+		        	} else {
+		        		ajaxResponse.setResponse(428, "인증코드를 발급하지 않음");
+		        	}
+					
+				} else {
+					ajaxResponse.setResponse(401, "이메일 일치하지 않음");
+				}
+				
+			} else {
+				ajaxResponse.setResponse(404, "사용자 존재하지 않음");
+			}
+			
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+		
+		return ajaxResponse;
+	}
+	
+	public String myPage(HttpServletRequest request, HttpServletResponse response) {
+		
+		
+		
+		return "/user/myPage";
+	}
 }
 	

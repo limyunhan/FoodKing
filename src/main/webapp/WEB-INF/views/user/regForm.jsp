@@ -7,6 +7,8 @@
   <%@include file="/WEB-INF/views/include/head.jsp"%>
   <script>
     $(document).ready(function() {
+    	var isUserIdChecked = false;
+    	
         $("#userId").focus();
 
         $("#userId").on("input", function() {
@@ -100,33 +102,37 @@
         });
 
         $("#userImage").on("change", function() {
-            var fileName = this.files[0] ? this.files[0].name : "선택된 파일 없음";
+            var fileName = this.files[0] ? this.files[0].name : "선택된 이미지 없음";
             $("#fileName").text(fileName);
 
             if (this.files && this.files[0]) {
-                var fileType = file.type; 
-                var fileSize = file.size; 
-                
+                var fileType = this.files[0].type; 
+                var fileSize = this.files[0].size; 
+
                 if (!fileType.match('image.*')) {
                     alert("이미지 파일만 업로드할 수 있습니다.");
-                    $(this).val(''); 
+                    $(this).val(""); 
+                    $("#fileName").text("선택된 이미지 없음"); 
+                    $("#imagePreview").attr("src", "/resources/profile/defaultProfile.jpg");
                     return;
                 }
 
                 if (fileSize > 5 * 1024 * 1024) { 
                     alert("파일 크기는 5MB 이하로 설정해야 합니다.");
-                    $(this).val(''); 
+                    $(this).val(""); 
+                    $("#fileName").text("선택된 이미지 없음"); 
+                    $("#imagePreview").attr("src", "/resources/profile/defaultProfile.jpg");
                     return;
                 }
-            	
+
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     $("#imagePreview").attr("src", e.target.result).show();  
                 }
                 reader.readAsDataURL(this.files[0]);  
-
             } else {
-                $("#imagePreview").hide(); 
+                $("#fileName").text("선택된 이미지 없음"); 
+                $("#imagePreview").attr("src", "/resources/profile/defaultProfile.jpg");
             }
         });
 
@@ -152,7 +158,7 @@
                 $("#userId").focus();
                 return;
             }
-
+            
             $.ajax({
                 type: "POST",
                 url: "/user/idCheck",
@@ -168,7 +174,7 @@
                         $("#warningId").text("사용 가능한 아이디입니다.").css("color", "blue");
                         $("#userId").attr("readonly", true);
                         $("#id-btn").prop("disabled", true);
-
+                        isUserIdChecked = true;
                     } else if (response.code === 409) {
                         $("#warningId").text("이미 사용중인 아이디입니다.");
                         $("#userId").focus();
@@ -189,6 +195,32 @@
         });
 
         $("#signup-btn").on("click", function() {
+            if ($.trim($("#userId").val()).length === 0) {
+                alert("아이디를 입력해주세요.");
+                $("#userId").focus();
+                $("#userId").val("");
+                return;
+            }
+
+            if (fn_validateEmpty($("#userId").val())) {
+                alert("아이디는 공백을 포함할수 없습니다.");
+                $("#userId").focus();
+                $("#userId").val("");
+                return;
+            }
+
+            if (!fn_validateIdPwd($("#userId").val())) {
+                alert("아이디는 4 ~ 12자의 영문 대소문자와 숫자로만 입력가능합니다.");
+                $("#userId").focus();
+                return;
+            }
+            
+            if (!isUserIdChecked) {
+            	alert("아이디 중복체크를 진행해주세요.");
+            	$("#id-btn").focus();
+            	return;
+            }
+        	
             if ($.trim($("#userPwd1").val()).length === 0) {
                 alert("비밀번호를 입력하세요.");
                 $("#userPwd1").val("");
@@ -350,7 +382,9 @@
         <div class="input-group" style="display: flex; flex-direction: column; align-items: flex-start;">
           <div style="display: flex; align-items: center; width: 100%;">
             <input type="text" id="userId" name="userId" placeholder="아이디" style="flex: 1;">
-            <button type="button" class="id-btn" id="id-btn" style="margin-left: 5px; height:40px">중복 체크</button>
+            <button type="button" class="id-btn" id="id-btn" style="background-color: #f2b048; border: none; border-radius: 8px; margin-left: 5px; margin-top: 5px; width: 60px; height: 45px;">
+                중복 체크
+            </button>
           </div>
           <p class="warningText" id="warningId">아이디를 입력하세요.</p>
         </div>
@@ -404,7 +438,7 @@
             <option value="간식">간식</option>
           </select>
         </div>
-        <div id="profileBox" style="width: 120px; height: 120px; border: 2px solid; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; overflow: hidden;">
+        <div id="profileBox" style="width: 120px; height: 120px; border: 5px solid #F2B048; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; overflow: hidden;">
           <img id="imagePreview" src="/resources/profile/defaultProfile.jpg" alt="Profile Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
         </div>
         <div class="input-group" style="display: flex; align-items: center;">

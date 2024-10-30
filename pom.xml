@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.icia</groupId>
+	<groupId>co.kr.sist</groupId>
 	<artifactId>web</artifactId>
-	<name>HBoard</name>
+	<name>foodking</name>
 	<packaging>war</packaging>
 	<version>1.0.0-BUILD-SNAPSHOT</version>
 	<properties>
@@ -22,6 +22,8 @@
 		<com.oracle.ojdbc6-version>11.2.0.4</com.oracle.ojdbc6-version>
 		<ch.qos.logback-version>1.2.3</ch.qos.logback-version>
 		<jackson-version>2.12.1</jackson-version>
+		<org.springframework-data-redis-version>2.3.9.RELEASE</org.springframework-data-redis-version>
+        <lettuce-core-version>5.2.2.RELEASE</lettuce-core-version>
 	</properties>
 	<dependencies>
 		<!-- Spring -->
@@ -137,7 +139,21 @@
 		    <artifactId>quartz-jobs</artifactId>
 		    <version>2.3.0</version>
 		</dependency>
-
+		
+		<!-- Spring Data Redis -->
+	    <dependency>
+	        <groupId>org.springframework.data</groupId>
+	        <artifactId>spring-data-redis</artifactId>
+	        <version>${org.springframework-data-redis-version}</version>
+	    </dependency>
+	
+	    <!-- Lettuce -->
+	    <dependency>
+	        <groupId>io.lettuce</groupId>
+	        <artifactId>lettuce-core</artifactId>
+	        <version>${lettuce-core-version}</version>
+	    </dependency>
+	        
 		<!-- 추가시작 -->
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>

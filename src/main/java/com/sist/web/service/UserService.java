@@ -85,8 +85,9 @@ public class UserService {
 	}
 	
 	// 유저 아이디 찾기
-	public boolean userIdFind(Map<String, String> hashMap) {
+	public String userIdFind(Map<String, String> hashMap) {
 		List<String> list = null;
+		String userId = null;
 		
 		try {
 			list = userDao.userIdFind(hashMap);
@@ -94,7 +95,9 @@ public class UserService {
 			logger.error("[UserService] userIdFind Exception", e);
 		}
 		
-		return (list != null && list.size() == 1);
+		userId = (list != null && list.size() == 1) ? list.get(0) : "";
+		
+		return userId;
 	}
 	
 }

@@ -7,7 +7,7 @@
       <div class="member-info">
         <button name="btnLogin" id="btnLogin" onclick="location.href='/user/loginForm'">로그인</button>
         <div class="member-links">
-          <a href="/user/userRegForm.jsp">회원가입</a> <span>|</span> <a href="/user/idFind">아이디 찾기</a>
+          <a href="/user/regForm">회원가입</a> <span>|</span> <a href="/user/idFind">아이디 찾기</a> <span>|</span> <a href="/user/pwdFind"> 비밀번호 찾기 </a>
         </div>
       </div>
     </c:when>

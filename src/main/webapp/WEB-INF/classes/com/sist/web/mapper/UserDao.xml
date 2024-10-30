@@ -62,7 +62,7 @@
 		#{userName},
 		#{userEmail},
 		#{userGender},
-		#{userStatus},
+		'Y',
 		#{userRegon},
 		#{userFood},
 		#{userTel},
@@ -107,6 +107,6 @@
 	
 	<!-- 사용자 아이디 찾기 -->
 	<select id="userIdFind" parameterType="map" resultType="string">
-	   SELECT USER_ID FROM USER_TABLE WHERE USER_EMAIL = #{userEmail} AND USER_TEL = #{userTel}
+	   SELECT USER_ID FROM USER_TABLE WHERE USER_EMAIL = #{userEmail} AND USER_TEL = #{userTel} AND USER_NAME = #{userName} AND USER_STATUS = 'Y'
 	</select>
 </mapper>
