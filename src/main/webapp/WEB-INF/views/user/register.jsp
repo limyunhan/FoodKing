@@ -45,7 +45,9 @@
             }
             
             if ($.trim($("#userPwd2").val()) !== userPwd1) {
-                $("#warningPwd2").text("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+                $("#warningPwd2").text("비밀번호와 비밀번호 확인이 일치하지 않습니다.").css("color", "red");;
+            } else{
+            	$("#warningPwd2").text("비밀번호 일치").css("color", "blue");
             }
         });
         
@@ -53,10 +55,10 @@
             var userPwd2 = $.trim($("#userPwd2").val());
 
             if (userPwd2.length === 0) {
-                $("#warningPwd2").text("비밀번호 확인을 입력하세요.");
+                $("#warningPwd2").text("비밀번호 확인을 입력하세요.").css("color", "red");;
 
             } else if (userPwd2 !== $("#userPwd1").val()) {
-                $("#warningPwd2").text("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+                $("#warningPwd2").text("비밀번호와 비밀번호 확인이 일치하지 않습니다.").css("color", "red");;
 
             } else {
                 $("#warningPwd2").text("비밀번호 일치").css("color", "blue");
@@ -234,7 +236,7 @@
                 $("#userPwd1").focus();
             }
 
-            if (fn_validateIdPwd($("#userPwd1").val())) {
+            if (!fn_validateIdPwd($("#userPwd1").val())) {
                 alert("비밀번호는 4 ~ 12자의 영문 대소문자와 숫자로만 입력가능합니다.");
                 $("#userPwd1").focus();
                 return;
@@ -312,7 +314,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "/user/regProc",
+                url: "/user/registerProc",
                 enctype: "multipart/form-data",
                 data: formData,
                 contentType: false,
@@ -439,7 +441,7 @@
           </select>
         </div>
         <div id="profileBox" style="width: 120px; height: 120px; border: 5px solid #F2B048; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; overflow: hidden;">
-          <img id="imagePreview" src="/resources/profile/defaultProfile.jpg" alt="Profile Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+          <img id="imagePreview" src="/resources/profile/defaultProfile.png" alt="Profile Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
         </div>
         <div class="input-group" style="display: flex; align-items: center;">
           <label for="userImage" class="custom-file-upload" style="white-space: nowrap;">이미지 선택</label>

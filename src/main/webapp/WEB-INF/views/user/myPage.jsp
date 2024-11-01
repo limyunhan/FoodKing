@@ -8,6 +8,11 @@
   <%@include file="/WEB-INF/views/include/head.jsp" %>
   <script>
     $(document).ready(function() {
+    	$("#user")
+    	
+    	
+    	
+    	
         $('#checkPasswordButton').on('click', function() {
             var inputPwd = $('#inputPassword').val();
             var bbsPwd = $('#passwordModal').data('bbsPwd');
@@ -20,8 +25,15 @@
             }
             closePasswordModal();
         });
-
-        $('#closeModalButton').on('click', closePasswordModal);
+        
+        $('#closeModalButton').on('click', closePasswordModal());
+        
+        
+        
+        
+        
+        
+        
     });
 
     function fn_list(curPage) {
@@ -62,41 +74,35 @@
   <div class="Board-Main-Page">
     <div class="Board-Main">
       <%@include file="/WEB-INF/views/include/navigation.jsp"%>
-
       <div class="main-contanier">
         <%@include file="/WEB-INF/views/leftMainContent.jsp"%>
         <div class="profile-page">
-          <!-- User Profile Section -->
           <div class="profile-header">
             <div class="profile-picture">
-              <img src="/" alt="ProfilePicture" />
+              <c:set var="profileImage" value="${not empty user.userImageName ? user.userImageName + '.' + user.userImageExt : 'defaultProfile.png'}"/>
+              <img src="/resources/profile/${profileImage}" alt="프로필 사진" class="profile-image">
             </div>
             <div class="profile-info">
-              <h2></h2>
+              <h2>${user.userName}</h2>
               <p>
-                작성글 <span>0</span> · 작성댓글 <span>0</span>
+                작성글 <span><fmt:formatNumber type="Number" maxFractionDigits="3" groupingUsed="true" value="${user.userBbsCnt}" /></span> / 작성댓글 <span><fmt:formatNumber type="Number" maxFractionDigits="3" groupingUsed="true" value="${user.userComCnt}" /></span>
               </p>
             </div>
           </div>
-
-          <!-- Navigation Section -->
           <div class="profile-nav">
             <ul>
               <li><a href="/user/myPage">작성글</a></li>
               <li><a href="/user/update">회원정보 수정</a></li>
-              <!-- 프로필 사진 수정 -->
               <li><a href="javascript:void(0)" onclick="openProfileModal()">프로필 사진 수정</a></li>
             </ul>
           </div>
-
-          <!-- Table Section -->
           <div class="post-table">
             <table>
               <thead>
                 <tr>
                   <th>제목</th>
                   <th>작성일</th>
-                  <th>조회</th>
+                  <th>조회수</th>
                 </tr>
               </thead>
               <tbody>
@@ -124,28 +130,28 @@
   </div>
 
   <form name="listForm" id="listForm" method="post">
-    <input type="hidden" name="boardSeq" value="">
+    <input type="hidden" name="bbsSeq" value="">
     <input type="hidden" name="curPage" value="">
   </form>
   
   <!-- 모달 창 HTML -->
-  <div id="profileModal" class="modal" style="display:none;">
+  <div id="profileModal" style="display:none;">
     <div class="modal-content">
       <span class="close" onclick="closeProfileModal()">&times;</span>
       <h2>프로필 사진 수정</h2>
-      <form id="profileForm" method="post" enctype="multipart/form-data" action="/user/profile">
-        <input type="file" name="profilePicture" accept="image/*">
-        <button type="submit">변경</button>
+      <form id="profileForm" method="post" enctype="multipart/form-data" action="/user/updateImage">
+        <input type="file" name="userImage" accept="image/*">
+        <button id="checkImageButton">변경</button>
       </form>
     </div>
   </div>
 
   <div id="passwordModal" style="display:none;">
     <div class="modal-content">
+      <span class="close" onclick="closePasswordModal()">&times;</span>
       <h3>비밀번호 입력</h3>
       <input type="password" id="inputPassword" placeholder="비밀번호를 입력하세요" />
       <button id="checkPasswordButton">확인</button>
-      <button id="closeModalButton">취소</button>
     </div>
   </div>
 </body>

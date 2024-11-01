@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -46,8 +47,8 @@ public class UserController {
 	@Value("#{env['profile.img.dir']}")
 	private String PROFILE_IMG_DIR;
 	
-	@Value("#{env['mail.template.dir']}")
-	private String MAIL_TEMPLATE_DIR;
+	@Value("#{env['html.template.dir']}")
+	private String HTML_TEMPLATE_DIR;
 	
 	@Autowired
 	private UserService userService;
@@ -59,7 +60,7 @@ public class UserController {
 	JavaMailSenderImpl mailSender;
 	
 	// 회원 가입 페이지
-	@RequestMapping(value = "/user/regForm")
+	@RequestMapping(value = "/user/register")
 	public String regForm(HttpServletRequest request, HttpServletResponse response) {
 		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
 		
@@ -67,7 +68,7 @@ public class UserController {
 			CookieUtil.deleteCookie(request, response, "/", AUTH_COOKIE_NAME);
 			return "redirect:/";
 		} else {
-			return "/user/regForm";
+			return "/user/register";
 		}
 	}
 	
@@ -98,9 +99,9 @@ public class UserController {
 	}
 	
 	// 회원가입 ajax 
-	@RequestMapping(value = "/user/regProc", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/registerProc", method = RequestMethod.POST)
 	@ResponseBody
-	public Response<Object> regProc(MultipartHttpServletRequest request, HttpSession session) {
+	public Response<Object> registerProc(MultipartHttpServletRequest request, HttpSession session) {
 		Response<Object> ajaxResponse = new Response<>();
 		
 		String userId = HttpUtil.get(request, "userId", "");
@@ -173,7 +174,7 @@ public class UserController {
 	// 로그인 ajax  
 	@RequestMapping(value = "/user/loginProc", method = RequestMethod.POST) 
 	@ResponseBody
-	public Response<Object> loginProc(HttpServletRequest request) {
+	public Response<Object> loginProc(HttpServletRequest request, HttpServletResponse response) {
 		Response<Object> ajaxResponse = new Response<>();
 		
 		String userId = HttpUtil.get(request, "userId", "");
@@ -183,8 +184,12 @@ public class UserController {
 			User user = userService.userSelect(userId);
 			
 			if (user != null) {
+				
 				if (StringUtil.equals(user.getUserStatus(), "Y")) {
+					
 					if (StringUtil.equals(userPwd, user.getUserPwd())) {
+						CookieUtil.addCookie(response, "/", -1, AUTH_COOKIE_NAME, CookieUtil.stringToHex(userId));
+						ajaxResponse.setResponse(200, "로그인 성공");
 						
 					} else {
 						ajaxResponse.setResponse(401, "비밀번호 불일치");
@@ -258,28 +263,18 @@ public class UserController {
 	            // 이메일 보낼 양식
 	            String setFrom = "lim9807@naver.com";
 	            String title = "[FoodKing] 아이디 찾기 인증 메일";
-	            StringBuilder content = new StringBuilder();
-	     
-	            content.append("<div style='margin:100px;'>")
-		               .append("<h1> 안녕하세요</h1>")
-		               .append("<br>")
-		               .append("<p>아래 코드를 아이디 찾기 창으로 돌아가 입력해주세요<p>")
-		               .append("<br>")
-		               .append("<div align='center' style='border:1px solid black; font-family:verdana';>")
-		               .append("<h3 style='color:blue;'>아이디 찾기 인증 코드입니다.</h3>")
-		               .append("<div style='font-size:130%'>")
-		               .append("CODE : <strong>")
-		               .append(authCode.toString())
-		               .append("</strong>")
-		               .append("</div>");
-	           
+	            
 	            try {
+	            	String template = new String(Files.readAllBytes(Paths.get(HTML_TEMPLATE_DIR + FileUtil.getFileSeparator() + "mail.html")), StandardCharsets.UTF_8);
+                    template = template.replace("${type}", "인증 번호")
+                                       .replace("${value}", authCode.toString());
+                    
 	                MimeMessage message = mailSender.createMimeMessage();
 	                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 	                helper.setFrom(setFrom);
 	                helper.setTo(userEmail);
 	                helper.setSubject(title);
-	                helper.setText(content.toString(), true);
+	                helper.setText(template, true);
 	                mailSender.send(message);
 
 	                // Redis에 인증 코드와 인증 여부 저장
@@ -325,7 +320,7 @@ public class UserController {
 	        String userId = userService.userIdFind(hashMap);
 	        
 			if (!StringUtil.isEmpty(userId)) {
-	        	String redisAuthCode = redisCommands.get("idFindAuthCode:" + userEmail);
+	        	String redisAuthCode = redisCommands.get("idFindAuthCode:" + userId);
 	        	
 	        	if (!StringUtil.isEmpty(redisAuthCode)) {
 	        		
@@ -438,29 +433,19 @@ public class UserController {
 		            }
 		            
 		            String setFrom = "lim9807@naver.com";
-		            String title = "[FoodKing] 비밀번호 찾기 인증 메일";
-		            StringBuilder content = new StringBuilder();
-		     
-		            content.append("<div style='margin:100px;'>")
-			               .append("<h1> 안녕하세요</h1>")
-			               .append("<br>")
-			               .append("<p>아래 코드를 비밀번호 찾기 창으로 돌아가 입력해주세요<p>")
-			               .append("<br>")
-			               .append("<div align='center' style='border:1px solid black; font-family:verdana';>")
-			               .append("<h3 style='color:blue;'>비밀번호 찾기 인증 코드입니다.</h3>")
-			               .append("<div style='font-size:130%'>")
-			               .append("CODE : <strong>")
-			               .append(authCode.toString())
-			               .append("</strong>")
-			               .append("</div>");
-		           
+		            String title = "[Food King] 비밀번호 찾기 인증 메일";
+
 		            try {
+		            	String template = new String(Files.readAllBytes(Paths.get(HTML_TEMPLATE_DIR + FileUtil.getFileSeparator() + "mail.html")), StandardCharsets.UTF_8);
+	                    template = template.replace("${type}", "인증 번호")
+	                                       .replace("${value}", authCode.toString());
+	                    
 		                MimeMessage message = mailSender.createMimeMessage();
 		                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 		                helper.setFrom(setFrom);
 		                helper.setTo(userEmail);
 		                helper.setSubject(title);
-		                helper.setText(content.toString(), true);
+		                helper.setText(template, true);
 		                mailSender.send(message);
 		                
 		                // Redis에 인증 코드와 인증 여부 저장
@@ -555,7 +540,7 @@ public class UserController {
 			if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
 				
 				if (StringUtil.equals(user.getUserEmail(), userEmail)) {
-		        	String isVerified = redisCommands.get("idFind:" + userId);
+		        	String isVerified = redisCommands.get("pwdFind:" + userId);
 		        	
 		        	if (!StringUtil.isEmpty(isVerified)) {
 		        		
@@ -572,10 +557,10 @@ public class UserController {
 				            }
 				            
 				            String setFrom = "lim9807@naver.com";
-				            String title = "[FoodKing] 임시 비밀번호 발급 메일";
+				            String title = "[Food King] 임시 비밀번호 발급 메일";
 				            
 				            try {
-				            	String template = new String(Files.readAllBytes(Paths.get(MAIL_TEMPLATE_DIR + FileUtil.getFileSeparator() + "mail.html")), StandardCharsets.UTF_8);
+				            	String template = new String(Files.readAllBytes(Paths.get(HTML_TEMPLATE_DIR + FileUtil.getFileSeparator() + "mail.html")), StandardCharsets.UTF_8);
 	                            template = template.replace("${type}", "임시 비밀번호")
 	                                               .replace("${value}", password.toString());
 
@@ -627,11 +612,149 @@ public class UserController {
 		return ajaxResponse;
 	}
 	
-	public String myPage(HttpServletRequest request, HttpServletResponse response) {
-		
-		
+	@RequestMapping(value = "/user/myPage")
+	public String myPage(Model model, HttpServletRequest request) {
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		User user = userService.userSelect(cookieUserId);
+		model.addAttribute("user", user);
 		
 		return "/user/myPage";
 	}
-}
 	
+	// 사용자 업데이트 페이지
+	@RequestMapping(value = "/user/update")
+	public String update(Model model, HttpServletRequest request, HttpServletResponse response) {
+		
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		User user = userService.userSelect(cookieUserId);
+		model.addAttribute("user", user);
+		
+		return "/user/update";
+	}
+	
+	// 사용자 업데이트 ajax 
+	@RequestMapping(value = "/user/updateProc", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> updateProc(HttpServletRequest request, HttpServletResponse response) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		String userPwd = HttpUtil.get(request, "userPwd", "");
+		String userEmail = HttpUtil.get(request, "userEmail", "");
+		String userTel = HttpUtil.get(request, "userTel", "");
+		String userName = HttpUtil.get(request, "userName", "");
+		String userRegion = HttpUtil.get(request, "userRegion", "");
+		String userFood = HttpUtil.get(request, "userFood", "");
+		
+		if (!StringUtil.isEmpty(userPwd) && !StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel) && !StringUtil.isEmpty(userName) && !StringUtil.isEmpty(userRegion) && !StringUtil.isEmpty(userFood)) {
+			
+			User user = userService.userSelect(cookieUserId);
+			
+			if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
+				user.setUserPwd(userPwd);
+				user.setUserEmail(userEmail);
+				user.setUserTel(userTel);
+				user.setUserName(userName);
+				user.setUserRegion(userRegion);
+				user.setUserFood(userFood);
+				
+				if (userService.userUpdate(user)) {
+					ajaxResponse.setResponse(200, "유저 정보 수정됨");
+					
+				} else {
+					ajaxResponse.setResponse(500, "DB 정합성 오류");
+				}
+				
+			} else {
+				CookieUtil.deleteCookie(request, response, "/", AUTH_COOKIE_NAME);
+				ajaxResponse.setResponse(404, "사용자 존재하지 않음");
+			}
+			
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+				
+		return ajaxResponse;
+	}
+	
+	// 사용자 회원탈퇴 ajax
+	@RequestMapping(value = "/user/delete", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> delete(HttpServletRequest request, HttpServletResponse response) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		String userPwd = HttpUtil.get(request, "userPwd", "");
+		
+		if (!StringUtil.isEmpty(userPwd)) {
+			User user = userService.userSelect(cookieUserId);
+			
+			if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
+				if (StringUtil.equals(user.getUserPwd(), userPwd)) {
+					if (userService.userWithdraw(cookieUserId)) {
+						CookieUtil.deleteCookie(request, response, "/", AUTH_COOKIE_NAME);
+						ajaxResponse.setResponse(200, "회원 탈퇴 완료");
+						
+					} else {
+						ajaxResponse.setResponse(500, "DB 정합성 오류");
+					}
+					
+				} else {
+					ajaxResponse.setResponse(401, "비밀번호 일치하지 않음");
+				}
+				
+			} else {
+				CookieUtil.deleteCookie(request, response, "/", AUTH_COOKIE_NAME);
+				ajaxResponse.setResponse(404, "사용자 존재하지 않음");
+			}
+			
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+
+		return ajaxResponse;
+	}
+	
+	// 사용자 프로필 사진 수정 ajax
+	@RequestMapping(value = "/user/updateImage", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> updateImage(MultipartHttpServletRequest request, HttpServletResponse response) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		FileData fileData = HttpUtil.getFile(request, "userImage", PROFILE_IMG_DIR);
+		if (fileData != null && fileData.getFileSize() > 0) {
+			User user = userService.userSelect(cookieUserId);
+			
+			if (user != null && StringUtil.equals(user.getUserStatus(), "Y")) {
+				
+				if (!StringUtil.isEmpty(user.getUserImageName())) {
+					StringBuilder srcFile = new StringBuilder();
+					srcFile.append(PROFILE_IMG_DIR).append(FileUtil.getFileSeparator()).append(user.getUserImageName());
+					FileUtil.deleteFile(srcFile.toString());
+				}
+				
+				user.setUserImageName(fileData.getFileName());
+				user.setUserImageOrgName(fileData.getFileOrgName());
+				user.setUserImageSize(fileData.getFileSize());
+				user.setUserImageExt(fileData.getFileExt());
+				
+				if (userService.userImageUpdate(user)) {
+					ajaxResponse.setResponse(200, "사진 업데이트 완료");
+					
+				} else {
+					ajaxResponse.setResponse(500, "DB 정합성 오류");
+				}
+				
+			} else {
+				CookieUtil.deleteCookie(request, response, "/", AUTH_COOKIE_NAME);
+				ajaxResponse.setResponse(404, "존재하지 않는 사용자");
+			}
+			
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+		
+		return ajaxResponse;
+	}
+}

@@ -22,6 +22,8 @@ public class User implements Serializable {
 	private String userImageOrgName;
 	private String userImageExt;
 	private long userImageSize;
+	private int userBbsCnt;
+	private int userComCnt;
 	
 	public User() {
 		userId = "";
@@ -38,6 +40,8 @@ public class User implements Serializable {
 		userImageOrgName = "";
 		userImageExt = "";
 		userImageSize = 0L;
+		userBbsCnt = 0;
+		userComCnt = 0;
 	}
 
 	public String getUserId() {return userId;}
@@ -68,4 +72,8 @@ public class User implements Serializable {
 	public void setUserImageSize(long userImageSize) {this.userImageSize = userImageSize;}
 	public String getUserTel() {return userTel;}
 	public void setUserTel(String userTel) {this.userTel = userTel;}
+	public int getUserBbsCnt() {return userBbsCnt;}
+	public void setUserBbsCnt(int userBbsCnt) {this.userBbsCnt = userBbsCnt;}
+	public int getUserComCnt() {return userComCnt;}
+	public void setUserComCnt(int userComCnt) {this.userComCnt = userComCnt;}
 }

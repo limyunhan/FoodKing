@@ -5,19 +5,20 @@
   <c:choose>
     <c:when test="${empty loginUser}">
       <div class="member-info">
-        <button name="btnLogin" id="btnLogin" onclick="location.href='/user/loginForm'">로그인</button>
+        <button name="btnLogin" id="btnLogin" onclick="location.href='/user/login'">로그인</button>
         <div class="member-links">
-          <a href="/user/regForm">회원가입</a> <span>|</span> <a href="/user/idFind">아이디 찾기</a> <span>|</span> <a href="/user/pwdFind"> 비밀번호 찾기 </a>
+          <a href="/user/register">회원가입</a> <span>|</span> <a href="/user/idFind">아이디 찾기</a> <span>|</span> <a href="/user/pwdFind"> 비밀번호 찾기 </a>
         </div>
       </div>
     </c:when>
     <c:otherwise>
       <div class="member-info-user">
         <div class="user-info">
-          <img src="/user/profile/${loginUser.userImageName}.${loginUser.userImageExt}" alt="프로필 사진" class="profile-image">
+          <c:set var="profileImage" value="${not empty loginUser.userImageName ? loginUser.userImageName + '.' + loginUser.userImageExt : 'defaultProfile.png'}"/>
+          <img src="/resources/profile/${profileImage}" alt="프로필 사진" class="profile-image">
           <div class="user-details">
             <h3 class="user-info-h3">${loginUser.userName}</h3>
-            <p class="user-info-p">가입일: ${loginUser.userRegDate}</p>
+            <p class="user-info-p">가입일: ${fn:substring(loginUser.userRegDate, 0, 10)}</p>
             <p class="user-info-p">#${loginUser.userRegion} #${loginUser.userFood}</p>
           </div>
         </div>
@@ -41,6 +42,6 @@
   </c:choose>
   <div class="left-main-content-ad">
     <h2>광고</h2>
-    <img class="leftlogo" src="resources/images/logo3.png">
+    <img class="leftlogo" src="/resources/images/logo3.png">
   </div>
 </div>

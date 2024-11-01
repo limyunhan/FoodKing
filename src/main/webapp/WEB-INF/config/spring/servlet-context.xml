@@ -60,9 +60,8 @@
             			<value>/index</value>
             			<value>/first</value>
             			<value>/user/login</value>
-            			<value>/user/loginOut</value>
-            			<value>/user/regForm</value>
-            			<value>/user/regProc</value>
+            			<value>/user/logOut</value>
+            			<value>/user/register</value>
             			<value>/user/idCheck</value>
             			<value>/user/idFind</value>
             			<value>/user/pwdFind</value>
@@ -107,27 +106,26 @@
 	<!-- 파일 업로드 설정 종료 -->
 	
 	<!-- 이메일 인증 관련 등록 -->
-    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="smtp.naver.com"/>
-        <property name="port" value="465"/>
-        <property name="username" value="lim9807"/>
-        <property name="password" value="a9thelims2658"/>
-        <property name="javaMailProperties">    
-            <props>
-                <prop key="mail.smtp.auth">true</prop>
-                <prop key="mail.smtp.starttls.enable">true</prop>
-                <prop key="mail.smtps.checkserveridentity">true</prop>
-                <prop key="mail.smtps.ssl.trust">*</prop>
-                <prop key="mail.smtps.ssl.checkserveridentity">true</prop>
-                <prop key="mail.smtp.ssl.enable">true</prop>
-                <prop key="mail.smtp.socketFactory.port">465</prop>
-                <prop key="mail.debug">true</prop>
-                <prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
-                <prop key="mail.transport.protocol">smtps</prop>
-                <prop key="mail.smtps.auth">true</prop>
-                <prop key="mail.smtps.ssl.protocols">TLSv1.2</prop>
-            </props>
-        </property>
-    </bean>
-    <!--  이메일 인증 관련 등록 해제 -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.naver.com"/>
+		<property name="port" value="465"/>
+		<property name="username" value="lim9807"/>
+		<property name="password" value="a9thelims2658"/>
+		<property name="javaMailProperties">    
+		<props>
+			<prop key="mail.smtp.auth">true</prop>
+	        <prop key="mail.smtp.starttls.enable">true</prop>
+			<prop key="mail.smtps.checkserveridentity">true</prop>
+			<prop key="mail.smtps.ssl.trust">*</prop>
+			<prop key="mail.smtps.ssl.checkserveridentity">true</prop>
+			<prop key="mail.smtp.ssl.enable">true</prop>
+			<prop key="mail.smtp.socketFactory.port">465</prop>
+			<prop key="mail.debug">true</prop>
+			<prop key="mail.smtp.socketFactory.class">javax.net.ssl.SSLSocketFactory</prop>
+			<prop key="mail.transport.protocol">smtps</prop>
+			<prop key="mail.smtps.auth">true</prop>
+			<prop key="mail.smtps.ssl.protocols">TLSv1.2</prop>
+		</props>
+		</property>
+	</bean>
 </beans>

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sist.web.dao.BbsDao">
+    <resultMap id="bbsResultMap" type="com.sist.web.model.Bbs">
+        <id column="BBS_SEQ" property="bbsSeq"></id>
+        <result column="SUB_CATE_COMBINED_NUM" property="subCateCombinedNum"></result>
+        <result column="USER_ID" property="userId"></result>
+        <result column="BBS_TITLE" property="bbsTitle"></result>
+        <result column="BBS_CONTENT" property="bbsContent"></result>
+        <result column="BBS_PWD" property="bbsPwd"></result>
+        <result column="BBS_READ_CNT" property="bbsReadCnt"></result>
+        <result column="BBS_STATUS" property="bbsStatus"></result>
+        <result column="BBS_REG_DATE" property="bbsRegDate"></result>
+        <result column="BBS_UPDATE_DATE" property="bbsUpdateDate"></result>
+        <result column="USER_NAME" property="userName"></result>
+        <result column="BBS_COM_CNT" property="bbsComCnt"></result>
+        <result column="BBS_RECOM_CNT" property="bbsRecomCnt"></result>
+        <result column="BBS_MAIN_CATE_NAME" property="bbsMainCateName"></result>
+        <result column="BBS_SUB_CATE_NAME" property="bbbsSubCateName"></result>
+        <result column="IS_BOOKMARKED" property="isBookmarked"></result>
+        <result column="IS_RECOMMENDED" property="isRecommended"></result>
+    </resultMap>
+    
+    <!-- 게시글 리스트 조회 (페이징 처리) -->
+    <select id="bbsList" parameterType="com.sist.web.model.BbsSearch" resultMap="bbsResultMap">
+		SELECT BBS_SEQ, SUB_CATE_COMBINED_NUM, USER_ID, BBS_TITLE, BBS_CONTENT, BBS_PWD, BBS_READ_CNT, BBS_STATUS, BBS_REG_DATE, BBS_UPDATE_DATE, USER_NAME, BBS_COM_CNT, BBS_RECOM_CNT, BBS_MAIN_CATE_NAME, BBS_SUB_CATE_NAME, IS_BOOKMARKED, IS_RECOMMENDED
+		FROM (
+		    SELECT ROWNUM RNUM, BBS_SEQ, SUB_CATE_COMBINED_NUM, USER_ID, BBS_TITLE, BBS_CONTENT, BBS_PWD, BBS_READ_CNT, BBS_STATUS, BBS_REG_DATE, BBS_UPDATE_DATE, USER_NAME, BBS_COM_CNT, BBS_RECOM_CNT, BBS_MAIN_CATE_NAME, BBS_SUB_CATE_NAME, IS_BOOKMARKED, IS_RECOMMENDED
+		    FROM ( 
+		        SELECT 
+		            A.BBS_SEQ BBS_SEQ,
+		            A.SUB_CATE_COMBINED_NUM SUB_CATE_COMBINED_NUM,
+		            A.USER_ID USER_ID,
+		            NVL(A.BBS_TITLE, '') BBS_TITLE,
+		            NVL(A.BBS_CONTENT, '') BBS_CONTENT,
+		            NVL(A.BBS_PWD, '') BBS_PWD,
+		            NVL(A.BBS_READ_CNT, 0) BBS_READ_CNT,
+		            NVL(A.BBS_STATUS, 'N') BBS_STATUS,
+		            NVL(TO_CHAR(A.BBS_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_REG_DATE,
+		            NVL(TO_CHAR(A.BBS_UPDATE_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_UPDATE_DATE,
+		            NVL(U.USER_NAME, '') USER_NAME,
+		            NVL(C.BBS_COM_CNT, 0) BBS_COM_CNT,
+		            NVL(D.BBS_RECOM_CNT, 0) BBS_RECOM_CNT,
+		            NVL(E.MAIN_CATE_NAME, '') BBS_MAIN_CATE_NAME,
+		            NVL(E.SUB_CATE_NAME, '') BBS_SUB_CATE_NAME,
+		            CASE 
+		                WHEN EXISTS (
+		                    SELECT 1 
+		                    FROM BOOKMARK B 
+		                    WHERE B.BBS_SEQ = A.BBS_SEQ 
+		                      AND B.USER_ID = #{userId}
+		                ) THEN 'Y' 
+		                ELSE 'N' 
+		            END IS_BOOKMARKED,
+		            CASE 
+		                WHEN EXISTS (
+		                    SELECT 1 
+		                    FROM RECOM R 
+		                    WHERE R.BBS_SEQ = A.BBS_SEQ 
+		                      AND R.USER_ID = #{userId}
+		                ) THEN 'Y' 
+		                ELSE 'N' 
+		            END AS IS_RECOMMENDED
+		        FROM BBS A, USER_TABLE U,
+		            (SELECT BBS_SEQ, COUNT(COM_SEQ) BBS_COM_CNT 
+		            FROM (SELECT * FROM COM WHERE COM_STATUS = 'Y') 
+		            GROUP BY BBS_SEQ) C,
+		            (SELECT BBS_SEQ, COUNT(BBS_SEQ) BBS_RECOM_CNT 
+		            FROM RECOM 
+		            GROUP BY BBS_SEQ) D,
+		            (SELECT S.SUB_CATE_COMBINED_NUM SUB_CATE_COMBINED_NUM, S.SUB_CATE_NAME SUB_CATE_NAME, M.MAIN_CATE_NAME MAIN_CATE_NAME 
+		            FROM SUB_CATE S, MAIN_CATE M
+		            WHERE S.MAIN_CATE_NUM = M.MAIN_CATE_NUM) E
+		        WHERE 
+		            A.BBS_STATUS = 'Y'
+		            <if test="myPageUserId != null and myPageUserId != ''"> AND A.USER_ID = #{myPageUserId}</if>
+		            <if test="recomUserId != null and recomUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
+		            <if test="bookmarkUserId != null and bookmarkUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
+		            <if test="isSecret != null and isSecret != ''">
+		                <choose>
+		                    <when test="isSecret == 'Y'"> (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
+		                    <otherwise> (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
+		                </choose>
+		            </if> 
+		            <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
+		                <choose>
+		                    <when test="searchType == '1'"> AND A.BBS_TITLE LIKE '%' || #{searchValue} || '%'</when>
+		                    <when test="searchType == '2'"> AND (A.FREE_BBS_TITLE LIKE '%' || #{searchValue} || '%' OR DBMS_LOB.INSTR(A.FREE_BBS_CONTENT, #{searchValue}) <![CDATA[>]]> 0)</when>
+		                    <when test="searchType == '3'"> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
+		                </choose>
+		            </if> 
+		            <if test="cateNum != null and cateNum != ''"> AND A.BBS_SUB_CATE_COMBINED_NUM LIKE '%' || #{cateNum} || '%'</if>
+		            <if test="periodFilter != null and periodFilter !=''">  
+		                <choose>
+		                    <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
+		                    <when test="periodFilter == '2'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+		                    <when test="periodFilter == '3'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
+		                    <when test="periodFilter == '4'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
+		                    <when test="periodFilter == '5'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+		                </choose>
+		            </if>
+		            AND A.USER_ID = U.USER_ID
+		            AND A.SUB_CATE_COMBINED_NUM = E.SUB_CATE_COMBINED_NUM
+		            AND A.BBS_SEQ = C.BBS_SEQ(+) 
+		            AND A.BBS_SEQ = D.BBS_SEQ(+)       
+			        <choose>
+			            <when test="orderBy == '1'"> ORDER BY BBS_SEQ DESC</when>
+			            <when test="orderBy == '2'"> ORDER BY BBS_READ_CNT DESC</when>
+			            <when test="orderBy == '3'"> ORDER BY BBS_RECOM_CNT DESC</when>
+			            <when test="orderBy == '4'"> ORDER BY BBS_COM_CNT DESC</when>
+			        </choose>         
+		    ) 
+		)
+		WHERE RNUM BETWEEN #{startRow} AND #{endRow};
+    </select>
+    
+    <!-- 페이징 처리를 위한 게시글 수 조회 -->
+    <select id="bbsListCnt" parameterType="com.sist.web.model.BbsSearch" resultType="long">
+        SELECT COUNT(BBS_SEQ)
+        FROM BBS A, USER_TABLE U
+        WHERE 
+	        A.BBS_STATUS = 'Y'
+	        <if test="myPageUserId != null and myPageUserId != ''"> AND A.USER_ID = #{myPageUserId}</if>
+	        <if test="recomUserId != null and recomUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
+	        <if test="bookmarkUserId != null and bookmarkUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
+	        <if test="isSecret != null and isSecret != ''">
+	            <choose>
+	                <when test="isSecret == 'Y'"> (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
+	                <otherwise> (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
+	            </choose>
+	        </if> 
+	        <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
+	            <choose>
+	                <when test="searchType == '1'"> AND A.BBS_TITLE LIKE '%' || #{searchValue} || '%'</when>
+	                <when test="searchType == '2'"> AND (A.FREE_BBS_TITLE LIKE '%' || #{searchValue} || '%' OR DBMS_LOB.INSTR(A.FREE_BBS_CONTENT, #{searchValue}) <![CDATA[>]]> 0)</when>
+	                <when test="searchType == '3'"> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
+	            </choose>
+	        </if> 
+	        <if test="cateNum != null and cateNum != ''"> AND A.BBS_SUB_CATE_COMBINED_NUM LIKE '%' || #{cateNum} || '%'</if>
+	        <if test="periodFilter != null and periodFilter !=''">  
+	            <choose>
+	                <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
+	                <when test="periodFilter == '2'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+	                <when test="periodFilter == '3'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
+	                <when test="periodFilter == '4'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
+	                <when test="periodFilter == '5'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+	            </choose>
+	        </if>
+	        AND A.USER_ID = U.USER_ID
+    </select>
+    
+    <!-- 게시글 조회 -->
+    <select id="bbsSelect" parameterType="long" resultMap="bbsResultMap">
+		SELECT 
+		    A.BBS_SEQ BBS_SEQ,
+		    A.SUB_CATE_COMBINED_NUM SUB_CATE_COMBINED_NUM,
+		    A.USER_ID USER_ID,
+		    NVL(A.BBS_TITLE, '') BBS_TITLE,
+		    NVL(A.BBS_CONTENT, '') BBS_CONTENT,
+		    NVL(A.BBS_PWD, '') BBS_PWD,
+		    NVL(A.BBS_READ_CNT, 0) BBS_READ_CNT,
+		    NVL(A.BBS_STATUS, 'N') BBS_STATUS,
+		    NVL(TO_CHAR(A.BBS_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_REG_DATE,
+		    NVL(TO_CHAR(A.BBS_UPDATE_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_UPDATE_DATE,
+		    NVL(U.USER_NAME, '') USER_NAME,
+		    NVL(C.BBS_COM_CNT, 0) BBS_COM_CNT,
+		    NVL(D.BBS_RECOM_CNT, 0) BBS_RECOM_CNT,
+		    NVL(E.MAIN_CATE_NAME, '') BBS_MAIN_CATE_NAME,
+		    NVL(E.SUB_CATE_NAME, '') BBS_SUB_CATE_NAME,
+		    CASE 
+		        WHEN EXISTS (
+		            SELECT 1 
+		            FROM BOOKMARK B 
+		            WHERE B.BBS_SEQ = A.BBS_SEQ 
+		              AND B.USER_ID = #{value}
+		        ) THEN 'Y' 
+		        ELSE 'N' 
+		    END IS_BOOKMARKED,
+		    CASE 
+		        WHEN EXISTS (
+		            SELECT 1 
+		            FROM RECOM R 
+		            WHERE R.BBS_SEQ = A.BBS_SEQ 
+		              AND R.USER_ID = #{value}
+		        ) THEN 'Y' 
+		        ELSE 'N' 
+		    END AS IS_RECOMMENDED
+		FROM BBS A, USER_TABLE U
+		WHERE
+		    A.USER_ID = U.USER_ID
+		    AND A.SUB_CATE_COMBINED_NUM = E.SUB_CATE_COMBINED_NUM
+		    AND A.BBS_SEQ = C.BBS_SEQ(+) 
+		    AND A.BBS_SEQ = D.BBS_SEQ(+)
+    </select>
+    
+    <!-- 특정 게시글의 첨부파일 리스트 조회 -->
+    <select id="bbsFileList" parameterType="long" resultMap="bbsFileResultMap">
+	    SELECT
+		    BBS_FILE_SEQ,
+		    BBS_SEQ,
+		    NVL(BBS_FILE_ORG_NAME, '') BBS_FILE_ORG_NAME,
+		    NVL(BBS_FILE_NAME, '') BBS_FILE_NAME,
+		    NVL(BBS_FILE_EXT, '') BBS_FILE_EXT,
+		    NVL(BBS_FILE_SIZE, 0) BBS_FILE_SIZE,
+		    NVL(TO_CHAR(BBS_FILE_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_FILE_REG_DATE
+		FROM
+		    BBS_FILE
+		WHERE BBS_SEQ = #{value}
+    </select>
+    
+    <!-- 특정 게시글의 특정 첨부파일 조회 -->
+    <select id="bbsFileSelect" parameterType="java.util.HashMap" resultMap="bbsFileResultMap">
+	    SELECT
+		    BBS_FILE_SEQ,
+		    BBS_SEQ,
+		    NVL(BBS_FILE_ORG_NAME, '') BBS_FILE_ORG_NAME,
+		    NVL(BBS_FILE_NAME, '') BBS_FILE_NAME,
+		    NVL(BBS_FILE_EXT, '') BBS_FILE_EXT,
+		    NVL(BBS_FILE_SIZE, 0) BBS_FILE_SIZE,
+		    NVL(TO_CHAR(BBS_FILE_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_FILE_REG_DATE
+		FROM
+		    BBS_FILE
+		WHERE BBS_SEQ = #{bbsSeq} AND BBS_FILE_SEQ = #{bbsFileSeq}
+    </select>
+    
+    <!-- 특정 게시글의 조회수 1 증가 -->
+    <update id="bbsReadCntPlus" parameterType="long">
+        UPDATE BBS SET BBS_READ_CNT = BBS_READ_CNT + 1 WHERE BBS_SEQ = #{value}
+    </update>
+    
+    <!-- 게시글 작성 -->
+    <insert id="bbsInsert" parameterType="com.sist.web.model.Bbs">
+        <selectKey resultType="long" keyProperty="bbsSeq" order="BEFORE">
+            SELECT BBS_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+    
+		INSERT INTO BBS (
+		    BBS_SEQ,
+		    SUB_CATE_COMBINED_NUM,
+		    USER_ID,
+		    BBS_TITLE,
+		    BBS_CONTENT,
+		    BBS_PWD,
+		    BBS_READ_CNT,
+		    BBS_STATUS,
+		    BBS_REG_DATE
+		) VALUES (
+		    #{bbsSeq},
+		    #{subCateCombinedNum},
+		    #{userId},
+		    #{bbsTitle},
+		    #{bbsContent},
+		    #{bbsPwd},
+		    0,
+		    'Y',
+		    SYSDATE
+		)
+	</insert>
+	
+	<!-- 게시글 파일 삽입(트랜잭션) -->
+	<insert id="bbsFileInsert" parameterType="com.sist.web.model.BbsFile">
+		INSERT INTO BBS_FILE (
+		    BBS_FILE_SEQ,
+		    BBS_SEQ,
+		    BBS_FILE_ORG_NAME,
+		    BBS_FILE_NAME,
+		    BBS_FILE_EXT,
+		    BBS_FILE_SIZE,
+		    BBS_FILE_REG_DATE
+		) VALUES (
+		    #{bbsFileSeq},
+		    #{bbsSeq},
+		    #{bbsFileOrgName},
+		    #{bbsFileName},
+		    #{bbsFileExt},
+		    #{bbsFileSize},
+		    SYSDATE
+		)
+	</insert>
+	
+	<!-- 게시글 이미지 삽입(트랜잭션) -->
+	<insert id="bbsImageInsert" parameterType="com.sist.web.model.BbsImage">
+	    INSERT INTO BBS_IMAGE (
+	        BBS_IMAGE_SEQ,
+	        BBS_SEQ,
+	        BBS_IMAGE_ORG_NAME,
+	        BBS_IMAGE_NAME,
+	        BBS_IMAGE_EXT,
+	        BBS_IMAGE_SIZE,
+	        BBS_IMAGE_REG_DATE
+	    ) VALUES (
+	        #{bbsImageSeq},
+	        #{bbsSeq},
+	        #{bbsImageOrgName},
+	        #{bbsImageName},
+	        #{bbsImageExt},
+	        #{bbsImageSize},
+	        SYSDATE
+	    )
+	</insert>
+	
+	<!-- 게시글 수정 -->
+	<update id="bbsUpdate" parameterType="com.sist.web.model.Bbs">
+		UPDATE BBS
+		SET SUB_CATE_COMBINED_NUM = #{subCateCombinedNum},
+		    BBS_TITLE = #{bbsTitle},
+		    BBS_CONTENT = #{bbsContent},
+		    BBS_PWD = #{bbsPwd},
+		    BBS_UPDATE_DATE = SYSDATE
+		WHERE BBS_SEQ = #{bbsSeq}
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<update id="bbsDelete" parameterType="long">
+        UPDATE BBS SET BBS_STATUS = 'N' WHERE BBS_SEQ = #{value}
+    </update>
+    
+	<!-- 게시글에 달린 댓글들 삭제(트랜잭션) -->
+	<update id="comDeleteByBbsDelete" parameterType="long">
+	    UPDATE COM SET COM_STATUS = 'N' WHERE BBS_SEQ = #{value}
+	</update>
+	
+	<!-- 게시글 파일, 이미지 삭제(게시글 삭제시 적용, 트랜잭션) -->
+	<delete id="fileDeleteByBbsDelete" parameterType="long">
+	    DELETE FROM BBS_FILE WHERE BBS_SEQ = #{value}
+	</delete>
+	<delete id="ImageDeleteByBbsDelete" parameterType="long">
+	    DELETE FROM BBS_IMAGE WHERE BBS_SEQ = #{value}
+	</delete>
+	
+	<!--  게시글 파일, 이미지 삭제(게시글 수정시 적용, 트랜잭션) -->
+	<delete id="fileDeleteByBbsUpdate" parameterType="java.util.HashMap">
+	    DELETE FROM BBS_FILE WHERE BBS_SEQ = #{bbsSeq} AND BBS_FILE_SEQ = #{bbsFileSeq}
+	</delete>
+	<delete id="ImageDeleteByBbsUpdate" parameterType="java.util.HashMap">
+        DELETE FROM BBS_IMAGE WHERE BBS_SEQ = #{bbsSeq} AND BBS_IMAGE_SEQ = #{bbsImageSeq}
+    </delete>
+</mapper>

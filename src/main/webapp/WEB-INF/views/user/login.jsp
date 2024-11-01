@@ -126,7 +126,7 @@
                 <button type="button" id="login-btn">로그인</button>
             </form>
             <div class="signup-link">
-                <p>계정이 없으신가요? <a href="/user/regForm">회원가입</a></p>
+                <p>계정이 없으신가요? <a href="/user/register">회원가입</a></p>
             </div>
         </div>
     </div>

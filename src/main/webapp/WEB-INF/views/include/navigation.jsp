@@ -2,9 +2,8 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp" %>
 
 <script>
-function fn_selectCategory(cateId) {
-    window.location.href = "/board/list?cateId=" + cateId;
-    
+function fn_selectCategory(cateNum) {
+    window.location.href = "/board/list?cateNum=" + cateNum;
 } 
 </script>
 
@@ -38,7 +37,7 @@ function fn_selectCategory(cateId) {
         <ul>
           <c:forEach var="subCate" items="${subCateMap[mainCate.mainCateNum]}" varStatus="status">
             <li>
-              <a href="javascript:void(0)" onclick="fn_selectCategory('${subCate.subCateNum}')">${subCate.subCateName}</a>
+              <a href="javascript:void(0)" onclick="fn_selectCategory('${subCate.subCateCombinedNum}')">${subCate.subCateName}</a>
             </li>
           </c:forEach>
         </ul>

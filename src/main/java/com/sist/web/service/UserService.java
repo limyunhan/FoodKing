@@ -100,4 +100,16 @@ public class UserService {
 		return userId;
 	}
 	
+	// 유저 프로필 사진 업데이트
+	public boolean userImageUpdate(User user) {
+		int cnt = 0;
+		
+		try {
+			cnt = userDao.userImageUpdate(user);
+		} catch(Exception e) {
+			logger.error("[UserService] userProfileUpdate Exception", e);
+		}
+		
+		return (cnt == 1);
+	}
 }

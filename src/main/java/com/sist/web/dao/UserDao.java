@@ -12,4 +12,5 @@ public interface UserDao {
 	public abstract int userWithdraw(String userId);
 	public abstract int userPwdUpdate(Map<String, String> hashMap);
 	public abstract List<String> userIdFind(Map<String, String> hashMap);
+	public abstract int userImageUpdate(User user);
 }

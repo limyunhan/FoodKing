@@ -17,8 +17,9 @@
   </style>
   <script>
     $(document).ready(function() {
-    	var isAuthCodeSent = false; 
-    	var isVerified = false;
+    	let isAuthCodeSent = false; 
+    	let isVerified = false;
+    	let timer;
     	
         $("#emailAuthNum").on("click", function() {
         	if ($.trim($("#userName").val()).length === 0) {
@@ -174,7 +175,7 @@
                         alert("인증이 완료되었습니다.");
                         $("#emailAuth").prop("disabled", true); 
                         $("#emailAuth").text("인증 완료");
-                        isVerfied = true;
+                        isVerified = true;
                         if (timer) clearInterval(timer); 
                         
                     } else if (response.code === 403) {
@@ -234,7 +235,7 @@
                 return;
             }
             
-            if (!isVerifed) {
+            if (!isVerified) {
             	alert("이메일 인증이 완료되지 않았습니다. 인증을 완료해주세요.");
             	return;
             }

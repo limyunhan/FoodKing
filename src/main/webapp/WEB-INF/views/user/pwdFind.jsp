@@ -16,9 +16,10 @@
   </style>
   <script>
       $(document).ready(function() {
-  	      var isAuthCodeSent = false; 
-          var isVerified = false;
-    	  
+  	      let isAuthCodeSent = false; 
+          let isVerified = false;
+    	  let timer;
+          
     	  $("#userId").focus();
     	  
           $("#userId").on("input", function() {
@@ -207,7 +208,7 @@
                           alert("인증이 완료되었습니다.");
                           $("#emailAuth").prop("disabled", true); 
                           $("#emailAuth").text("인증 완료");
-                          isVerfied = true;
+                          isVerified = true;
                           if (timer) clearInterval(timer); 
 
                       } else if (response.code === 403) {
@@ -270,7 +271,7 @@
                   return;
               }
               
-              if (!isVerifed) {
+              if (!isVerified) {
                   alert("이메일 인증이 완료되지 않았습니다. 인증을 완료해주세요.");
                   return;
               }
@@ -351,7 +352,7 @@
         <p>가입하신 정보를 입력하세요.</p>
       </div>
       
-      <form class="find-id-form" name="findIdForm" id="findIdForm" action="/user/userFindProc.jsp" method="post">
+      <form class="find-id-form" name="findIdForm" id="findIdForm" method="post">
         <div class="input-group">
           <input type="text" id="userId" name="userId" placeholder="아이디">
           <p class="warningText" id="warningId">아이디를 입력하세요.</p>
