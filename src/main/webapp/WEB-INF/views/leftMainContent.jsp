@@ -22,21 +22,8 @@
             <p class="user-info-p">#${loginUser.userRegion} #${loginUser.userFood}</p>
           </div>
         </div>
-
         <button id="cafeBtn" onclick="location.href='/bbs/write'">카페 글쓰기</button>
         <button onclick="location.href='/user/myPage'">마이페이지</button>
-
-        <form name="cafeForm" id="cafeForm" method="post" action="/bbs/write">
-          <input type="hidden" name="cafeInfo" id="cafeInfo" value="cafe">
-        </form>
-        
-        <script>
-            $(document).ready(function() {
-                $("#cafeBtn").on("click", function() {
-                    document.cafeForm.submit();
-                });
-            });
-        </script>
       </div>
     </c:otherwise>
   </c:choose>

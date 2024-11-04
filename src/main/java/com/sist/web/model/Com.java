@@ -15,6 +15,7 @@ public class Com implements Serializable {
 	private short comIndent;
 	private String comStatus;
 	private String comRegDate;
+	private String userName;
 	
 	public Com() {
 		comSeq = 0L;
@@ -27,6 +28,7 @@ public class Com implements Serializable {
 		comIndent = 0;
 		comStatus = "";
 		comRegDate = "";
+		userName = "";
 	}
 
 	public long getComSeq() {return comSeq;}
@@ -49,4 +51,6 @@ public class Com implements Serializable {
 	public void setComStatus(String comStatus) {this.comStatus = comStatus;}
 	public String getComRegDate() {return comRegDate;}
 	public void setComRegDate(String comRegDate) {this.comRegDate = comRegDate;}
+	public String getUserName() {return userName;}
+	public void setUserName(String userName) {this.userName = userName;}
 }

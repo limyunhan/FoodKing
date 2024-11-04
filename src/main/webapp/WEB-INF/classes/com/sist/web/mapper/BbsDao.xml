@@ -21,6 +21,26 @@
         <result column="IS_RECOMMENDED" property="isRecommended"></result>
     </resultMap>
     
+    <resultMap id="bbsFileResultMap" type="com.sist.web.model.BbsFile"> 
+        <id column="BBS_FILE_SEQ" property="bbsFileSeq"></id>
+        <id column="BBS_SEQ" property="bbsSeq"></id>
+        <result column="BBS_FILE_ORG_NAME" property="bbsFileOrgName"></result>
+        <result column="BBS_FILE_NAME" property="bbsFileName"></result>
+        <result column="BBS_FILE_EXT" property="bbsFileExt"></result>
+        <result column="BBS_FILE_SIZE" property="bbsFileSize"></result>
+        <result column="BBS_FILE_REG_DATE" property="bbsFileRegDate"></result>
+    </resultMap>
+    
+    <resultMap id="bbsImageResultMap" type="com.sist.web.model.BbsImage">
+        <id column="BBS_IMAGE_SEQ" property="bbsImageSeq"></id>
+        <result column="BBS_SEQ" property="bbsSeq"></result>
+        <result column="BBS_IMAGE_ORG_NAME" property="bbsImageOrgName"></result>
+        <result column="BBS_IMAGE_NAME" property="bbsImageName"></result>
+        <result column="BBS_IMAGE_EXT" property="bbsImageExt"></result>
+        <result column="BBS_IMAGE_SIZE" property="bbsImageSize"></result>
+        <result column="BBS_IMAGE_REG_DATE" property="bbsImageRegDate"></result>
+    </resultMap>
+    
     <!-- 게시글 리스트 조회 (페이징 처리) -->
     <select id="bbsList" parameterType="com.sist.web.model.BbsSearch" resultMap="bbsResultMap">
 		SELECT BBS_SEQ, SUB_CATE_COMBINED_NUM, USER_ID, BBS_TITLE, BBS_CONTENT, BBS_PWD, BBS_READ_CNT, BBS_STATUS, BBS_REG_DATE, BBS_UPDATE_DATE, USER_NAME, BBS_COM_CNT, BBS_RECOM_CNT, BBS_MAIN_CATE_NAME, BBS_SUB_CATE_NAME, IS_BOOKMARKED, IS_RECOMMENDED
@@ -48,7 +68,7 @@
 		                    SELECT 1 
 		                    FROM BOOKMARK B 
 		                    WHERE B.BBS_SEQ = A.BBS_SEQ 
-		                      AND B.USER_ID = #{userId}
+		                      AND B.USER_ID = #{loginUserId}
 		                ) THEN 'Y' 
 		                ELSE 'N' 
 		            END IS_BOOKMARKED,
@@ -57,7 +77,7 @@
 		                    SELECT 1 
 		                    FROM RECOM R 
 		                    WHERE R.BBS_SEQ = A.BBS_SEQ 
-		                      AND R.USER_ID = #{userId}
+		                      AND R.USER_ID = #{loginUserId}
 		                ) THEN 'Y' 
 		                ELSE 'N' 
 		            END AS IS_RECOMMENDED
@@ -78,8 +98,8 @@
 		            <if test="bookmarkUserId != null and bookmarkUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
 		            <if test="isSecret != null and isSecret != ''">
 		                <choose>
-		                    <when test="isSecret == 'Y'"> (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
-		                    <otherwise> (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
+		                    <when test="isSecret == 'Y'"> AND (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
+		                    <otherwise> AND (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
 		                </choose>
 		            </if> 
 		            <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
@@ -93,10 +113,10 @@
 		            <if test="periodFilter != null and periodFilter !=''">  
 		                <choose>
 		                    <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
-		                    <when test="periodFilter == '2'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
-		                    <when test="periodFilter == '3'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
-		                    <when test="periodFilter == '4'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
-		                    <when test="periodFilter == '5'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+		                    <when test="periodFilter == '2'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+		                    <when test="periodFilter == '3'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
+		                    <when test="periodFilter == '4'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
+		                    <when test="periodFilter == '5'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
 		                </choose>
 		            </if>
 		            AND A.USER_ID = U.USER_ID
@@ -125,8 +145,8 @@
 	        <if test="bookmarkUserId != null and bookmarkUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
 	        <if test="isSecret != null and isSecret != ''">
 	            <choose>
-	                <when test="isSecret == 'Y'"> (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
-	                <otherwise> (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
+	                <when test="isSecret == 'Y'"> AND (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
+	                <otherwise> AND (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
 	            </choose>
 	        </if> 
 	        <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
@@ -140,17 +160,17 @@
 	        <if test="periodFilter != null and periodFilter !=''">  
 	            <choose>
 	                <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
-	                <when test="periodFilter == '2'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
-	                <when test="periodFilter == '3'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
-	                <when test="periodFilter == '4'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
-	                <when test="periodFilter == '5'"> AND TRUNC(AND A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+	                <when test="periodFilter == '2'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+	                <when test="periodFilter == '3'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
+	                <when test="periodFilter == '4'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
+	                <when test="periodFilter == '5'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
 	            </choose>
 	        </if>
 	        AND A.USER_ID = U.USER_ID
     </select>
     
     <!-- 게시글 조회 -->
-    <select id="bbsSelect" parameterType="long" resultMap="bbsResultMap">
+    <select id="bbsSelect" parameterType="java.util.HashMap" resultMap="bbsResultMap">
 		SELECT 
 		    A.BBS_SEQ BBS_SEQ,
 		    A.SUB_CATE_COMBINED_NUM SUB_CATE_COMBINED_NUM,
@@ -172,7 +192,7 @@
 		            SELECT 1 
 		            FROM BOOKMARK B 
 		            WHERE B.BBS_SEQ = A.BBS_SEQ 
-		              AND B.USER_ID = #{value}
+		              AND B.USER_ID = #{loginUserId}
 		        ) THEN 'Y' 
 		        ELSE 'N' 
 		    END IS_BOOKMARKED,
@@ -181,13 +201,14 @@
 		            SELECT 1 
 		            FROM RECOM R 
 		            WHERE R.BBS_SEQ = A.BBS_SEQ 
-		              AND R.USER_ID = #{value}
+		              AND R.USER_ID = #{loginUserId}
 		        ) THEN 'Y' 
 		        ELSE 'N' 
 		    END AS IS_RECOMMENDED
 		FROM BBS A, USER_TABLE U
 		WHERE
-		    A.USER_ID = U.USER_ID
+		    A.BBS_SEQ = #{bbsSeq}
+		    AND A.USER_ID = U.USER_ID
 		    AND A.SUB_CATE_COMBINED_NUM = E.SUB_CATE_COMBINED_NUM
 		    AND A.BBS_SEQ = C.BBS_SEQ(+) 
 		    AND A.BBS_SEQ = D.BBS_SEQ(+)
@@ -223,6 +244,36 @@
 		WHERE BBS_SEQ = #{bbsSeq} AND BBS_FILE_SEQ = #{bbsFileSeq}
     </select>
     
+    <!-- 특정 게시글의 이미지 리스트 조회 -->
+    <select id="bbsImageList" parameterType="long" resultMap="bbsImageResultMap">
+        SELECT
+            BBS_IMAGE_SEQ,
+            BBS_SEQ,
+            NVL(BBS_IMAGE_ORG_NAME, '') BBS_IMAGE_ORG_NAME,
+            NVL(BBS_IMAGE_NAME, '') BBS_IMAGE_NAME,
+            NVL(BBS_IMAGE_EXT, '') BBS_IMAGE_EXT,
+            NVL(BBS_IMAGE_SIZE, 0) BBS_IMAGE_SIZE,
+            NVL(TO_CHAR(BBS_IMAGE_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_IMAGE_REG_DATE
+        FROM
+            BBS_IMAGE
+        WHERE BBS_SEQ = #{value}
+    </select>
+    
+    <!-- 특정 게시글의 특정 이미지 조회 -->
+    <select id="bbsImageSelect" parameterType="java.util.HashMap" resultMap="bbsImageResultMap">
+        SELECT
+            BBS_IMAGE_SEQ,
+            BBS_SEQ,
+            NVL(BBS_IMAGE_ORG_NAME, '') BBS_IMAGE_ORG_NAME,
+            NVL(BBS_IMAGE_NAME, '') BBS_IMAGE_NAME,
+            NVL(BBS_IMAGE_EXT, '') BBS_IMAGE_EXT,
+            NVL(BBS_IMAGE_SIZE, 0) BBS_IMAGE_SIZE,
+            NVL(TO_CHAR(BBS_IMAGE_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_IMAGE_REG_DATE
+        FROM
+            BBS_IMAGE
+        WHERE BBS_SEQ = #{bbsSeq} AND BBS_IMAGE_SEQ = #{bbsImageSeq}
+    </select>
+
     <!-- 특정 게시글의 조회수 1 증가 -->
     <update id="bbsReadCntPlus" parameterType="long">
         UPDATE BBS SET BBS_READ_CNT = BBS_READ_CNT + 1 WHERE BBS_SEQ = #{value}
@@ -257,6 +308,16 @@
 		)
 	</insert>
 	
+	<!-- 게시글 파일 시퀀스 -->
+	<select id="bbsFileSeq" parameterType="long" resultType="short">
+	   SELECT NVL(MAX(BBS_FILE_SEQ), 0) + 1 FROM BBS_FILE WHERE BBS_SEQ = #{value}
+	</select>
+	
+	<!-- 게시글 이미지 시퀀스 -->
+	<select id="bbsImageSeq" parameterType="long" resultType="short">
+       SELECT NVL(MAX(BBS_IMAGE_SEQ), 0) + 1 FROM BBS_IMAGE WHERE BBS_SEQ = #{value}
+    </select>
+
 	<!-- 게시글 파일 삽입(트랜잭션) -->
 	<insert id="bbsFileInsert" parameterType="com.sist.web.model.BbsFile">
 		INSERT INTO BBS_FILE (
@@ -280,6 +341,7 @@
 	
 	<!-- 게시글 이미지 삽입(트랜잭션) -->
 	<insert id="bbsImageInsert" parameterType="com.sist.web.model.BbsImage">
+	
 	    INSERT INTO BBS_IMAGE (
 	        BBS_IMAGE_SEQ,
 	        BBS_SEQ,
@@ -321,18 +383,46 @@
 	</update>
 	
 	<!-- 게시글 파일, 이미지 삭제(게시글 삭제시 적용, 트랜잭션) -->
-	<delete id="fileDeleteByBbsDelete" parameterType="long">
+	<delete id="bbsFileDelete" parameterType="long">
 	    DELETE FROM BBS_FILE WHERE BBS_SEQ = #{value}
 	</delete>
-	<delete id="ImageDeleteByBbsDelete" parameterType="long">
+	
+	<delete id="bbsImageDelete" parameterType="long">
 	    DELETE FROM BBS_IMAGE WHERE BBS_SEQ = #{value}
 	</delete>
 	
-	<!--  게시글 파일, 이미지 삭제(게시글 수정시 적용, 트랜잭션) -->
-	<delete id="fileDeleteByBbsUpdate" parameterType="java.util.HashMap">
-	    DELETE FROM BBS_FILE WHERE BBS_SEQ = #{bbsSeq} AND BBS_FILE_SEQ = #{bbsFileSeq}
-	</delete>
-	<delete id="ImageDeleteByBbsUpdate" parameterType="java.util.HashMap">
-        DELETE FROM BBS_IMAGE WHERE BBS_SEQ = #{bbsSeq} AND BBS_IMAGE_SEQ = #{bbsImageSeq}
+	<!-- 게시글 추천 -->
+	<insert id="recomInsert" parameterType="java.util.HashMap">
+	    INSERT INTO RECOM (
+	        USER_ID,
+	        BBS_SEQ,
+	        RECOM_REG_DATE
+	    ) VALUES (
+	        #{userId},
+	        #{bbsSeq},
+	        SYSDATE
+	    )
+	</insert>
+	<!--  게시글 추천 해제 -->
+    <delete id="recomDelete" parameterType="java.util.HashMap">
+	    DELETE FROM RECOM WHERE USER_ID = #{userId} AND BBS_SEQ = #{bbsSeq}
+    </delete>
+
+	<!--  게시글 북마크 -->
+	<insert id="bookmarkInsert" parameterType="java.util.HashMap">
+		INSERT INTO BOOKMARK (
+		    USER_ID,
+		    BBS_SEQ,
+		    BOOKMARK_REG_DATE
+		) VALUES (
+		    #{userId},
+		    #{bbsSeq},
+		    SYSDATE
+		)
+	</insert>
+	
+    <!--  게시글 북마크 해제 -->
+    <delete id="bookmarkDelete" parameterType="java.util.HashMap">
+        DELETE FROM BOOKMARK WHERE USER_ID = #{userId} AND BBS_SEQ = #{bbsSeq}
     </delete>
 </mapper>

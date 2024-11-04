@@ -6,7 +6,7 @@ public class BbsSearch implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	// 북마크, 추천 여부를 위한 로그인한 유저의 아이디 멤버
-	private String userId;
+	private String loginUserId;
 	
 	// 카테고리 아이디를 위한 멤버 // empty : 모든 게시글 조회
 	private String cateNum;
@@ -34,7 +34,7 @@ public class BbsSearch implements Serializable {
 	private String orderBy;
 	
 	public BbsSearch() {
-		userId = "";
+		loginUserId = "";
 		
 		cateNum = "";
 		
@@ -71,12 +71,12 @@ public class BbsSearch implements Serializable {
 	public void setSearchType(String searchType) {this.searchType = searchType;}
 	public String getSearchValue() {return searchValue;}
 	public void setSearchValue(String searchValue) {this.searchValue = searchValue;}
-	public String getUserId() {return userId;}
-	public void setUserId(String userId) {this.userId = userId;}
 	public String getOrderBy() {return orderBy;}
 	public void setOrderBy(String orderBy) {this.orderBy = orderBy;}
 	public String getCateNum() {return cateNum;}
 	public void setCateNum(String cateNum) {this.cateNum = cateNum;}
 	public String getperiodFilter() {return periodFilter;}
 	public void setperiodFilter(String periodFilter) {this.periodFilter = periodFilter;}
+	public String getLoginUserId() {return loginUserId;}
+	public void setLoginUserId(String loginUserId) {this.loginUserId = loginUserId;}
 }

@@ -13,3 +13,4 @@
 <script type="text/javascript" src="/resources/js/icia.common.js"></script>
 <script type="text/javascript" src="/resources/js/icia.ajax.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.4/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>

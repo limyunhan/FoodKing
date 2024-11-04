@@ -1,9 +1,175 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sist.web.dao.ComDao">
+    <resultMap id="comResultMap" type="com.sist.web.model.Com">
+        <id column="COM_SEQ" property="comSeq"></id>
+        <result column="USER_ID" property="userId"></result>
+        <result column="BBS_SEQ" property="bbsSeq"></result>
+        <result column="COM_CONTENT" property="comContent"></result>
+        <result column="COM_GROUP" property="comGroup"></result>
+        <result column="COM_PARENT" property="comParent"></result>
+        <result column="COM_ORDER" property="comOrder"></result>
+        <result column="COM_INDENT" property="comIndent"></result>
+        <result column="COM_STATUS" property="comStatus"></result>
+        <result column="COM_REG_DATE" property="comRegDate"></result>
+        <result column="USER_NAME" property="userName"></result>
+    </resultMap>
+    
+    <!-- 특정 게시글의 댓글 리스트 조회(페이징 처리) -->
+    <select id="comList" parameterType="com.sist.web.model.ComSearch" resultMap="comResultMap">
+	    SELECT COM_SEQ, USER_ID, BBS_SEQ, COM_CONTENT, COM_GROUP, COM_PARENT, COM_ORDER, COM_INDENT, COM_STATUS, COM_REG_DATE, USER_NAME
+		FROM (
+		    SELECT ROWNUM RNUM, COM_SEQ, USER_ID, BBS_SEQ, COM_CONTENT, COM_GROUP, COM_PARENT, COM_ORDER, COM_INDENT, COM_STATUS, COM_REG_DATE, USER_NAME
+		    FROM (
+		        SELECT
+		            C.COM_SEQ COM_SEQ,
+		            U.USER_ID USER_ID,
+		            C.BBS_SEQ BBS_SEQ,
+		            NVL(C.COM_CONTENT, '') COM_CONTENT,
+		            NVL(C.COM_GROUP, 0) COM_GROUP,
+		            NVL(C.COM_PARENT, 0) COM_PARENT,
+		            NVL(C.COM_ORDER, 0) COM_ORDER,
+		            NVL(C.COM_INDENT, 0) COM_INDENT,
+		            NVL(C.COM_STATUS, 'N') COM_STATUS,
+		            NVL(TO_CHAR(C.COM_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') COM_REG_DATE,
+		            NVL(U.USER_NAME, '') USER_NAME
+		        FROM 
+		            COM C, 
+		            USER_TABLE U
+		        WHERE
+		            1 = 1  
+                    <if test="myPageUserId != null and myPageUserId != ''">
+		                AND C.USER_ID = #{myPageUserId} AND C.COM_STATUS = 'Y'
+                    </if>
+                    <if test="bbsSeq != 0">
+                        AND C.BBS_SEQ = #{bbsSeq}    
+                    </if>
+		            AND C.USER_ID = U.USER_ID
+		        ORDER BY C.COM_GROUP, C.COM_ORDER 
+		    )
+		)
+		WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+    </select>
 
+	<!-- 페이징처리를 위한 게시글의 댓글 수 조회 -->
+	<select id="comListCnt" parameterType="com.sist.web.model.ComSearch" resultType="long">
+	   SELECT COUNT(COM_SEQ) 
+	   FROM COM 
+	   WHERE 
+	       1 = 1
+           <if test="myPageUserId != null and myPageUserId != ''">
+               AND C.USER_ID = #{myPageUserId} AND C.COM_STATUS = 'Y'
+           </if>
+           <if test="bbsSeq != 0">
+               AND C.BBS_SEQ = #{bbsSeq}    
+           </if>
+	</select>
 
+	<!-- 단일 댓글 조회 -->
+	<select id="comSelect" parameterType="long" resultMap="comResultMap">
+	    SELECT
+	        C.COM_SEQ COM_SEQ,
+	        U.USER_ID USER_ID,
+	        C.BBS_SEQ BBS_SEQ,
+	        NVL(C.COM_CONTENT, '') COM_CONTENT,
+	        NVL(C.COM_GROUP, 0) COM_GROUP,
+	        NVL(C.COM_PARENT, 0) COM_PARENT,
+	        NVL(C.COM_ORDER, 0) COM_ORDER,
+	        NVL(C.COM_INDENT, 0) COM_INDENT,
+	        NVL(C.COM_STATUS, 'N') COM_STATUS,
+	        NVL(TO_CHAR(C.COM_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') COM_REG_DATE,
+	        NVL(U.USER_NAME, '') USER_NAME
+	    FROM COM C, USER_TABLE U
+	    WHERE C.COM_SEQ = #{value}
+	</select>
 
+    <!-- INDENT가 0인 댓글 작성 -->
+    <insert id="comInsert" parameterType="com.sist.web.model.Com">
+        <selectKey resultType="long" keyProperty="comSeq" order="BEFORE">
+            SELECT COM_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+    
+	    INSERT INTO COM (
+	        COM_SEQ,
+	        USER_ID,
+	        BBS_SEQ,
+	        COM_CONTENT,
+	        COM_GROUP,
+	        COM_PARENT,
+	        COM_ORDER,
+	        COM_INDENT,
+	        COM_STATUS,
+	        COM_REG_DATE
+	    ) VALUES (
+	        #{comSeq},
+	        #{userId},
+	        #{bbsSeq},
+	        #{comContent},
+	        #{comSeq},
+	        0,
+	        0,
+	        0,
+	        'Y',
+	        SYSDATE
+	    )
+    </insert>
 
+    <!-- INDENT가 0이 아닌 댓글(대댓글) 작성 -->
+    <insert id="comReplyInsert" parameterType="com.sist.web.model.Com">
+        <selectKey resultType="long" keyProperty="comSeq" order="BEFORE">
+            SELECT COM_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        
+	    INSERT INTO COM (
+		    COM_SEQ,
+		    USER_ID,
+		    BBS_SEQ,
+		    COM_CONTENT,
+		    COM_GROUP,
+		    COM_PARENT,
+		    COM_ORDER,
+		    COM_INDENT,
+		    COM_STATUS,
+		    COM_REG_DATE
+		) VALUES (
+		    #{comSeq},
+		    #{userId},
+		    #{bbsSeq},
+		    #{comContent},
+		    #{comGroup},
+		    #{comParent},
+		    #{comOrder},
+		    #{comIndent},
+		    'Y',
+		    SYSDATE
+		)
+    </insert>
 
+    <!-- 대댓글 삽입시 COM_ORDER 업데이트 -->
+    <update id="comGroupOrderUpdate" parameterType="java.util.HashMap">
+        UPDATE COM SET COM_ORDER = COM_ORDER + 1 WHERE COM_GROUP = #{comGroup} AND COM_ORDER >= #{comOrder}
+    </update>
+
+	<!-- 기존 대댓글의 개수 구하기 -->
+	<select id="comReplyCnt" parameterType="long" resultType="int">
+        SELECT COUNT(COM_SEQ) 
+	    FROM COM
+	    START WITH COM_PARENT = #{value}
+	    CONNECT BY PRIOR COM_SEQ = COM_PARENT
+	</select>
+
+	<!-- indent가 0인 댓글에 대댓글 작성시 COM_ORDER의 MAX값 조회 -->
+	<select id="comGroupMaxOrder" parameterType="long" resultType="int">
+	   SELECT MAX(COM_ORDER) + 1 FROM COM WHERE COM_GROUP = #{value}
+	</select>
+	
+	<!-- 댓글 수정 -->
+	<update id="comUpdate" parameterType="java.util.HashMap">
+	   UPDATE COM SET COM_CONTENT = #{comContent} WHERE COM_SEQ = #{comSeq}
+	</update>
+
+    <!-- 댓글 삭제 -->
+    <update id="comDelete" parameterType="long">
+        UPDATE COM SET COM_STATUS = 'N' WHERE COM_SEQ = #{value}
+    </update>
 </mapper>

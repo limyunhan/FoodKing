@@ -3,7 +3,7 @@
 
 <script>
 function fn_selectCategory(cateNum) {
-    window.location.href = "/board/list?cateNum=" + cateNum;
+    window.location.href = "/bbs/list?cateNum=" + cateNum;
 } 
 </script>
 
@@ -35,7 +35,7 @@ function fn_selectCategory(cateNum) {
       <li>
         <a href="javascript:void(0)" onclick="fn_selectCategory('${mainCate.mainCateNum}')">${mainCate.mainCateName}</a>
         <ul>
-          <c:forEach var="subCate" items="${subCateMap[mainCate.mainCateNum]}" varStatus="status">
+          <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status"> 
             <li>
               <a href="javascript:void(0)" onclick="fn_selectCategory('${subCate.subCateCombinedNum}')">${subCate.subCateName}</a>
             </li>

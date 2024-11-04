@@ -24,15 +24,39 @@ public class CateAdvice {
         return cateService.mainCateList();
     }
     
-    @ModelAttribute("subCateMap")
-    public Map<String, List<SubCate>> getSubCateMap() {
+    @ModelAttribute("subCateListMap") 
+    public Map<String, List<SubCate>> getSubCateListMap() {
         List<SubCate> subCateList = cateService.subCateList();
-        Map<String, List<SubCate>> subCateMap = new HashMap<>();
+        Map<String, List<SubCate>> subCateListMap = new HashMap<>();
 
         for (SubCate subCate : subCateList) {
-            subCateMap
+            subCateListMap
                 .computeIfAbsent(subCate.getMainCateNum(), k -> new ArrayList<>())
                 .add(subCate);
+        }
+
+        return subCateListMap;
+    }
+    
+    @ModelAttribute("mainCateMap")
+    public Map<String, MainCate> getMainCateMap() {
+        List<MainCate> mainCateList = cateService.mainCateList();
+        Map<String, MainCate> mainCateMap = new HashMap<>();
+
+        for (MainCate mainCate : mainCateList) {
+            mainCateMap.put(mainCate.getMainCateNum(), mainCate);
+        }
+
+        return mainCateMap;
+    }
+    
+    @ModelAttribute("subCateMap") 
+    public Map<String, SubCate> getSubCateMap() {
+        List<SubCate> subCateList = cateService.subCateList();
+        Map<String, SubCate> subCateMap = new HashMap<>();
+
+        for (SubCate subCate : subCateList) {
+            subCateMap.put(subCate.getSubCateCombinedNum(), subCate);
         }
 
         return subCateMap;
