@@ -1,98 +1,146 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-  pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@include file="/WEB-INF/views/include/taglib.jsp"%>
-<%@ page import="com.sist.common.util.StringUtil"%>
-<%@ page import="com.sist.web.util.CookieUtil"%>
-<%@ page import="com.sist.web.util.HttpUtil"%>
 
 <!DOCTYPE html>
 <html lang="ko">
 
 <head>
 <%@include file="/WEB-INF/views/include/head.jsp"%>
-<link
-  href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css"
-  rel="stylesheet">
-<script
-  src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
-<script
-  src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-ko-KR.min.js"></script>
-<style>
-.note-editor {
-  border: 2px solid #1e88e5;
-  border-radius: 5px;
-  font-family: "GmarketSans";
-}
-
-.note-editable {
-  border: 2px solid #1e88e5;
-  color: #7B8AB8;
-  min-height: 500px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #FFFFFF;
-}
-
-.note-editable:focus {
-  border: 4px solid #abccee;
-}
-
-.note-toolbar {
-  border-radius: 5px;
-  margin-bottom: 5px;
-}
-</style>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-ko-KR.min.js"></script>
 <script>
 $(document).ready(function() {
-    $("#bbsTitle").focus();
-    $("#bbsContent").summernote({
-        lang: 'ko-KR',
-        toolbar: [
-            ["insert", ['picture']],
-            ["fontname", ["fontname"]],
-            ["fontsize", ["fontsize"]],
-            ["color", ["color"]],
-            ["style", ["style"]],
-            ["font", ["strikethrough", "superscript", "subscript"]],
-            ["table", ["table"]],
-            ["para", ["ul", "ol", "paragraph"]],
-            ["height", ["height"]],
-        ],
-        fontNames: ['을지로체', 'Nanum Gothic', 'Noto Sans KR', 'Spoqa Han Sans'],
-        fontNamesIgnoreCheck: ['을지로체', 'Nanum Gothic', 'Noto Sans KR', 'Spoqa Han Sans'], 
-        callbacks: {
-            onImageUpload: function(files) {
-                for (let i = 0; i < files.length; i++) {
-                    uploadImage(files[i]);
-                }
-            },
-            onPaste: function(e) {
-                var clipbbsData = e.originalEvent.clipbbsData;
+	$("#bbsContent").summernote({
+	    lang: 'ko-KR',
+	    toolbar: [
+	        ["insert", ['picture']],
+	        ["fontname", ["fontname"]],
+	        ["fontsize", ["fontsize"]],
+	        ["color", ["color"]],
+	        ["style", ["style"]],
+	        ["font", ["strikethrough", "superscript", "subscript"]],
+	        ["table", ["table"]],
+	        ["para", ["ul", "ol", "paragraph"]],
+	        ["height", ["height"]],
+	    ],
+	    fontNames: ['을지로체', 'Nanum Gothic', 'Noto Sans KR', 'Spoqa Han Sans'],
+	    fontNamesIgnoreCheck: ['을지로체', 'Nanum Gothic', 'Noto Sans KR', 'Spoqa Han Sans'], 
+	    callbacks: {
+	        onInit: function() {
+	            // 초기 폰트 및 폰트 크기 설정
+	            $("#bbsContent").summernote("fontName", "을지로체");
+	            $("#bbsContent").summernote("fontSize", "18");
+	            $("#bbsTitle").focus();
+	        },
+	        onImageUpload: function(files) {
+	            for (let i = 0; i < files.length; i++) {
+	                uploadImage(files[i]);
+	            }
+	        },
+	        onPaste: function(e) {
+	            var clipbbsData = e.originalEvent.clipboardData;
 
-                if (clipbbsData && clipbbsData.items && clipbbsData.items.length) {
-                    var item = clipbbsData.items[0];
+	            if (clipbbsData && clipbbsData.items && clipbbsData.items.length) {
+	                var item = clipbbsData.items[0];
 
-                    if (item.kind === "file" && item.type.indexOf("image/") !== -1) {
-                        e.preventDefault();
-                    }
-                }
-            }
+	                if (item.kind === "file" && item.type.indexOf("image/") !== -1) {
+	                    e.preventDefault();
+	                }
+	            }
+	        }
+	    }
+	});
+	
+	$("#bbsFile").on("change", function() {
+	    var fileName = $(this).get(0).files.length > 0 ? $(this).get(0).files[0].name : "선택된 파일 없음";
+	    $('#fileName').text(fileName);
+	});
+	
+	
+	$("#secretCheck").on("change", function(){
+	    $("#bbsPwd").prop("disabled", !this.checked);		
+	});
+	
+	$("#write-btn").on("click", function() {
+        if ($("#subCateCombinedNum").val() === "") {
+        	alert("게시판을 선택해주세요.");
+        	$("#subCateCombinedNum").focus();
+        	return;
         }
-    }).summernote('fontName', '을지로체')
-      .summernote('fontSize', '18px');
+		
+	    if ($.trim($("#bbsTitle").val()).length === 0) {
+	        alert("제목을 입력해주세요.");
+	        $("#bbsTitle").val("");
+	        $("#bbsTitle").focus();
+	        return;
+	    }
+	    
+	    var content = $("#bbsContent").summernote("code");
+	    var strippedContent = content.replace(/<[^>]+>/g, ""); // HTML 태그 제거
+
+	    if ($.trim(strippedContent).length === 0) {
+	        alert("내용을 입력해주세요.");
+	        $("#bbsContent").summernote("focus"); // 서머노트 에디터에 포커스
+	        return; 
+	    }
+
+	    if ($("#secretCheck").prop("checked") && $.trim($("#bbsPwd").val()).length === 0) {
+	        alert("게시글 비밀번호를 입력해주세요.");
+	        $("#bbsPwd").val("");
+	        $("#bbsPwd").focus();
+	        return;
+	    }
+	    
+	    var form = $("#writeForm")[0];
+	    var formData = new FormData(form);
+	    
+	    $.ajax({
+	        type: "POST",
+	        enctype: "multipart/form-data",
+	        url: "/bbs/writeProc",
+	        data: formData,
+	        processData: false,
+	        contentType: false,
+	        cache: false,
+	        beforeSend: function(xhr) {
+	        	xhr.setRequestHeader("AJAX", "true");
+	        },
+	        success: function(response) {
+	        	if (response.code === 200) {
+	        	    alert("게시글을 성공적으로 작성하였습니다.");
+	        	    document.bbsForm.action = "/bbs/list" 
+	        	    document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
+	                document.bbsForm.submit();
+	        	} else if (response.code === 500) {
+	        		alert("DB정합성 오류로 게시글 작성에 실패하였습니다.");      		
+	        		
+	        	} else if (response.code === 400) {
+	        		alert("비정상적인 접근입니다.");
+	        		location.href = "/";
+	        		
+	        	} else {
+	        		alert("서버 응답 오류로 게시글 작성에 실패하였습니다.");
+	        	}
+	        	
+	        },
+	        error: function(error) {
+	        	alert("서버 응답 오류로 게시글 작성에 실패하였습니다.");
+	        	icia.common.error(error);
+	        }
+	    });
+	});
 });
 </script>
 </head>
-
 <body id="index-body">
   <div class="bbs-Main-Page">
     <div class="bbs-Main">
       <%@include file="/WEB-INF/views/include/navigation.jsp"%>
-
       <div class="main-contanier">
         <%@include file="/WEB-INF/views/leftMainContent.jsp"%>
         <div class="write-container">
-          <form name="writeForm" id="writeForm" method="post">
+          <form name="writeForm" id="writeForm" method="post" enctype="multipart/form-data">
             <div class="write-header">
               <h1>글쓰기</h1>
               <div class="write-section">
@@ -101,69 +149,52 @@ $(document).ready(function() {
               </div>
             </div>
             <div class="write-category">
-              <select id="write-category">
+              <select id="subCateCombinedNum">
                 <option value="">게시판을 선택해 주세요.</option>
-                <option value="1,1">[추천] 관리자가 추천하는 맛집</option>
-                <option value="1,2">[추천] 블로거 추천</option>
-                <option value="2,4">[커뮤니티] 자유게시판</option>
-                <option value="3,6">[지역별 맛집] 경기도</option>
-                <option value="3,7">[지역별 맛집] 서울</option>
-                <option value="3,8">[지역별 맛집] 강원도</option>
-                <option value="3,9">[지역별 맛집] 충청도</option>
-                <option value="3,10">[지역별 맛집] 전라도</option>
-                <option value="3,11">[지역별 맛집] 경상도</option>
-                <option value="3,12">[지역별 맛집] 제주도</option>
-                <option value="4,13">[테마별 맛집] 한식</option>
-                <option value="4,14">[테마별 맛집] 중식</option>
-                <option value="4,15">[테마별 맛집] 일식</option>
-                <option value="4,16">[테마별 맛집] 양식</option>
-                <option value="4,17">[테마별 맛집] 간식</option>
-                <option value="5,18">[공지사항]</option>
-                <option value="1,1">[추천] 관리자가 추천하는 맛집</option>
-                <option value="1,2">[추천] 블로거 추천</option>
+                <c:forEach var="mainCate" items="${mainCateList}" varStatus="status">
+                  <c:if test="${mainCate.mainCateNum != '06' && mainCate.mainCateNum != '01' && mainCate.mainCateNum != '05'}">
+                    <optgroup label="${mainCate.mainCateName}">
+                    <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status">
+                      <option value="${subCate.subCateCombinedNum}" <c:if test="${subCate.subCateCombinedNum == cateNum}">selected</c:if>>${subCate.subCateName}</option>   
+                    </c:forEach>
+                    </optgroup>
+                  </c:if>
+                </c:forEach>
               </select>
               <div></div>
               <div class="write-pwd">
-                <label for="lockLabel" id="lockLabel">🔒</label> <input
-                  type="checkbox" id="secretCheck" name="secretCheck" />
-                <input type="password" id="secretPassword"
-                  name="secretPassword" placeholder="비밀번호를 입력하세요."
-                  disabled />
+                <label for="secretCheck" id="lockLabel">🔒</label> 
+                <input type="checkbox" id="secretCheck" name="secretCheck">
+                <input type="password" id="bbsPwd" name="bbsPwd" placeholder="비밀번호를 입력하세요." disabled>
               </div>
             </div>
-
-            <div class="input-group"
-              style="display: flex; align-items: center;">
-              <label for="userImage" class="custom-file-upload"
-                style="white-space: nowrap;">파일 선택</label> <span
-                class="file-name" id="fileName">선택된 파일 없음</span> <input
-                type="file" id="userImage" name="userImage">
+            <div class="input-group" style="display: flex; align-items: center;">
+              <label for="bbsFile" class="custom-file-upload" style="white-space: nowrap;">파일 선택</label> 
+              <span class="file-name" id="fileName">선택된 파일 없음</span> 
+              <input type="file" id="bbsFile" name="bbsFile" multiple style="display: none;">
             </div>
-
             <div class="write-title">
-              <input type="text" id="bbsTitle" name="bbsTitle"
-                placeholder="제목을 입력해 주세요." value="" />
+              <input type="text" id="bbsTitle" name="bbsTitle" placeholder="제목을 입력해 주세요." value="" />
             </div>
-
             <div class="write-content">
-              <textarea id="bbsContent" name="bbsContent"
-                placeholder="내용을 입력하세요."></textarea>
+              <textarea class="summernote" id="bbsContent" name="bbsContent" placeholder="내용을 입력하세요."></textarea>
             </div>
-            <input type="hidden" name="Catfirst" id="Catfirst" value="">
-            <input type="hidden" name="firstName" id="firstName"
-              value=""> <input type="hidden" name="Catsecond"
-              id="Catsecond" value=""> <input type="hidden"
-              name="secondName" id="secondName" value=""> <input
-              type="hidden" name="bbsName" id="bbsName" value="">
-            <input type="hidden" name="bbsSeq" id="bbsSeq" value="">
-            <input type="hidden" name="searchType" value=""> <input
-              type="hidden" name="searchValue" value=""> <input
-              type="hidden" name="curPage" value="">
           </form>
         </div>
       </div>
       <%@ include file="/WEB-INF/views/include/footer.jsp"%>
     </div>
   </div>
+  <form name="bbsForm" id="bbsForm" method="post">
+    <input type="hidden" name="listCount" value="${listCount}">
+    <input type="hidden" name="curPage" value="${curPage}">
+    <input type="hidden" name="cateNum" value="${cateNum}">
+    <input type="hidden" name="cateFilter" value="${cateFilter}">
+    <input type="hidden" name="periodFilter" value="${periodFilter}">
+    <input type="hidden" name="orderBy" value="${orderBy}">  
+    <input type="hidden" name="isSecret" value="${isSecret}">
+    <input type="hidden" name="searchType" value="${searchType}">
+    <input type="hidden" name="searchValue" value="${searchValue}">
+  </form>
 </body>
 </html>

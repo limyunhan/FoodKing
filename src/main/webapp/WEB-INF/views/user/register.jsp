@@ -132,6 +132,7 @@
                     $("#imagePreview").attr("src", e.target.result).show();  
                 }
                 reader.readAsDataURL(this.files[0]);  
+                
             } else {
                 $("#fileName").text("선택된 이미지 없음"); 
                 $("#imagePreview").attr("src", "/resources/profile/defaultProfile.jpg");
@@ -380,7 +381,7 @@
         <h2>회원가입</h2>
         <p>아래의 양식을 작성해 회원가입을 완료하세요.</p>
       </div>
-      <form action="/user/userProc.jsp" method="POST" id="regForm" name="regForm">
+      <form action="/user/userProc.jsp" method="POST" id="regForm" name="regForm" enctype="multipart/form-data">
         <div class="input-group" style="display: flex; flex-direction: column; align-items: flex-start;">
           <div style="display: flex; align-items: center; width: 100%;">
             <input type="text" id="userId" name="userId" placeholder="아이디" style="flex: 1;">
@@ -421,23 +422,17 @@
         <div class="input-group">
           <select id="userRegion" name="userRegion">
             <option value="">사는 지역</option>
-            <option value="서울">서울</option>
-            <option value="경기도">경기도</option>
-            <option value="강원도">강원도</option>
-            <option value="충정도">충정도</option>
-            <option value="전라도">전라도</option>
-            <option value="경상도">경상도</option>
-            <option value="제주도">제주도</option>
+            <c:forEach var="subCate" items="${subCateListMap['03']}" varStatus="status">
+              <option value="${subCate.subCateName}">${subCate.subCateName}</option>
+            </c:forEach>
           </select>
         </div>
         <div class="input-group">
           <select id="userFood" name="userFood">
             <option value="">좋아하는 테마별 음식</option>
-            <option value="한식">한식</option>
-            <option value="중식">중식</option>
-            <option value="일식">일식</option>
-            <option value="양식">양식</option>
-            <option value="간식">간식</option>
+            <c:forEach var="subCate" items="${subCateListMap['04']}" varStatus="status">
+              <option value="${subCate.subCateName}">${subCate.subCateName}</option>
+            </c:forEach>
           </select>
         </div>
         <div id="profileBox" style="width: 120px; height: 120px; border: 5px solid #F2B048; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; overflow: hidden;">

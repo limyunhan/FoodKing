@@ -8,7 +8,7 @@
   <%@include file="/WEB-INF/views/include/head.jsp" %>
   <script>
     $(document).ready(function() {
-    	$("#user")
+
     	
     	
     	

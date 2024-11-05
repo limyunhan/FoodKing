@@ -12,9 +12,9 @@
                            http://www.springframework.org/schema/mvc
 		 				   http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 		 				   
-	<!-- 어노테이션 service, controller 스캔 시작 -->
+	<!-- 어노테이션 controller, advice, config 스캔 시작 -->
     <context:component-scan base-package="com.sist.web.controller, com.sist.web.advice, com.sist.web.config" />
-    <!-- 어노테이션 service, controller 스캔 종료 -->
+    <!-- 어노테이션 controller, advice, config 스캔 종료 -->
 
     <mvc:annotation-driven>
    		<mvc:message-converters>

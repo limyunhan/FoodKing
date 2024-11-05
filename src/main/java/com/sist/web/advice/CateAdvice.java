@@ -19,11 +19,13 @@ public class CateAdvice {
     @Autowired
     private CateService cateService;
 
+    // 메인 카테고리 리스트
     @ModelAttribute("mainCateList")
     public List<MainCate> getMainCateList() {
         return cateService.mainCateList();
     }
     
+    // 메인 카테고리에 해당하는 서브 카테고리 리스트 맵
     @ModelAttribute("subCateListMap") 
     public Map<String, List<SubCate>> getSubCateListMap() {
         List<SubCate> subCateList = cateService.subCateList();
@@ -38,6 +40,7 @@ public class CateAdvice {
         return subCateListMap;
     }
     
+    // 메인 카테고리 번호로 메인 카테고리 객체를 얻는 맵 (이름을 조회할 수 있음)
     @ModelAttribute("mainCateMap")
     public Map<String, MainCate> getMainCateMap() {
         List<MainCate> mainCateList = cateService.mainCateList();
@@ -50,6 +53,7 @@ public class CateAdvice {
         return mainCateMap;
     }
     
+    // 서브 카테고리 번호로 서브 카테고리 객체를 얻는 맵 (이름을 조회할 수 있음)
     @ModelAttribute("subCateMap") 
     public Map<String, SubCate> getSubCateMap() {
         List<SubCate> subCateList = cateService.subCateList();

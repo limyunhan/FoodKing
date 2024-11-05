@@ -9,7 +9,7 @@ public class BbsSearch implements Serializable {
 	private String loginUserId;
 	
 	// 카테고리 아이디를 위한 멤버 // empty : 모든 게시글 조회
-	private String cateNum;
+	private String cateFilter;
 	
 	// 페이징 처리를 위한 멤버
 	private long startRow;
@@ -36,7 +36,7 @@ public class BbsSearch implements Serializable {
 	public BbsSearch() {
 		loginUserId = "";
 		
-		cateNum = "";
+		cateFilter = "";
 		
 		startRow = 0L;
 		endRow = 0L;
@@ -73,10 +73,10 @@ public class BbsSearch implements Serializable {
 	public void setSearchValue(String searchValue) {this.searchValue = searchValue;}
 	public String getOrderBy() {return orderBy;}
 	public void setOrderBy(String orderBy) {this.orderBy = orderBy;}
-	public String getCateNum() {return cateNum;}
-	public void setCateNum(String cateNum) {this.cateNum = cateNum;}
 	public String getperiodFilter() {return periodFilter;}
 	public void setperiodFilter(String periodFilter) {this.periodFilter = periodFilter;}
 	public String getLoginUserId() {return loginUserId;}
 	public void setLoginUserId(String loginUserId) {this.loginUserId = loginUserId;}
+	public String getCateFilter() {return cateFilter;}
+	public void setCateFilter(String cateFilter) {this.cateFilter = cateFilter;}
 }

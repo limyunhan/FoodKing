@@ -109,14 +109,14 @@
 		                    <when test="searchType == '3'"> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
 		                </choose>
 		            </if> 
-		            <if test="cateNum != null and cateNum != ''"> AND A.BBS_SUB_CATE_COMBINED_NUM LIKE '%' || #{cateNum} || '%'</if>
+		            <if test="cateFilter != null and cateFilter != ''"> AND A.BBS_SUB_CATE_COMBINED_NUM LIKE '%' || #{cateNum} || '%'</if>
 		            <if test="periodFilter != null and periodFilter !=''">  
 		                <choose>
-		                    <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
-		                    <when test="periodFilter == '2'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+		                    <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+		                    <when test="periodFilter == '2'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
 		                    <when test="periodFilter == '3'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
-		                    <when test="periodFilter == '4'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
-		                    <when test="periodFilter == '5'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+		                    <when test="periodFilter == '4'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+		                    <when test="periodFilter == '5'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
 		                </choose>
 		            </if>
 		            AND A.USER_ID = U.USER_ID

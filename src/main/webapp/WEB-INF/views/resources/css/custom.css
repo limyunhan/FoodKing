@@ -596,7 +596,7 @@ input[type="password"] {
     padding-bottom: 10px;*/
 }
 
-.pagingSelect {
+.listCount {
   font-family: "을지로체";
   padding: 5px;
   margin-right: 5px;
@@ -607,7 +607,29 @@ input[type="password"] {
   cursor: pointer;
 }
 
-.sortSelect {
+.orderBy {
+  font-family: "을지로체";
+  padding: 5px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.isSecret {
+  font-family: "을지로체";
+  padding: 5px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.cateFilter {
   font-family: "을지로체";
   padding: 5px;
   margin-right: 5px;
@@ -1287,7 +1309,8 @@ form.profile-form {
 }
 
 .write-pwd label {
-  font-size: 18px;
+  font-size: 20px; /* 체크박스와 비슷한 높이로 설정 */
+  margin-top: 7px;
   font-weight: bold;
   white-space: nowrap;
 }
@@ -1295,7 +1318,6 @@ form.profile-form {
 .write-pwd input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  margin-left: 10px;
   margin-right: 10px;
   cursor: pointer;
 }
@@ -1310,7 +1332,7 @@ form.profile-form {
   transition: border-color 0.3s ease;
 }
 
-.write-pwd input[type="password"]:placeholder {
+.write-pwd input[type="password"]::placeholder {
   font-family: '을지로체', sans-serif;
 }
 
@@ -1322,6 +1344,7 @@ form.profile-form {
 .write-pwd input[type="password"]:focus {
   border-color: #333;
 }
+
 
 #passwordModal,
 #profileModal {
@@ -1551,4 +1574,26 @@ form.profile-form {
 
 .emailAuthBtn:hover {
   background-color: #eaad70;
+}
+.note-editor {
+  border: 2px solid #1e88e5;
+  border-radius: 5px;
+  font-family: "을지로체";
+}
+
+.note-editable {
+  color: #7B8AB8;
+  min-height: 500px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #FFFFFF;
+}
+
+.note-editable:focus {
+  border: 3px solid #101010;
+}
+
+.note-toolbar {
+  border-radius: 5px;
+  margin-bottom: 5px;
 }
