@@ -33,19 +33,41 @@
 		            NVL(C.COM_STATUS, 'N') COM_STATUS,
 		            NVL(TO_CHAR(C.COM_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') COM_REG_DATE,
 		            NVL(U.USER_NAME, '') USER_NAME
+		            NVL(R.GROUP_REPLY_CNT, 0) GROUP_REPLY_CNT
 		        FROM 
 		            COM C, 
-		            USER_TABLE U
+		            USER_TABLE U,
+		            (SELECT COM_GROUP, COUNT(COM_SEQ) GROUP_REPLY_CNT
+		            FROM (
+		              SELECT COM_GROUP, COM_SEQ, COM_PARENT
+		              FROM COM
+		              WHERE COM_PARENT != 0
+		              START WITH COM_PARENT = 0
+		              CONNECT BY PRIOR COM_SEQ = COM_PARENT
+		              AND LEVEL > 1
+		            )
+		            GROUP BY COM_GROUP) R
 		        WHERE
 		            1 = 1  
-                    <if test="myPageUserId != null and myPageUserId != ''">
+                    <if test='myPageUserId != null and myPageUserId != ""'>
 		                AND C.USER_ID = #{myPageUserId} AND C.COM_STATUS = 'Y'
                     </if>
                     <if test="bbsSeq != 0">
                         AND C.BBS_SEQ = #{bbsSeq}    
                     </if>
 		            AND C.USER_ID = U.USER_ID
-		        ORDER BY C.COM_GROUP, C.COM_ORDER 
+		            AND C.COM_GROUP = R.COM_GROUP
+		        
+		        <choose>
+		            <when test='myPageUserId != null and myPageUserId != ""'> ORDER BY C.COM_SEQ DESC</when>
+		            <otherwise>
+		                <choose>
+				            <when test='comOrderBy == "1"'> ORDER BY C.COM_GROUP, C.COM_ORDER</when>
+		                    <when test='comOrderBy == "2"'> ORDER BY C.COM_GROUP DESC, C.COM_ORDER </when>
+		                    <when test='comOrderBy == "3"'> ORDER BY GROUP_REPLY_CNT DESC, COM_GROUP, COM_ORDER </when>
+	                    </choose>
+		            </otherwise>
+		        </choose>
 		    )
 		)
 		WHERE RNUM BETWEEN #{startRow} AND #{endRow}
@@ -57,7 +79,7 @@
 	   FROM COM 
 	   WHERE 
 	       1 = 1
-           <if test="myPageUserId != null and myPageUserId != ''">
+           <if test='myPageUserId != null and myPageUserId != ""'>
                AND C.USER_ID = #{myPageUserId} AND C.COM_STATUS = 'Y'
            </if>
            <if test="bbsSeq != 0">
@@ -79,8 +101,11 @@
 	        NVL(C.COM_STATUS, 'N') COM_STATUS,
 	        NVL(TO_CHAR(C.COM_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') COM_REG_DATE,
 	        NVL(U.USER_NAME, '') USER_NAME
-	    FROM COM C, USER_TABLE U
+	    FROM 
+	       COM C, 
+	       USER_TABLE U
 	    WHERE C.COM_SEQ = #{value}
+	       AND C.USER_ID = U.USER_ID
 	</select>
 
     <!-- INDENT가 0인 댓글 작성 -->

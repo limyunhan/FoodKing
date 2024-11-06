@@ -43,5 +43,8 @@ function fn_selectCategory(cateNum) {
         </ul>
       </li>
     </c:forEach>
+    <li>
+      <a href="/bbs/list">전체 글</a>
+    </li>
   </ul>
 </div>

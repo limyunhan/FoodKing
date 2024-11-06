@@ -31,7 +31,7 @@ public class BbsSearch implements Serializable {
 	private String searchValue;   // 입력 받은 값
 	
 	// 정렬 기준을 위한 멤버
-	private String orderBy;
+	private String bbsOrderBy;
 	
 	public BbsSearch() {
 		loginUserId = "";
@@ -52,7 +52,7 @@ public class BbsSearch implements Serializable {
 		searchType = "";
 		searchValue = "";
 		
-		orderBy = "";
+		bbsOrderBy = "";
 	}
 
 	public long getStartRow() {return startRow;}
@@ -71,8 +71,8 @@ public class BbsSearch implements Serializable {
 	public void setSearchType(String searchType) {this.searchType = searchType;}
 	public String getSearchValue() {return searchValue;}
 	public void setSearchValue(String searchValue) {this.searchValue = searchValue;}
-	public String getOrderBy() {return orderBy;}
-	public void setOrderBy(String orderBy) {this.orderBy = orderBy;}
+	public String getBbsOrderBy() {return bbsOrderBy;}
+	public void setBbsOrderBy(String bbsOrderBy) {this.bbsOrderBy = bbsOrderBy;}
 	public String getperiodFilter() {return periodFilter;}
 	public void setperiodFilter(String periodFilter) {this.periodFilter = periodFilter;}
 	public String getLoginUserId() {return loginUserId;}

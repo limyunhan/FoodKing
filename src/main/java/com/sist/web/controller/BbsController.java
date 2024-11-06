@@ -1,6 +1,7 @@
 package com.sist.web.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,9 +23,14 @@ import com.sist.common.util.StringUtil;
 import com.sist.web.model.Bbs;
 import com.sist.web.model.BbsFile;
 import com.sist.web.model.BbsSearch;
+import com.sist.web.model.Com;
+import com.sist.web.model.ComSearch;
 import com.sist.web.model.Paging;
 import com.sist.web.model.Response;
+import com.sist.web.model.User;
 import com.sist.web.service.BbsService;
+import com.sist.web.service.ComService;
+import com.sist.web.service.UserService;
 import com.sist.web.util.CookieUtil;
 import com.sist.web.util.HttpUtil;
 
@@ -32,7 +38,9 @@ import com.sist.web.util.HttpUtil;
 public class BbsController {
 	public static Logger logger = LoggerFactory.getLogger(BbsController.class);
 	
-	private static final int PAGE_COUNT = 5;
+	private static final int COM_PAGE_COUNT = 100;
+	private static final int COM_LIST_COUNT = 5;
+	private static final int BBS_PAGE_COUNT = 5;
 	
 	@Value("#{env['auth.cookie.name']}")
 	private String AUTH_COOKIE_NAME;
@@ -43,61 +51,138 @@ public class BbsController {
 	@Autowired
 	private BbsService bbsService;
 	
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private ComService comService;
+	
 	// 게시글 리스트 페이지
 	@RequestMapping(value = "/bbs/list")
 	public String list(Model model, HttpServletRequest request) {
-		int listCount = HttpUtil.get(request, "listCount", 10);
-		long curPage = HttpUtil.get(request, "curPage", 1L);
+		int bbsListCount = HttpUtil.get(request, "bbsListCount", 10);
+		long bbsCurPage = HttpUtil.get(request, "bbsCurPage", 1L);
 		
 		String cateNum = HttpUtil.get(request, "cateNum", "");
+		
 		String cateFilter = HttpUtil.get(request, "cateFilter", "");
 		String periodFilter = HttpUtil.get(request, "periodFilter", "");
-		String orderBy = HttpUtil.get(request, "orderBy", "1");
+		
+		String bbsOrderBy = HttpUtil.get(request, "bbsOrderBy", "1");
 		String isSecret = HttpUtil.get(request, "isSecret", "");
+		
 		String searchType = HttpUtil.get(request, "searchType", "");
 		String searchValue = HttpUtil.get(request, "searchValue", "");
 		
 		BbsSearch bbsSearch = new BbsSearch();
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		bbsSearch.setLoginUserId(cookieUserId);
+		
 		bbsSearch.setperiodFilter(periodFilter);
 		bbsSearch.setCateFilter(cateFilter);
-		bbsSearch.setOrderBy(orderBy);
+		
+		if (!StringUtil.isEmpty(cateNum) && StringUtil.isEmpty(cateFilter)) {
+			bbsSearch.setCateFilter(cateNum);
+		}
+		
+		bbsSearch.setBbsOrderBy(bbsOrderBy);
 		bbsSearch.setIsSecret(isSecret);
 		bbsSearch.setSearchType(searchType);
 		bbsSearch.setSearchValue(searchValue);
-
+		
 		long totalCnt = bbsService.bbsListCnt(bbsSearch);
 		List<Bbs> bbsList = null;
-		Paging paging = null;
+		Paging bbsPaging = null;
 		
 		if (totalCnt > 0) {
-			paging = new Paging("/bbs/list", totalCnt, listCount, PAGE_COUNT, curPage, "curPage");
-			bbsSearch.setStartRow(paging.getStartRow());
-			bbsSearch.setEndRow(paging.getEndRow());
+			bbsPaging = new Paging("/bbs/list", totalCnt, bbsListCount, BBS_PAGE_COUNT, bbsCurPage, "bbsCurPage");
+			bbsSearch.setStartRow(bbsPaging.getStartRow());
+			bbsSearch.setEndRow(bbsPaging.getEndRow());
 			bbsList = bbsService.bbsList(bbsSearch);
 		}
 		
-		model.addAttribute("listCount", listCount);
-		model.addAttribute("curPage", curPage);
+		model.addAttribute("bbsListCount", bbsListCount);
+		model.addAttribute("bbsCurPage", bbsCurPage);
 		
 		model.addAttribute("cateNum", cateNum);
 		model.addAttribute("cateFilter", cateFilter);
 		model.addAttribute("periodFilter", periodFilter);
-		model.addAttribute("orderBy", orderBy);
+		model.addAttribute("bbsOrderBy", bbsOrderBy);
 		model.addAttribute("isSecret", isSecret);
 		model.addAttribute("searchType", searchType);
 		model.addAttribute("searchValue", searchValue);
 		
 		model.addAttribute("bbsList", bbsList);
+		model.addAttribute("bbsPaging", bbsPaging);
 
 		return "/bbs/list";
 	}
 	
 	// 게시글 보기 페이지
 	@RequestMapping(value = "/bbs/view")
-	public String view(Model model, HttpServletRequest request, HttpServletResponse response) {
+	public String view(Model model, HttpServletRequest request) {
+		int bbsListCount = HttpUtil.get(request, "bbsListCount", 10);
+		long bbsCurPage = HttpUtil.get(request, "bbsCurPage", 1L);
+		long comCurPage = HttpUtil.get(request, "comCurPage", 1L);
+		long bbsSeq = HttpUtil.get(request, "bbsSeq", -1L);
 		
+		String cateNum = HttpUtil.get(request, "cateNum", "");
+		String cateFilter = HttpUtil.get(request, "cateFilter", "");
+		String periodFilter = HttpUtil.get(request, "periodFilter", "");
+		String bbsOrderBy = HttpUtil.get(request, "bbsOrderBy", "1");
+		String comOrderBy = HttpUtil.get(request, "comOrderBy", "1");
+		String isSecret = HttpUtil.get(request, "isSecret", "");
+		String searchType = HttpUtil.get(request, "searchType", "");
+		String searchValue = HttpUtil.get(request, "searchValue", "");
+		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
 		
+		Bbs bbs = null;
+		List<Com> comList = null;
+		Paging comPaging = null;
 		
+		if (bbsSeq > 0) {
+			HashMap<String, Object> hashMap = new HashMap<>();
+			hashMap.put("loginUserId", cookieUserId);
+			hashMap.put("bbsSeq", bbsSeq);
+			
+			bbs = bbsService.bbsView(hashMap);
+			if (bbs != null) {
+				bbsService.bbsReadCntPlus(bbsSeq);
+				bbs.setBbsReadCnt(bbs.getBbsReadCnt() + 1);
+				
+				ComSearch comSearch = new ComSearch();
+				comSearch.setBbsSeq(bbsSeq);
+				comSearch.setComOrderBy(comOrderBy);
+				
+				long totalCnt = comService.comListCnt(comSearch);
+				
+				if (totalCnt > 0) {
+					comPaging = new Paging("/bbs/view", totalCnt, COM_LIST_COUNT, COM_PAGE_COUNT, comCurPage, "comCurPage");
+					comSearch.setStartRow(comPaging.getStartRow());
+					comSearch.setEndRow(comPaging.getEndRow());
+					comList = comService.comList(comSearch);
+				}
+			}
+		}
+		
+		model.addAttribute("bbs", bbs);
+		model.addAttribute("bbsSeq", bbsSeq);
+		model.addAttribute("bbsListCount", bbsListCount);
+		model.addAttribute("bbsCurPage", bbsCurPage);
+		model.addAttribute("bbsOrderBy", bbsOrderBy);
+		
+		model.addAttribute("cateNum", cateNum);
+		model.addAttribute("cateFilter", cateFilter);
+		model.addAttribute("periodFilter", periodFilter);
+		
+		model.addAttribute("isSecret", isSecret);
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("searchValue", searchValue);
+		
+		model.addAttribute("comList", comList);
+		model.addAttribute("comPaging", comPaging);
+	    model.addAttribute("comCurPage", comCurPage);
+		model.addAttribute("comOrderBy", comOrderBy);
 		
 		return "/bbs/view";
 	}
@@ -105,25 +190,25 @@ public class BbsController {
 	// 게시글 쓰기 페이지
 	@RequestMapping(value = "/bbs/write")
 	public String write(Model model, HttpServletRequest request) {
-		int listCount = HttpUtil.get(request, "listCount", 10);
-		long curPage = HttpUtil.get(request, "curPage", 1L);
+		int bbsListCount = HttpUtil.get(request, "bbsListCount", 10);
+		long bbsCurPage = HttpUtil.get(request, "bbsCurPage", 1L);
 		
 		String cateNum = HttpUtil.get(request, "cateNum", "");
 		String cateFilter = HttpUtil.get(request, "cateFilter", "");
 		String periodFilter = HttpUtil.get(request, "periodFilter", "");
-		String orderBy = HttpUtil.get(request, "orderBy", "1");
+		String bbsOrderBy = HttpUtil.get(request, "bbsOrderBy", "1");
 		String isSecret = HttpUtil.get(request, "isSecret", "");
 		String searchType = HttpUtil.get(request, "searchType", "");
 		String searchValue = HttpUtil.get(request, "searchValue", "");
 
 		
-		model.addAttribute("listCount", listCount);
-		model.addAttribute("curPage", curPage);
+		model.addAttribute("bbsListCount", bbsListCount);
+		model.addAttribute("bbsCurPage", bbsCurPage);
 		
 		model.addAttribute("cateNum", cateNum);
 		model.addAttribute("cateFilter", cateFilter);
 		model.addAttribute("periodFilter", periodFilter);
-		model.addAttribute("orderBy", orderBy);
+		model.addAttribute("bbsOrderBy", bbsOrderBy);
 		model.addAttribute("isSecret", isSecret);
 		model.addAttribute("searchType", searchType);
 		model.addAttribute("searchValue", searchValue);
@@ -131,6 +216,7 @@ public class BbsController {
 		return "/bbs/write";
 	}
 	
+	// 게시글 작성 ajax 통신
 	@RequestMapping(value = "/bbs/writeProc", method = RequestMethod.POST)
 	@ResponseBody
 	public Response<Object> writeProc(MultipartHttpServletRequest request, HttpServletResponse response) {
@@ -140,58 +226,60 @@ public class BbsController {
 		String subCateCombinedNum = HttpUtil.get(request, "subCateCombinedNum", "");
 		String bbsTitle = HttpUtil.get(request, "bbsTitle", "");
 		String bbsContent = HttpUtil.get(request, "bbsContent", "");
-		
-		logger.debug("bbsTitle : " + bbsTitle);
-		logger.debug("bbsContent : "  + bbsContent);
-		
 		String bbsPwd = HttpUtil.get(request, "bbsPwd", "");
 		
 		if (!StringUtil.isEmpty(subCateCombinedNum) && !StringUtil.isEmpty(bbsTitle) && !StringUtil.isEmpty(bbsContent)) {
-			Bbs bbs = new Bbs();
-			bbs.setUserId(cookieUserId);
-			bbs.setSubCateCombinedNum(subCateCombinedNum);
-			bbs.setBbsTitle(bbsTitle);
-			bbs.setBbsContent(bbsContent);
-			
-			if (!StringUtil.isEmpty(bbsPwd)) {
-				bbs.setBbsPwd(bbsPwd);
-			}
-			
-			List<FileData> fileDataList = HttpUtil.getFiles(request, "bbsFile", UPLOAD_SAVE_DIR);
-			
-			if (fileDataList != null) {
-				List<BbsFile> bbsFileList = new ArrayList<>();
+			User user = userService.userSelect(cookieUserId);
+			if (((!subCateCombinedNum.startsWith("0101") && !subCateCombinedNum.startsWith("05")) || StringUtil.equals(user.getUserType(), "MANAGER")) && (!subCateCombinedNum.startsWith("0102") || !StringUtil.equals(user.getUserType(), "USER"))) {
+				Bbs bbs = new Bbs();
+				bbs.setUserId(cookieUserId);
+				bbs.setSubCateCombinedNum(subCateCombinedNum);
+				bbs.setBbsTitle(bbsTitle);
+				bbs.setBbsContent(bbsContent);
 				
-				for (FileData fileData : fileDataList) {
-					if (fileData.getFileSize() > 0) {
-						BbsFile bbsFile = new BbsFile();
-						bbsFile.setBbsFileExt(fileData.getFileExt());
-						bbsFile.setBbsFileName(fileData.getFileName());
-						bbsFile.setBbsFileOrgName(fileData.getFileOrgName());
-						bbsFile.setBbsFileSize(fileData.getFileSize());
-						bbsFileList.add(bbsFile);
-					}
+				if (!StringUtil.isEmpty(bbsPwd)) {
+					bbs.setBbsPwd(bbsPwd);
 				}
 				
-				if (fileDataList.size() > 0) {
-					bbs.setBbsFileList(bbsFileList);
-				}
-
-			}
-			
-			try {
-				if (bbsService.bbsInsert(bbs)) {
-					ajaxResponse.setResponse(200, "게시글 작성 성공");
+				List<FileData> fileDataList = HttpUtil.getFiles(request, "bbsFile", UPLOAD_SAVE_DIR);
+				
+				if (fileDataList != null) {
+					List<BbsFile> bbsFileList = new ArrayList<>();
 					
-				} else {
-					ajaxResponse.setResponse(500, "DB 정합성 오류");
+					for (FileData fileData : fileDataList) {
+						if (fileData.getFileSize() > 0) {
+							BbsFile bbsFile = new BbsFile();
+							bbsFile.setBbsFileExt(fileData.getFileExt());
+							bbsFile.setBbsFileName(fileData.getFileName());
+							bbsFile.setBbsFileOrgName(fileData.getFileOrgName());
+							bbsFile.setBbsFileSize(fileData.getFileSize());
+							bbsFileList.add(bbsFile);
+						}
+					}
+					
+					if (fileDataList.size() > 0) {
+						bbs.setBbsFileList(bbsFileList);
+					}
+
 				}
 				
-			} catch (Exception e) {
-				logger.error("[BbsController] writeProc Exception", e);
-				ajaxResponse.setResponse(500, "DB 정합성 오류");
+				try {
+					if (bbsService.bbsInsert(bbs)) {
+						ajaxResponse.setResponse(200, "게시글 작성 성공");
+						
+					} else {
+						ajaxResponse.setResponse(500, "DB 정합성 오류");
+					}
+					
+				} catch (Exception e) {
+					logger.error("[BbsController] writeProc Exception", e);
+					ajaxResponse.setResponse(500, "DB 정합성 오류");
+				}	    
+					
+			} else {
+				ajaxResponse.setResponse(403, "접근권한이 없는 회원");
+				
 			}
-
 		} else {
 			ajaxResponse.setResponse(400, "비정상적인 접근");
 			
@@ -199,8 +287,4 @@ public class BbsController {
 
 		return ajaxResponse;
 	}
-	
-	
-	
-	
 }

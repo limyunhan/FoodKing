@@ -18,6 +18,7 @@
 		<result column="USER_IMAGE_SIZE" property="userImageSize" />
 		<result column="USER_BBS_CNT" property="userBbsCnt" />
 		<result column="USER_COM_CNT" property="userComCnt" />
+		<result column="USER_TYPE" property="userType" />
 	</resultMap>
 
 	<!-- 단일 유저 조회 -->
@@ -37,7 +38,8 @@
 		    NVL(A.USER_IMAGE_EXT, '') USER_IMAGE_EXT,
 		    NVL(A.USER_IMAGE_SIZE, 0) USER_IMAGE_SIZE,
 		    NVL(B.BBS_CNT, 0) USER_BBS_CNT,
-		    NVL(C.COM_CNT, 0) USER_COM_CNT
+		    NVL(C.COM_CNT, 0) USER_COM_CNT,
+		    NVL(A.USER_TYPE, '') USER_TYPE
 		FROM USER_TABLE A,
 		   (SELECT USER_ID, COUNT(BBS_SEQ) BBS_CNT FROM (SELECT * FROM BBS WHERE BBS_STATUS = 'Y') GROUP BY USER_ID) B,
 		   (SELECT USER_ID, COUNT(COM_SEQ) COM_CNT FROM (SELECT * FROM COM WHERE COM_STATUS = 'Y') GROUP BY USER_ID) C
@@ -62,7 +64,8 @@
 			USER_IMAGE_NAME,
 			USER_IMAGE_ORG_NAME,
 			USER_IMAGE_EXT,
-			USER_IMAGE_SIZE
+			USER_IMAGE_SIZE,
+			USER_TYPE,
 			) 
 			VALUES (
 				#{userId},
@@ -78,7 +81,8 @@
 				#{userImageName},
 				#{userImageOrgName},
 				#{userImageExt},
-				#{userImageSize}
+				#{userImageSize},
+				'USER'
 			)
 	</insert>
 

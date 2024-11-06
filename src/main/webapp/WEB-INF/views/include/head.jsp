@@ -6,9 +6,8 @@
 <title><spring:eval expression="@env['site.title']" /></title>
 <link rel="shortcut icon" href="/resources/images/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" href="/resources/css/bootstrap.min.css" type="text/css">
-<link rel="icon" href="/resources/images/icons8.ico">
-<link rel="stylesheet" href="/resources/css/custom.css" type="text/css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.4/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="/resources/css/custom.css" type="text/css">
 <script type="text/javascript" src="/resources/js/jquery-3.5.1.min.js"></script>
 <script type="text/javascript" src="/resources/js/icia.common.js"></script>
 <script type="text/javascript" src="/resources/js/icia.ajax.js"></script>

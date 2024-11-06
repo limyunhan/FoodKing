@@ -38,6 +38,7 @@ public class BbsService {
 		
 		try {
 			list = bbsDao.bbsList(bbsSearch);
+			
 		} catch (Exception e) {
 			logger.error("[BbsService] bbsList Exception", e);
 		}
@@ -50,6 +51,7 @@ public class BbsService {
 		
 		try {
 			cnt = bbsDao.bbsListCnt(bbsSearch);
+			
 		} catch (Exception e) {
 			logger.error("[BbsService] bbsListCnt Exception", e);
 		}
@@ -63,6 +65,7 @@ public class BbsService {
 		
 		try {
 			bbs = bbsDao.bbsSelect(hashMap);
+			
 		} catch (Exception e) {
 	        logger.error("[BbsService] bbsSelect Exception", e);
 		}
@@ -75,6 +78,7 @@ public class BbsService {
 		
 		try {
 			list = bbsDao.bbsFileList(bbsSeq);
+			
 		} catch (Exception e) {
 			logger.error("[BbsService] bbsFileList Exception", e);
 		}
@@ -87,6 +91,7 @@ public class BbsService {
 		
 		try {
 			bbsFile = bbsDao.bbsFileSelect(hashMap);
+			
 		} catch (Exception e) {
 			logger.error("[BbsService] bbsFileSelect Exception", e);
 		}
@@ -126,6 +131,7 @@ public class BbsService {
 		
 		try {
 			cnt = bbsDao.bbsReadCntPlus(bbsSeq);
+			
 		} catch (Exception e) {
 			logger.error("[BbsService] bbsReadCntPlus Exception", e);
 		}
@@ -227,6 +233,7 @@ public class BbsService {
 		Bbs bbs = bbsView(hashMap);
 		
 		if (bbs != null) {
+			
 			if (bbs.getBbsComCnt() > 0) {
 				bbsDao.comDeleteByBbsDelete(bbs.getBbsSeq());
 			}

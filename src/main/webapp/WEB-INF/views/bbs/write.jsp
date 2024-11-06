@@ -112,12 +112,15 @@ $(document).ready(function() {
 	        	    document.bbsForm.action = "/bbs/list" 
 	        	    document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
 	                document.bbsForm.submit();
+	                
 	        	} else if (response.code === 500) {
 	        		alert("DB정합성 오류로 게시글 작성에 실패하였습니다.");      		
 	        		
 	        	} else if (response.code === 400) {
 	        		alert("비정상적인 접근입니다.");
-	        		location.href = "/";
+	        		
+	        	} else if (response.code === 403) {
+	        		alert("작성 권한이 없는 카테고리입니다.");
 	        		
 	        	} else {
 	        		alert("서버 응답 오류로 게시글 작성에 실패하였습니다.");
@@ -149,17 +152,41 @@ $(document).ready(function() {
               </div>
             </div>
             <div class="write-category">
-              <select id="subCateCombinedNum">
+              <select id="subCateCombinedNum" name="subCateCombinedNum">
                 <option value="">게시판을 선택해 주세요.</option>
-                <c:forEach var="mainCate" items="${mainCateList}" varStatus="status">
-                  <c:if test="${mainCate.mainCateNum != '06' && mainCate.mainCateNum != '01' && mainCate.mainCateNum != '05'}">
-                    <optgroup label="${mainCate.mainCateName}">
-                    <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status">
-                      <option value="${subCate.subCateCombinedNum}" <c:if test="${subCate.subCateCombinedNum == cateNum}">selected</c:if>>${subCate.subCateName}</option>   
-                    </c:forEach>
-                    </optgroup>
-                  </c:if>
-                </c:forEach>
+                  <c:forEach var="mainCate" items="${mainCateList}" varStatus="status">
+                    <c:choose>
+                      <c:when test="${loginUser.userType == 'USER'}">
+                        <c:if test="${mainCate.mainCateNum != '01' && mainCate.mainCateNum != '05'}">
+                          <optgroup label="${mainCate.mainCateName}">
+                            <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status">
+                              <option value="${subCate.subCateCombinedNum}" <c:if test="${subCate.subCateCombinedNum == cateNum}">selected</c:if>>${subCate.subCateName}</option>
+                            </c:forEach>
+                          </optgroup>
+                        </c:if>
+                      </c:when>
+                      <c:when test="${loginUser.userType == 'BLOGGER'}">
+                        <c:if test="${mainCate.mainCateNum != '05'}">
+                          <optgroup label="${mainCate.mainCateName}">
+                            <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status">
+                              <c:if test="${subCate.subCateCombinedNum != '0101'}">
+                                <option value="${subCate.subCateCombinedNum}" <c:if test="${subCate.subCateCombinedNum == cateNum}">selected</c:if>>${subCate.subCateName}</option>
+                              </c:if>
+                            </c:forEach>
+                          </optgroup>
+                        </c:if>
+                      </c:when>
+                      <c:otherwise>
+                        <optgroup label="${mainCate.mainCateName}">
+                          <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status">
+                            <c:if test="${subCate.subCateCombinedNum != '0101'}">
+                              <option value="${subCate.subCateCombinedNum}" <c:if test="${subCate.subCateCombinedNum == cateNum}">selected</c:if>>${subCate.subCateName}</option>
+                            </c:if>
+                          </c:forEach>
+                        </optgroup>
+                      </c:otherwise>
+                    </c:choose>
+                  </c:forEach>
               </select>
               <div></div>
               <div class="write-pwd">

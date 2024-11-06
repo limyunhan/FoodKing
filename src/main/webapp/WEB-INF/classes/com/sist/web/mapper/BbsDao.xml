@@ -16,7 +16,7 @@
         <result column="BBS_COM_CNT" property="bbsComCnt"></result>
         <result column="BBS_RECOM_CNT" property="bbsRecomCnt"></result>
         <result column="BBS_MAIN_CATE_NAME" property="bbsMainCateName"></result>
-        <result column="BBS_SUB_CATE_NAME" property="bbbsSubCateName"></result>
+        <result column="BBS_SUB_CATE_NAME" property="bbsSubCateName"></result>
         <result column="IS_BOOKMARKED" property="isBookmarked"></result>
         <result column="IS_RECOMMENDED" property="isRecommended"></result>
     </resultMap>
@@ -93,45 +93,45 @@
 		            WHERE S.MAIN_CATE_NUM = M.MAIN_CATE_NUM) E
 		        WHERE 
 		            A.BBS_STATUS = 'Y'
-		            <if test="myPageUserId != null and myPageUserId != ''"> AND A.USER_ID = #{myPageUserId}</if>
-		            <if test="recomUserId != null and recomUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
-		            <if test="bookmarkUserId != null and bookmarkUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
-		            <if test="isSecret != null and isSecret != ''">
+		            <if test='myPageUserId != null and myPageUserId != ""'> AND A.USER_ID = #{myPageUserId}</if>
+		            <if test='recomUserId != null and recomUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
+		            <if test='bookmarkUserId != null and bookmarkUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
+		            <if test='isSecret != null and isSecret != ""'>
 		                <choose>
-		                    <when test="isSecret == 'Y'"> AND (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
-		                    <otherwise> AND (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
+		                    <when test='isSecret == "Y"'> AND (A.BBS_PWD IS NOT NULL AND A.BBS_PWD <![CDATA[<>]]> '')</when>
+		                    <otherwise> AND (A.BBS_PWD IS NULL OR A.BBS_PWD = '')</otherwise>
 		                </choose>
 		            </if> 
-		            <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
+		            <if test='searchType != null and searchType != "" and searchValue != null and searchValue != ""'>
 		                <choose>
-		                    <when test="searchType == '1'"> AND A.BBS_TITLE LIKE '%' || #{searchValue} || '%'</when>
-		                    <when test="searchType == '2'"> AND (A.FREE_BBS_TITLE LIKE '%' || #{searchValue} || '%' OR DBMS_LOB.INSTR(A.FREE_BBS_CONTENT, #{searchValue}) <![CDATA[>]]> 0)</when>
-		                    <when test="searchType == '3'"> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
+		                    <when test='searchType == "1"'> AND A.BBS_TITLE LIKE '%' || #{searchValue} || '%'</when>
+		                    <when test='searchType == "2"'> AND (A.BBS_TITLE LIKE '%' || #{searchValue} || '%' OR DBMS_LOB.INSTR(A.BBS_CONTENT, #{searchValue}) <![CDATA[>]]> 0)</when>
+		                    <when test='searchType == "3"'> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
 		                </choose>
 		            </if> 
-		            <if test="cateFilter != null and cateFilter != ''"> AND A.BBS_SUB_CATE_COMBINED_NUM LIKE '%' || #{cateNum} || '%'</if>
-		            <if test="periodFilter != null and periodFilter !=''">  
+		            <if test='cateFilter != null and cateFilter != ""'> AND A.SUB_CATE_COMBINED_NUM LIKE '%' || #{cateFilter} || '%'</if>
+		            <if test='periodFilter != null and periodFilter !=""'>  
 		                <choose>
-		                    <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
-		                    <when test="periodFilter == '2'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
-		                    <when test="periodFilter == '3'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
-		                    <when test="periodFilter == '4'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
-		                    <when test="periodFilter == '5'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
+		                    <when test='periodFilter == "1"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+		                    <when test='periodFilter == "2"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
+		                    <when test='periodFilter == "3"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
+		                    <when test='periodFilter == "4"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+		                    <when test='periodFilter == "5"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
 		                </choose>
 		            </if>
 		            AND A.USER_ID = U.USER_ID
 		            AND A.SUB_CATE_COMBINED_NUM = E.SUB_CATE_COMBINED_NUM
 		            AND A.BBS_SEQ = C.BBS_SEQ(+) 
 		            AND A.BBS_SEQ = D.BBS_SEQ(+)       
-			        <choose>
-			            <when test="orderBy == '1'"> ORDER BY BBS_SEQ DESC</when>
-			            <when test="orderBy == '2'"> ORDER BY BBS_READ_CNT DESC</when>
-			            <when test="orderBy == '3'"> ORDER BY BBS_RECOM_CNT DESC</when>
-			            <when test="orderBy == '4'"> ORDER BY BBS_COM_CNT DESC</when>
-			        </choose>         
+                <choose>
+                    <when test='bbsOrderBy == "1"'> ORDER BY BBS_SEQ DESC</when>
+                    <when test='bbsOrderBy == "2"'> ORDER BY BBS_READ_CNT DESC, BBS_SEQ DESC</when>
+                    <when test='bbsOrderBy == "3"'> ORDER BY BBS_RECOM_CNT DESC, BBS_SEQ DESC</when>
+                    <when test='bbsOrderBy == "4"'> ORDER BY BBS_COM_CNT DESC, BBS_SEQ DESC</when>
+                </choose>              
 		    ) 
 		)
-		WHERE RNUM BETWEEN #{startRow} AND #{endRow};
+		WHERE RNUM BETWEEN #{startRow} AND #{endRow}
     </select>
     
     <!-- 페이징 처리를 위한 게시글 수 조회 -->
@@ -140,30 +140,30 @@
         FROM BBS A, USER_TABLE U
         WHERE 
 	        A.BBS_STATUS = 'Y'
-	        <if test="myPageUserId != null and myPageUserId != ''"> AND A.USER_ID = #{myPageUserId}</if>
-	        <if test="recomUserId != null and recomUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
-	        <if test="bookmarkUserId != null and bookmarkUserId != ''"> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
-	        <if test="isSecret != null and isSecret != ''">
+	        <if test='myPageUserId != null and myPageUserId != ""'> AND A.USER_ID = #{myPageUserId}</if>
+	        <if test='recomUserId != null and recomUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
+	        <if test='bookmarkUserId != null and bookmarkUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
+	        <if test='isSecret != null and isSecret != ""'>
 	            <choose>
-	                <when test="isSecret == 'Y'"> AND (A.BBS_PWD IS NOT NULL AND A.USER_PWD <![CDATA[<>]]> '')</when>
-	                <otherwise> AND (A.BBS_PWD IS NULL OR A.USER_PWD = '')</otherwise>
+	                <when test='isSecret == "Y"'> AND (A.BBS_PWD IS NOT NULL AND A.BBS_PWD <![CDATA[<>]]> '')</when>
+	                <otherwise> AND (A.BBS_PWD IS NULL OR A.BBS_PWD = '')</otherwise>
+	            </choose>
+	        </if>  
+	        <if test='searchType != null and searchType != "" and searchValue != null and searchValue != ""'>
+	            <choose>
+	                <when test='searchType == "1"'> AND A.BBS_TITLE LIKE '%' || #{searchValue} || '%'</when>
+	                <when test='searchType == "2"'> AND (A.BBS_TITLE LIKE '%' || #{searchValue} || '%' OR DBMS_LOB.INSTR(A.BBS_CONTENT, #{searchValue}) <![CDATA[>]]> 0)</when>
+	                <when test='searchType == "3"'> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
 	            </choose>
 	        </if> 
-	        <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
+	        <if test='cateFilter != null and cateFilter != ""'> AND A.SUB_CATE_COMBINED_NUM LIKE '%' || #{cateFilter} || '%'</if>
+	        <if test='periodFilter != null and periodFilter != ""'>  
 	            <choose>
-	                <when test="searchType == '1'"> AND A.BBS_TITLE LIKE '%' || #{searchValue} || '%'</when>
-	                <when test="searchType == '2'"> AND (A.FREE_BBS_TITLE LIKE '%' || #{searchValue} || '%' OR DBMS_LOB.INSTR(A.FREE_BBS_CONTENT, #{searchValue}) <![CDATA[>]]> 0)</when>
-	                <when test="searchType == '3'"> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
-	            </choose>
-	        </if> 
-	        <if test="cateNum != null and cateNum != ''"> AND A.BBS_SUB_CATE_COMBINED_NUM LIKE '%' || #{cateNum} || '%'</if>
-	        <if test="periodFilter != null and periodFilter !=''">  
-	            <choose>
-	                <when test="periodFilter == '1'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
-	                <when test="periodFilter == '2'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
-	                <when test="periodFilter == '3'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
-	                <when test="periodFilter == '4'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
-	                <when test="periodFilter == '5'"> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+	                <when test='periodFilter == "1"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
+	                <when test='periodFilter == "2"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -1))</when>
+	                <when test='periodFilter == "3"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -3))</when>
+	                <when test='periodFilter == "4"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(ADD_MONTHS(SYSDATE, -6))</when>
+	                <when test='periodFilter == "5"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - INTERVAL '1' YEAR)</when>
 	            </choose>
 	        </if>
 	        AND A.USER_ID = U.USER_ID
@@ -205,7 +205,16 @@
 		        ) THEN 'Y' 
 		        ELSE 'N' 
 		    END AS IS_RECOMMENDED
-		FROM BBS A, USER_TABLE U
+		FROM BBS A, USER_TABLE U,
+		    (SELECT BBS_SEQ, COUNT(COM_SEQ) BBS_COM_CNT 
+            FROM (SELECT * FROM COM WHERE COM_STATUS = 'Y') 
+            GROUP BY BBS_SEQ) C,
+            (SELECT BBS_SEQ, COUNT(BBS_SEQ) BBS_RECOM_CNT 
+            FROM RECOM 
+            GROUP BY BBS_SEQ) D,
+            (SELECT S.SUB_CATE_COMBINED_NUM SUB_CATE_COMBINED_NUM, S.SUB_CATE_NAME SUB_CATE_NAME, M.MAIN_CATE_NAME MAIN_CATE_NAME 
+            FROM SUB_CATE S, MAIN_CATE M
+            WHERE S.MAIN_CATE_NUM = M.MAIN_CATE_NUM) E
 		WHERE
 		    A.BBS_SEQ = #{bbsSeq}
 		    AND A.USER_ID = U.USER_ID

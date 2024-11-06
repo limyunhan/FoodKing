@@ -20,6 +20,7 @@ public class User implements Serializable {
 	private long userImageSize;
 	private int userBbsCnt;
 	private int userComCnt;
+	private String userType;
 	
 	public User() {
 		userId = "";
@@ -38,6 +39,7 @@ public class User implements Serializable {
 		userImageSize = 0L;
 		userBbsCnt = 0;
 		userComCnt = 0;
+		userType = "";
 	}
 
 	public String getUserId() {return userId;}
@@ -72,4 +74,6 @@ public class User implements Serializable {
 	public void setUserBbsCnt(int userBbsCnt) {this.userBbsCnt = userBbsCnt;}
 	public int getUserComCnt() {return userComCnt;}
 	public void setUserComCnt(int userComCnt) {this.userComCnt = userComCnt;}
+	public String getUserType() {return userType;}
+	public void setUserType(String userType) {this.userType = userType;}
 }

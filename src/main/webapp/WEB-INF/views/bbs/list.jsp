@@ -12,12 +12,12 @@
             document.bbsForm.submit();
         });
 
-        $("#btn-search").on("click", function() {
+        $("#btnSearch").on("click", function() {
             document.bbsForm.searchType.value = $("#_searchType").val();
             document.bbsForm.searchValue.value = $("#_searchValue").val();
             document.bbsForm.periodFilter.value = $("#_periodFilter").val();
-            document.bbsForm.curPage.value = "1";
-            document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
+            document.bbsForm.bbsCurPage.value = "1";
+            document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
             document.bbsForm.submit();
         });
 
@@ -29,33 +29,45 @@
         <c:if test="${fn:length(cateNum) le 2}">
             $("#_cateFilter").on("change", function() {
                 document.bbsForm.cateFilter.value = $("#_cateFilter").val();
-                document.bbsForm.curPage.value = "1";
-                document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
+                document.bbsForm.bbsCurPage.value = "1";
+                document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
                 document.bbsForm.submit();
             });
         </c:if>
 
-        $("#_listCount").on("change", function() {
-            document.bbsForm.listCount.value = $("#_listCount").val();
-            document.bbsForm.curPage.value = "1";
-            document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
+        $("#_bbsListCount").on("change", function() {
+            document.bbsForm.bbsListCount.value = $("#_bbsListCount").val();
+            document.bbsForm.bbsCurPage.value = "1";
+            document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
             document.bbsForm.submit();
         });
 
-        $("#_orderBy").on("change", function() {
-            document.bbsForm.orderBy.value = $("#_orderBy").val();
-            document.bbsForm.curPage.value = "1";
-            document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
+        $("#_bbsOrderBy").on("change", function() {
+            document.bbsForm.bbsOrderBy.value = $("#_bbsOrderBy").val();
+            document.bbsForm.bbsCurPage.value = "1";
+            document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
             document.bbsForm.submit();
         });
 
         $("#_isSecret").on("change", function() {
             document.bbsForm.isSecret.value = $("#_isSecret").val();
-            document.bbsForm.curPage.value = "1";
-            document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
+            document.bbsForm.bbsCurPage.value = "1";
+            document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
             document.bbsForm.submit();
         });
     });
+    
+    function fn_view(bbsSeq) {
+        document.bbsForm.bbsSeq.value = bbsSeq;
+        document.bbsForm.action = "/bbs/view";
+        document.bbsForm.submit();
+    }
+
+    function fn_list(bbsCurPage) {
+        document.bbsForm.bbsCurPage.value = bbsCurPage;
+        document.bbsForm.action = "/bbs/list";
+        document.bbsForm.submit();
+    }
 </script>
 </head>
 <body id="index-body">
@@ -68,29 +80,51 @@
           <div class="right-main-content-header">
             <div class="right-main-content-header-title">
               <h1>
-                [${mainCateMap[fn:substring(cateNum, 0, 2)].mainCateName}]
-                <c:if test="${fn:length(cateNum) gt 2}">${subCateMap[cateNum].subCateName}</c:if>
+               <c:choose>
+                <c:when test="${!empty cateNum}">
+                  [${mainCateMap[fn:substring(cateNum, 0, 2)].mainCateName}]
+                  <c:if test="${fn:length(cateNum) gt 2}">${subCateMap[cateNum].subCateName}</c:if>
+                </c:when>
+                <c:otherwise>
+                  [전체 글]
+                </c:otherwise>
+               </c:choose>
               </h1>
             </div>
             <div class="right-main-content-header-search">
-              <c:if test="${fn:length(cateNum) le 2}">
-                <select class="cateFilter" id="_cateFilter" name="_cateFilter">
-                  <option value="${cateNum}">${mainCateMap[cateNum].mainCateName}</option>
-                  <c:forEach var="subCate" items="${subCateListMap[cateNum]}" varStatus="status">
-                    <option value="${subCate.subCateCombinedNum}" <c:if test="${cateFilter == subCate.subCateCombinedNum}">selected</c:if>>${subCate.subCateName}</option>
-                  </c:forEach>
-                </select>
-              </c:if>
-              <select class="listCount" id="_listCount" name="_listCount">
-                <option value="10" <c:if test="${listCount == 10}">selected</c:if>>10개</option>
-                <option value="20" <c:if test="${listCount == 20}">selected</c:if>>20개</option>
-                <option value="50" <c:if test="${listCount == 50}">selected</c:if>>50개</option>
+              <c:choose>
+                <c:when test="${!empty cateNum}">
+                  <c:if test="${fn:length(cateNum) le 2}">
+                    <select class="cateFilter" id="_cateFilter" name="_cateFilter">
+                      <option value="${cateNum}" style="font-weight: bold;">${mainCateMap[cateNum].mainCateName}</option>
+                      <c:forEach var="subCate" items="${subCateListMap[cateNum]}" varStatus="status">
+                        <option value="${subCate.subCateCombinedNum}" <c:if test="${cateFilter == subCate.subCateCombinedNum}">selected</c:if>>${subCate.subCateName}</option>
+                      </c:forEach>
+                    </select>
+                  </c:if>
+                </c:when>
+                <c:otherwise>
+                  <select class="cateFilter" id="_cateFilter" name="_cateFilter">
+                   <option value="">카테고리 선택</option>
+                   <c:forEach var="mainCate" items="${mainCateList}" varStatus="status">
+                     <option value="${mainCate.mainCateNum}" style="font-weight: bold;" <c:if test="${cateFilter == mainCate.mainCateNum}">selected</c:if>>${mainCate.mainCateName}</option>
+                     <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status"> 
+                       <option value="${subCate.subCateCombinedNum}" <c:if test="${cateFilter == subCate.subCateCombinedNum}">selected</c:if>>${subCate.subCateName}</option>
+                     </c:forEach>
+                   </c:forEach>
+                  </select>
+                </c:otherwise>
+              </c:choose>
+              <select class="bbsListCount" id="_bbsListCount" name="_bbsListCount">
+                <option value="10" <c:if test="${bbsListCount == 10}">selected</c:if>>10개</option>
+                <option value="20" <c:if test="${bbsListCount == 20}">selected</c:if>>20개</option>
+                <option value="50" <c:if test="${bbsListCount == 50}">selected</c:if>>50개</option>
               </select>
-              <select class="orderBy" id="_orderBy" name="_orderBy">
-                <option value="1" <c:if test="${orderBy == '1'}">selected</c:if>>등록일 순</option>
-                <option value="2" <c:if test="${orderBy == '2'}">selected</c:if>>조회수 순</option>
-                <option value="3" <c:if test="${orderBy == '3'}">selected</c:if>>추천수 순</option>
-                <option value="4" <c:if test="${orderBy == '4'}">selected</c:if>>댓글수 순</option>
+              <select class="bbsOrderBy" id="_bbsOrderBy" name="_bbsOrderBy">
+                <option value="1" <c:if test="${bbsOrderBy == '1'}">selected</c:if>>등록일 순</option>
+                <option value="2" <c:if test="${bbsOrderBy == '2'}">selected</c:if>>조회수 순</option>
+                <option value="3" <c:if test="${bbsOrderBy == '3'}">selected</c:if>>추천수 순</option>
+                <option value="4" <c:if test="${bbsOrderBy == '4'}">selected</c:if>>댓글수 순</option>
               </select>      
               <select class="isSecret" id="_isSecret" name="_isSecret">
                 <option value="" <c:if test="${isSecret == ''}">selected</c:if>>전체 보기</option>
@@ -103,49 +137,100 @@
           <table class="notice-board">
             <thead>
               <tr>
-                <th scope="col" class="text-center">번호</th>
-                <th scope="col" class="text-center">제목</th>
-                <th scope="col" class="text-center">작성자</th>
-                <th scope="col" class="text-center">작성일</th>
-                <th scope="col" class="text-center">조회</th>
-                <th scope="col" class="text-center">좋아요</th>
+                <th scope="col" class="text-center" style="width: 8%">번호</th>
+                <th scope="col" class="text-center" style="width: 20%">카테고리</th>
+                <th scope="col" class="text-center" style="width: 30%">제목</th>
+                <th scope="col" class="text-center" style="width: 8%">작성자</th>
+                <th scope="col" class="text-center" style="width: 20%">작성일</th>
+                <th scope="col" class="text-center" style="width: 7%">조회</th>
+                <th scope="col" class="text-center" style="width: 7%">추천</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="text-center-view" onclick="fn_view(); openPasswordModal('', ''); fn_view();">
-                <td class="text-center">번호</td>
-                <td class="text-center-title"><a href="javascript:void(0)">🔑비밀글 입니다.</a></td>
-                <td class="text-center">작성자</td>
-                <td class="text-center">작성일</td>
-                <td class="text-center">조회</td>
-                <td class="text-center">좋아요</td>
-              </tr>
-              <tr>
-                <td class="text-center" colspan="4">해당 데이터가 존재하지 않습니다.</td>
-              </tr>
+              <c:choose>
+                <c:when test="${!empty bbsList}">
+                  <c:forEach var="bbs" items="${bbsList}" varStatus="status">
+                    <tr class="text-center-view" onclick="fn_view(${bbs.bbsSeq})">
+                      <td class="text-center">${bbs.bbsSeq}</td>
+                      <td class="text-center">${bbs.bbsSubCateName}</td>
+                      <td class="text-center-title">
+                        <c:choose>
+                          <c:when test="${empty bbs.bbsPwd}">
+                            <a href="javascript:void(0)"><c:out value="${bbs.bbsTitle}" /><c:if test="${bbs.bbsComCnt != 0}">(<fmt:formatNumber type="Number" maxFractionDigits="3" groupingUsed="true" value="${bbs.bbsComCnt}"/>)</c:if></a>
+                          </c:when>
+                          <c:otherwise>
+                            <a href="javascript:void(0)">🔑비밀글 입니다.</a>                            
+                          </c:otherwise>
+                        </c:choose>
+                      </td>
+                      <td class="text-center">${bbs.userName}</td>
+                      <td class="text-center">${bbs.bbsRegDate}</td>
+                      <td class="text-center"><fmt:formatNumber type="Number" maxFractionDigits="3" groupingUsed="true" value="${bbs.bbsReadCnt}"/></td>
+                      <td class="text-center"><fmt:formatNumber type="Number" maxFractionDigits="3" groupingUsed="true" value="${bbs.bbsRecomCnt}"/></td>
+                    </tr>
+                  </c:forEach>
+                </c:when>
+                <c:otherwise>
+                  <tr>
+                    <td colspan="6" class="text-center" colspan="4">게시글이 존재하지 않습니다.</td>
+                  </tr>
+                </c:otherwise>
+              </c:choose>
             </tbody>
           </table>
           
           <c:choose>
-            <c:when test="${!fn:startsWith(cateNum, '05') && !fn:startsWith(cateNum, '01')}">
+            <c:when test="${!empty cateNum}">
+              <c:choose>
+                <c:when test="${loginUser.userType == 'USER'}">
+                  <c:if test="${!fn:startsWith(cateNum, '05') && !fn:startsWith(cateNum, '01')}">
+                    <div class="write-button-container">
+                      <a href="javascript:void(0)" class="write-button" id="write-button">글쓰기</a>
+                    </div>
+                  </c:if>
+                </c:when>
+                <c:when test="${loginUser.userType == 'BLOGGER'}">
+                  <c:if test="${!fn:startsWith(cateNum, '05') && !fn:startsWith(cateNum, '0101')}">
+                    <div class="write-button-container">
+                      <a href="javascript:void(0)" class="write-button" id="write-button">글쓰기</a>
+                    </div>
+                  </c:if>            
+                </c:when>
+                <c:when test="${loginUser.userType == 'MANAGER'}">
+                  <div class="write-button-container">
+                    <a href="javascript:void(0)" class="write-button" id="write-button">글쓰기</a>
+                  </div>
+                </c:when>
+              </c:choose>
+            </c:when>         
+            <c:otherwise>
               <div class="write-button-container">
                 <a href="javascript:void(0)" class="write-button" id="write-button">글쓰기</a>
               </div>
-            </c:when>
-            <c:otherwise>
-              <c:choose>
-                    
-              </c:choose>
             </c:otherwise>
           </c:choose>
-         
+          
           <!-- 페이징 처리 -->
           <div class="pagination">
             <ul>
-              <li><a href="javascript:void(0)" onclick="fn_list()">이전</a></li>
-              <li><a href="javascript:void(0)" onclick="fn_list()"></a></li>
-              <li><a href="javascript:void(0)" onclick="fn_list()"></a></li>
-              <li><a href="javascript:void(0)" onclick="fn_list()">다음</a></li>
+              <c:if test="${!empty bbsPaging}">
+                <c:if test="${bbsPaging.prevBlockPage gt 0}">
+                  <li><a href="javascript:void(0)" onclick="fn_list(bbsPaging.prevBlockPage)">이전</a></li>
+                </c:if>
+                <c:forEach var="i" begin="${bbsPaging.startPage}" end="${bbsPaging.endPage}" step="1" varStatus="status">
+                  <c:choose>
+                    <c:when test="${i ne bbsPaging.curPage}">
+                      <li><a href="javascript:void(0)" onclick="fn_list(${i})">${i}</a></li>
+                    </c:when>
+                    <c:otherwise>
+                      <li><a href="javascript:void(0)" style="cursor:default; color: #999;">${i}</a></li>
+                    </c:otherwise> 
+                  </c:choose>                  
+                </c:forEach>
+                <c:if test="${bbsPaging.nextBlockPage gt 0}">
+                  <li><a href="javascript:void(0)" onclick="fn_list(bbsPaging.nextBlockPage)">다음</a></li>
+                </c:if>
+              </c:if>
             </ul>
           </div>
           
@@ -153,23 +238,22 @@
           <div class="search-bar">
             <select name="_periodFilter" id="_periodFilter">
               <option value="">전체</option>
-              <option value="1">7일 전</option>
-              <option value="2">1개월 전</option>
-              <option value="3">3개월 전</option>
-              <option value="4">6개월 전</option>
-              <option value="5">1년 전</option>
+              <option value="1" <c:if test="${periodFilter == '1'}">selected</c:if>>7일 전</option>
+              <option value="2" <c:if test="${periodFilter == '2'}">selected</c:if>>1개월 전</option>
+              <option value="3" <c:if test="${periodFilter == '3'}">selected</c:if>>3개월 전</option>
+              <option value="4" <c:if test="${periodFilter == '4'}">selected</c:if>>6개월 전</option>
+              <option value="5" <c:if test="${periodFilter == '5'}">selected</c:if>>1년 전</option>
             </select>
             <select name="_searchType" id="_searchType">
               <option value="">검색 타입</option>
-              <option value="1">제목</option>
-              <option value="2">제목 + 내용</option>
-              <option value="3">작성자</option>
+              <option value="1" <c:if test="${searchType == '1'}">selected</c:if>>제목</option>
+              <option value="2" <c:if test="${searchType == '2'}">selected</c:if>>제목 + 내용</option>
+              <option value="3" <c:if test="${searchType == '3'}">selected</c:if>>작성자</option>
             </select> 
-            <input type="text" name="_searchValue" id="_searchValue" value="" placeholder="검색어를 입력하세요">
+            <input type="text" name="_searchValue" id="_searchValue" value="${searchValue}" placeholder="검색어를 입력하세요">
             <button type="button" id="btnSearch">검색</button>
           </div>
         </div>
-
         <div id="passwordModal" style="display:none;">
           <div class="modal-content">
             <h3>비밀번호 입력</h3>
@@ -183,12 +267,13 @@
     </div>
   </div>
   <form name="bbsForm" id="bbsForm" method="post">
-    <input type="hidden" name="listCount" value="${listCount}">
-    <input type="hidden" name="curPage" value="${curPage}">
+    <input type="hidden" name="bbsSeq" value="">
+    <input type="hidden" name="bbsListCount" value="${bbsListCount}">
+    <input type="hidden" name="bbsCurPage" value="${bbsCurPage}">
     <input type="hidden" name="cateNum" value="${cateNum}">
     <input type="hidden" name="cateFilter" value="${cateFilter}">
     <input type="hidden" name="periodFilter" value="${periodFilter}">
-    <input type="hidden" name="orderBy" value="${orderBy}">  
+    <input type="hidden" name="bbsOrderBy" value="${bbsOrderBy}">  
     <input type="hidden" name="isSecret" value="${isSecret}">
     <input type="hidden" name="searchType" value="${searchType}">
     <input type="hidden" name="searchValue" value="${searchValue}">
