@@ -137,13 +137,14 @@
           <table class="notice-board">
             <thead>
               <tr>
-                <th scope="col" class="text-center" style="width: 8%">번호</th>
-                <th scope="col" class="text-center" style="width: 20%">카테고리</th>
+                <th scope="col" class="text-center" style="width: 8%">북마크</th>
+                <th scope="col" class="text-center" style="width: 5%">번호</th>
+                <th scope="col" class="text-center" style="width: 21%">카테고리</th>
                 <th scope="col" class="text-center" style="width: 30%">제목</th>
-                <th scope="col" class="text-center" style="width: 8%">작성자</th>
+                <th scope="col" class="text-center" style="width: 6%">작성자</th>
                 <th scope="col" class="text-center" style="width: 20%">작성일</th>
-                <th scope="col" class="text-center" style="width: 7%">조회</th>
-                <th scope="col" class="text-center" style="width: 7%">추천</th>
+                <th scope="col" class="text-center" style="width: 5%">조회</th>
+                <th scope="col" class="text-center" style="width: 5%">추천</th>
               </tr>
             </thead>
             <tbody>
@@ -151,6 +152,12 @@
                 <c:when test="${!empty bbsList}">
                   <c:forEach var="bbs" items="${bbsList}" varStatus="status">
                     <tr class="text-center-view" onclick="fn_view(${bbs.bbsSeq})">
+                      <td class="text-center">
+                        <c:choose>
+                          <c:when test="${bbs.isBookmarked == 'Y' }"><i class="fa-solid fa-bookmark"></i></c:when>
+                          <c:otherwise><i class="fa-regular fa-bookmark"></i></c:otherwise>
+                        </c:choose>
+                      </td>
                       <td class="text-center">${bbs.bbsSeq}</td>
                       <td class="text-center">${bbs.bbsSubCateName}</td>
                       <td class="text-center-title">
@@ -172,7 +179,7 @@
                 </c:when>
                 <c:otherwise>
                   <tr>
-                    <td colspan="6" class="text-center" colspan="4">게시글이 존재하지 않습니다.</td>
+                    <td colspan="7" class="text-center" colspan="4">게시글이 존재하지 않습니다.</td>
                   </tr>
                 </c:otherwise>
               </c:choose>
@@ -196,7 +203,7 @@
                     </div>
                   </c:if>            
                 </c:when>
-                <c:when test="${loginUser.userType == 'MANAGER'}">
+                <c:when test="${loginUser.userType == 'ADMIN'}">
                   <div class="write-button-container">
                     <a href="javascript:void(0)" class="write-button" id="write-button">글쓰기</a>
                   </div>

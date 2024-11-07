@@ -312,4 +312,30 @@ public class BbsService {
 		
 		return (cnt == 1);
 	}
+	
+	public boolean isBookmarkable(HashMap<String, Object> hashMap) {
+		int cnt = -1;
+		
+		try {
+			cnt = bbsDao.isBookmarkable(hashMap);
+			
+		} catch (Exception e) {
+			logger.error("[BbsService] isBookmarkable Exception", e);
+		}
+		
+		return (cnt == 0);
+	}
+	
+	public boolean isRecommendable(HashMap<String, Object> hashMap) {
+		int cnt = -1;
+		
+		try {
+			cnt = bbsDao.isRecommendable(hashMap);
+			
+		} catch (Exception e) {
+			logger.error("[BbsService] isRecommendable Exception", e);
+		}
+		
+		return (cnt == 0);
+	}
 }

@@ -65,7 +65,7 @@
 			USER_IMAGE_ORG_NAME,
 			USER_IMAGE_EXT,
 			USER_IMAGE_SIZE,
-			USER_TYPE,
+			USER_TYPE
 			) 
 			VALUES (
 				#{userId},

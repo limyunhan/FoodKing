@@ -179,9 +179,7 @@ $(document).ready(function() {
                       <c:otherwise>
                         <optgroup label="${mainCate.mainCateName}">
                           <c:forEach var="subCate" items="${subCateListMap[mainCate.mainCateNum]}" varStatus="status">
-                            <c:if test="${subCate.subCateCombinedNum != '0101'}">
-                              <option value="${subCate.subCateCombinedNum}" <c:if test="${subCate.subCateCombinedNum == cateNum}">selected</c:if>>${subCate.subCateName}</option>
-                            </c:if>
+                            <option value="${subCate.subCateCombinedNum}" <c:if test="${subCate.subCateCombinedNum == cateNum}">selected</c:if>>${subCate.subCateName}</option>
                           </c:forEach>
                         </optgroup>
                       </c:otherwise>

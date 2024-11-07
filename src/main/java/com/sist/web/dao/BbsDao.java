@@ -34,4 +34,6 @@ public interface BbsDao {
 	public abstract int recomDelete(HashMap<String, Object> hashMap);
 	public abstract int bookmarkInsert(HashMap<String, Object> hashMap);
 	public abstract int bookmarkDelete(HashMap<String, Object> hashMap);
+	public abstract int isRecommendable(HashMap<String, Object> hashMap);
+	public abstract int isBookmarkable(HashMap<String, Object> hashMap);
 }

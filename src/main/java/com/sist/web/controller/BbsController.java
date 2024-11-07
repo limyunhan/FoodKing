@@ -76,7 +76,7 @@ public class BbsController {
 		
 		BbsSearch bbsSearch = new BbsSearch();
 		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
-		bbsSearch.setLoginUserId(cookieUserId);
+		bbsSearch.setUserId(cookieUserId);
 		
 		bbsSearch.setperiodFilter(periodFilter);
 		bbsSearch.setCateFilter(cateFilter);
@@ -142,13 +142,16 @@ public class BbsController {
 		
 		if (bbsSeq > 0) {
 			HashMap<String, Object> hashMap = new HashMap<>();
-			hashMap.put("loginUserId", cookieUserId);
+			hashMap.put("userId", cookieUserId);
 			hashMap.put("bbsSeq", bbsSeq);
 			
 			bbs = bbsService.bbsView(hashMap);
-			if (bbs != null) {
-				bbsService.bbsReadCntPlus(bbsSeq);
-				bbs.setBbsReadCnt(bbs.getBbsReadCnt() + 1);
+			if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
+				
+				if () {
+					bbsService.bbsReadCntPlus(bbsSeq);
+					bbs.setBbsReadCnt(bbs.getBbsReadCnt() + 1);
+				}
 				
 				ComSearch comSearch = new ComSearch();
 				comSearch.setBbsSeq(bbsSeq);
@@ -166,6 +169,7 @@ public class BbsController {
 		}
 		
 		model.addAttribute("bbs", bbs);
+		model.addAttribute("comList", comList);
 		model.addAttribute("bbsSeq", bbsSeq);
 		model.addAttribute("bbsListCount", bbsListCount);
 		model.addAttribute("bbsCurPage", bbsCurPage);
@@ -179,7 +183,6 @@ public class BbsController {
 		model.addAttribute("searchType", searchType);
 		model.addAttribute("searchValue", searchValue);
 		
-		model.addAttribute("comList", comList);
 		model.addAttribute("comPaging", comPaging);
 	    model.addAttribute("comCurPage", comCurPage);
 		model.addAttribute("comOrderBy", comOrderBy);
@@ -230,7 +233,7 @@ public class BbsController {
 		
 		if (!StringUtil.isEmpty(subCateCombinedNum) && !StringUtil.isEmpty(bbsTitle) && !StringUtil.isEmpty(bbsContent)) {
 			User user = userService.userSelect(cookieUserId);
-			if (((!subCateCombinedNum.startsWith("0101") && !subCateCombinedNum.startsWith("05")) || StringUtil.equals(user.getUserType(), "MANAGER")) && (!subCateCombinedNum.startsWith("0102") || !StringUtil.equals(user.getUserType(), "USER"))) {
+			if (((!subCateCombinedNum.startsWith("0101") && !subCateCombinedNum.startsWith("05")) || StringUtil.equals(user.getUserType(), "ADMIN")) && (!subCateCombinedNum.startsWith("0102") || !StringUtil.equals(user.getUserType(), "USER"))) {
 				Bbs bbs = new Bbs();
 				bbs.setUserId(cookieUserId);
 				bbs.setSubCateCombinedNum(subCateCombinedNum);
@@ -287,4 +290,101 @@ public class BbsController {
 
 		return ajaxResponse;
 	}
+	
+	// 게시글 추천
+	@RequestMapping(value = "/bbs/recom", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> recom(HttpServletRequest request) {
+	    Response<Object> ajaxResponse = new Response<>();
+
+	    String userId = HttpUtil.get(request, "userId", ""); 
+	    long bbsSeq = HttpUtil.get(request, "bbsSeq", -1L);
+	    
+	    if (!StringUtil.isEmpty(userId) && bbsSeq > 0) { 
+	        HashMap<String, Object> hashMap = new HashMap<>();
+	        hashMap.put("userId", userId);
+	        hashMap.put("bbsSeq", bbsSeq);
+	        
+	        if (bbsService.isRecommendable(hashMap)) {
+	        	// 추천을 하는 경우
+	            if (bbsService.recomInsert(hashMap)) {
+	                Bbs bbs = bbsService.bbsSelect(hashMap);
+	                
+	                if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
+	                    int bbsReComCnt = bbs.getBbsRecomCnt();
+	                    ajaxResponse.setResponse(201, "추천 성공", bbsReComCnt);
+	                    
+	                } else {
+	                    ajaxResponse.setResponse(404, "게시글 삭제됨"); 
+	                }
+	                
+	            } else {
+	                ajaxResponse.setResponse(500, "추천 실패"); 
+	            }
+	            
+	        } else {
+	            // 추천을 취소하는 경우
+	            if (bbsService.recomDelete(hashMap)) {
+	                Bbs bbs = bbsService.bbsSelect(hashMap);
+	                
+	                if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
+	                    int bbsRecomCnt = bbs.getBbsRecomCnt();
+	                    ajaxResponse.setResponse(200, "추천 취소 성공", bbsRecomCnt);
+	                    
+	                } else {
+	                    ajaxResponse.setResponse(404, "게시글 삭제됨");
+	                }
+	                
+	            } else {
+	                ajaxResponse.setResponse(500, "추천 취소 실패"); 
+	            }
+	            
+	        }
+	        
+	    } else {
+	        ajaxResponse.setResponse(400, "비정상적인 접근"); 
+	    }
+	    
+	    return ajaxResponse;
+	}
+	
+	
+	// 게시글 북마크
+	@RequestMapping(value = "/bbs/bookmark", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> bookmark(HttpServletRequest request) {
+	    Response<Object> ajaxResponse = new Response<>();
+
+	    String userId = HttpUtil.get(request, "userId", ""); 
+	    long bbsSeq = HttpUtil.get(request, "bbsSeq", -1L);
+	    
+	    if (!StringUtil.isEmpty(userId) && bbsSeq > 0) { 
+	        HashMap<String, Object> hashMap = new HashMap<>();
+	        hashMap.put("userId", userId);
+	        hashMap.put("bbsSeq", bbsSeq);
+	        
+	        if (bbsService.isBookmarkable(hashMap)) {
+	        	if (bbsService.bookmarkInsert(hashMap)) {
+	        		ajaxResponse.setResponse(200, "북마크 성공");
+	        		
+	        	} else {
+	        		ajaxResponse.setResponse(500, "북마크 실패");
+	        	}
+	            
+	        } else {
+	        	if (bbsService.bookmarkDelete(hashMap)) {
+		        	ajaxResponse.setResponse(201, "북마크 취소 성공");
+		        	
+	        	} else {
+	        		ajaxResponse.setResponse(500, "북마크 취소 실패");
+	        	}
+	        }
+	        
+	    } else {
+	        ajaxResponse.setResponse(400, "비정상적인 접근"); 
+	    }
+	    
+	    return ajaxResponse;
+	}
+
 }

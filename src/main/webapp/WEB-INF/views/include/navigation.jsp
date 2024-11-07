@@ -16,7 +16,7 @@ function fn_selectCategory(cateNum) {
   <div class="header-menu-btn">
     <% if (com.sist.web.util.CookieUtil.getCookie(request, (String)request.getAttribute("AUTH_COOKIE_NAME")) == null) { %>
     <button id="btnLogin" onclick="location.href='/user/login'">로그인</button>
-    <button id="btnReg" onclick="location.href='/user/regForm'">회원가입</button>
+    <button id="btnReg" onclick="location.href='/user/register'">회원가입</button>
     <% } else { %>
     <button id="btnLogin" onclick="location.href='/user/logOut'">로그아웃</button>
     <% } %>

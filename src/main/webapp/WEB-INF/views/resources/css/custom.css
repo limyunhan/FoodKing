@@ -30,7 +30,7 @@ body {
 
 .Board-Main {
   margin: 0 auto;
-  width: 1080px;
+  width: 1200px;
 }
 
 .footer {
@@ -446,13 +446,13 @@ table td.category {
 #reg-body {
   margin: 0;
   background-color: #333;
-  height: 100vh;
+  height: 200vh;
 }
 
 /* 회원가입 페이지 메인 컨테이너 */
 .signup-main-page {
   display: flex;
-  height: 100vh;
+  height: 200vh;
   justify-content: center;
   align-items: center;
   font-family: "Apple SD Gothic Neo", "맑은 고딕", "Malgun Gothic", 돋움, dotum,
@@ -470,7 +470,7 @@ table td.category {
   max-width: 400px;
   width: 100%;
   text-align: center;
-  max-height: 100vh;
+  max-height: 200vh;
 }
 
 .signup-header h2 {
@@ -596,7 +596,7 @@ input[type="password"] {
     padding-bottom: 10px;*/
 }
 
-.listCount {
+.bbsListCount {
   font-family: "을지로체";
   padding: 5px;
   margin-right: 5px;
@@ -607,7 +607,7 @@ input[type="password"] {
   cursor: pointer;
 }
 
-.orderBy {
+.bbsOrderBy {
   font-family: "을지로체";
   padding: 5px;
   margin-right: 5px;
@@ -849,6 +849,15 @@ input[type="password"] {
   background-color: #eaad70;
 }
 
+.bookmark-btn {
+  background-color: #f2b048;
+  color: black;
+}
+
+.bookmark-btn:hover {
+  background-color: #4db8b8;  
+}
+
 .post-header-info {
   
 }
@@ -874,49 +883,156 @@ input[type="password"] {
 }
 
 .comments-section {
-  margin-top: auto;
+    margin-top: 30px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.comments-section h2 {
-  font-size: 20px;
-  color: #333;
-  margin-bottom: 20px;
-  margin-top: 20px;
+.comments-header {
+    display: flex;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    align-items: center;
+    background-color: #ececec; /* 밝은 회색으로 변경 */
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd; /* 경계선 추가 */
+}
+
+.comments-header h3 {
+    font-size: 22px;
+    color: #333;
+    margin: 0;
+    margin-right: 10px;
+}
+
+.comment-count {
+    font-size: 14px;
+    color: #444; /* 댓글 수 텍스트 색상 약간 진하게 */
+}
+
+.refresh-icon {
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-right: 20px; /* 드롭다운과 간격 추가 */
+}
+
+.refresh-icon:hover {
+    transform: rotate(180deg);
+    color: #0056b3; /* 색상 변경 */
+}
+
+.comment-sort {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 끝 정렬 */
+    margin-left: auto; /* 왼쪽의 내용과 우측 요소를 분리 */
+}
+
+.comment-sort select {
+    font-size: 14px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #bbb; /* 약간 어두운 회색으로 변경 */
+    background-color: #fff;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.comment-sort select:hover {
+    border-color: #007bff; /* 선택 시 테두리 색상 변경 */
+}
+
+.comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.comment-item {
+    background-color: #f9f9f9; /* 밝은 회색 배경으로 변경 */
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #007bff; /* 왼쪽 테두리에 색상 강조 */
+}
+
+.comment-item-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+}
+
+.comment-item-header .comment-author {
+    font-weight: bold;
+    color: #333;
+}
+
+.comment-item-header .comment-date {
+    color: #888;
+}
+
+.comment-body {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+    padding: 5px 0; /* 댓글 내용에 약간의 여백 추가 */
+}
+
+.comment-body p {
+    word-wrap: break-word;
 }
 
 .comments-section form {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
 }
 
 .comments-section textarea {
-  font-family: "을지로체";
-  width: 100%;
-  padding: 12px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-  margin-bottom: 10px;
-  background-color: #fff;
-  resize: none;
+    font-family: "을지로체";
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px; /* 둥근 테두리로 변경 */
+    border: 1px solid #ddd;
+    font-size: 14px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    resize: none;
+    transition: border-color 0.3s ease;
+}
+
+.comments-section textarea:focus {
+    border-color: #007bff;
+    outline: none;
 }
 
 .comments-section button {
-  font-family: "을지로체";
-  width: 100px;
-  padding: 12px;
-  border: none;
-  border-radius: 5px;
-  background-color: #f2b048;
-  color: black;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  align-self: flex-end;
+    font-family: "을지로체";
+    width: 100px;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f2b048;
+    color: black;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-end;
+    margin-top: 10px;
 }
 
 .comments-section button:hover {
-  background-color: #eaad70;
+    background-color: #eaad70; /* 버튼 호버 시 색상 변경 */
+}
+
+.comments-section button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
 }
 
 /* 로그인 시 회원정보 css */
@@ -1514,7 +1630,7 @@ form.profile-form {
   margin-bottom: 20px;
 }
 
-.viewTextarea {
+.viewContent {
   font-family: "을지로체";
   resize: none;
   width: 100%;
@@ -1523,9 +1639,48 @@ form.profile-form {
   border: 0px;
 }
 
-.viewTextarea:focus {
+.viewContent:focus {
   border: 0px;
   outline: none;
+}
+
+.post-content {
+  position: relative;
+  padding-bottom: 50px; /* 버튼이 콘텐츠에 겹치지 않도록 아래쪽에 여백 추가 */
+}
+
+.recom-container {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.recom-btn {
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.recom-btn.not-recommended {
+  background-color: #28a745; /* 추천 안 했을 때 */
+}
+
+.recom-btn.not-recommended:hover {
+  background-color: #218838;
+}
+
+.recom-btn.recommended {
+  background-color: #007bff; /* 추천 완료 시 */
+}
+
+.recom-btn.recommended:hover {
+  background-color: #0056b3;
 }
 
 /* 기본 파일 입력 숨기기 */

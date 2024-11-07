@@ -68,7 +68,7 @@
 		                    SELECT 1 
 		                    FROM BOOKMARK B 
 		                    WHERE B.BBS_SEQ = A.BBS_SEQ 
-		                      AND B.USER_ID = #{loginUserId}
+		                      AND B.USER_ID = #{userId}
 		                ) THEN 'Y' 
 		                ELSE 'N' 
 		            END IS_BOOKMARKED,
@@ -77,7 +77,7 @@
 		                    SELECT 1 
 		                    FROM RECOM R 
 		                    WHERE R.BBS_SEQ = A.BBS_SEQ 
-		                      AND R.USER_ID = #{loginUserId}
+		                      AND R.USER_ID = #{userId}
 		                ) THEN 'Y' 
 		                ELSE 'N' 
 		            END AS IS_RECOMMENDED
@@ -192,7 +192,7 @@
 		            SELECT 1 
 		            FROM BOOKMARK B 
 		            WHERE B.BBS_SEQ = A.BBS_SEQ 
-		              AND B.USER_ID = #{loginUserId}
+		              AND B.USER_ID = #{userId}
 		        ) THEN 'Y' 
 		        ELSE 'N' 
 		    END IS_BOOKMARKED,
@@ -201,7 +201,7 @@
 		            SELECT 1 
 		            FROM RECOM R 
 		            WHERE R.BBS_SEQ = A.BBS_SEQ 
-		              AND R.USER_ID = #{loginUserId}
+		              AND R.USER_ID = #{userId}
 		        ) THEN 'Y' 
 		        ELSE 'N' 
 		    END AS IS_RECOMMENDED
@@ -412,6 +412,16 @@
 	        SYSDATE
 	    )
 	</insert>
+	
+	<!-- 게시글 추천, 북마크 여부를 알기위한 SELECT문 -->
+	<select id="isRecommendable" parameterType="java.util.HashMap" resultType="int">
+	   SELECT COUNT(*) FROM RECOM WHERE BBS_SEQ = #{bbsSeq} AND USER_ID = #{userId}
+	</select>
+	
+	<select id="isBookmarkable" parameterType="java.util.HashMap" resultType="int">
+	   SELECT COUNT(*) FROM BOOKMARK WHERE BBS_SEQ = #{bbsSeq} AND USER_ID = #{userId}
+	</select>
+	
 	<!--  게시글 추천 해제 -->
     <delete id="recomDelete" parameterType="java.util.HashMap">
 	    DELETE FROM RECOM WHERE USER_ID = #{userId} AND BBS_SEQ = #{bbsSeq}
