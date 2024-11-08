@@ -32,7 +32,7 @@
 		            NVL(C.COM_INDENT, 0) COM_INDENT,
 		            NVL(C.COM_STATUS, 'N') COM_STATUS,
 		            NVL(TO_CHAR(C.COM_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') COM_REG_DATE,
-		            NVL(U.USER_NAME, '') USER_NAME
+		            NVL(U.USER_NAME, '') USER_NAME,
 		            NVL(R.GROUP_REPLY_CNT, 0) GROUP_REPLY_CNT
 		        FROM 
 		            COM C, 
@@ -41,7 +41,7 @@
 		            FROM (
 		              SELECT COM_GROUP, COM_SEQ, COM_PARENT
 		              FROM COM
-		              WHERE COM_PARENT != 0
+		              WHERE COM_PARENT = 0
 		              START WITH COM_PARENT = 0
 		              CONNECT BY PRIOR COM_SEQ = COM_PARENT
 		              AND LEVEL > 1
@@ -80,10 +80,10 @@
 	   WHERE 
 	       1 = 1
            <if test='myPageUserId != null and myPageUserId != ""'>
-               AND C.USER_ID = #{myPageUserId} AND C.COM_STATUS = 'Y'
+               AND USER_ID = #{myPageUserId} AND COM_STATUS = 'Y'
            </if>
            <if test="bbsSeq != 0">
-               AND C.BBS_SEQ = #{bbsSeq}    
+               AND BBS_SEQ = #{bbsSeq}    
            </if>
 	</select>
 

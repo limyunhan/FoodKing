@@ -38,8 +38,8 @@ import com.sist.web.util.HttpUtil;
 public class BbsController {
 	public static Logger logger = LoggerFactory.getLogger(BbsController.class);
 	
-	private static final int COM_PAGE_COUNT = 100;
-	private static final int COM_LIST_COUNT = 5;
+	private static final int COM_PAGE_COUNT = 5;
+	private static final int COM_LIST_COUNT = 10;
 	private static final int BBS_PAGE_COUNT = 5;
 	
 	@Value("#{env['auth.cookie.name']}")
@@ -148,11 +148,9 @@ public class BbsController {
 			bbs = bbsService.bbsView(hashMap);
 			if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
 				
-				if () {
-					bbsService.bbsReadCntPlus(bbsSeq);
-					bbs.setBbsReadCnt(bbs.getBbsReadCnt() + 1);
-				}
-				
+				bbsService.bbsReadCntPlus(bbsSeq);
+				bbs.setBbsReadCnt(bbs.getBbsReadCnt() + 1);
+
 				ComSearch comSearch = new ComSearch();
 				comSearch.setBbsSeq(bbsSeq);
 				comSearch.setComOrderBy(comOrderBy);

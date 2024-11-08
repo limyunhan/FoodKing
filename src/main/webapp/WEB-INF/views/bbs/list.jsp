@@ -222,7 +222,7 @@
             <ul>
               <c:if test="${!empty bbsPaging}">
                 <c:if test="${bbsPaging.prevBlockPage gt 0}">
-                  <li><a href="javascript:void(0)" onclick="fn_list(bbsPaging.prevBlockPage)">이전</a></li>
+                  <li><a href="javascript:void(0)" onclick="fn_list(${bbsPaging.prevBlockPage})">이전</a></li>
                 </c:if>
                 <c:forEach var="i" begin="${bbsPaging.startPage}" end="${bbsPaging.endPage}" step="1" varStatus="status">
                   <c:choose>
@@ -235,7 +235,7 @@
                   </c:choose>                  
                 </c:forEach>
                 <c:if test="${bbsPaging.nextBlockPage gt 0}">
-                  <li><a href="javascript:void(0)" onclick="fn_list(bbsPaging.nextBlockPage)">다음</a></li>
+                  <li><a href="javascript:void(0)" onclick="fn_list(${bbsPaging.nextBlockPage})">다음</a></li>
                 </c:if>
               </c:if>
             </ul>
