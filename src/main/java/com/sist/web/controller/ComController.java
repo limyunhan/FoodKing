@@ -78,6 +78,7 @@ public class ComController {
 		return ajaxResponse;
 	}
 	
+	// 댓글 리스트 새로고침
 	@RequestMapping(value = "/bbs/refreshCom", method = RequestMethod.POST)
 	@ResponseBody
 	public Response<Object> refreshCom(HttpServletRequest request) {
@@ -113,6 +114,7 @@ public class ComController {
 		return ajaxResponse;
 	}
 	
+	// 대댓글 작성
 	@RequestMapping(value = "/bbs/writeComReply", method = RequestMethod.POST)
 	@ResponseBody
 	public Response<Object> writeComReply(HttpServletRequest request) {
@@ -170,4 +172,108 @@ public class ComController {
 		return ajaxResponse;
 	}
 	
+	// 댓글 수정하기
+	@RequestMapping(value = "/bbs/updateCom", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> updateCom(HttpServletRequest request) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		long comSeq = HttpUtil.get(request, "comSeq", -1L);
+		long bbsSeq = HttpUtil.get(request, "bbsSeq", -1L);
+		String userId = HttpUtil.get(request, "userId", "");
+		String comContent = HttpUtil.get(request, "comContent", "");
+		
+		if (comSeq > 0 && bbsSeq > 0 && !StringUtil.isEmpty(userId) && !StringUtil.isEmpty(comContent)) {
+			HashMap<String, Object> hashMap = new HashMap<>();
+			hashMap.put("userId", userId);
+			hashMap.put("bbsSeq", bbsSeq);
+			
+			Bbs bbs = bbsService.bbsSelect(hashMap);
+
+			if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
+				hashMap.clear();
+				hashMap.put("comSeq", comSeq);
+				hashMap.put("comContent", comContent);
+				Com com = comService.comSelect(comSeq);
+				
+				if (com != null && StringUtil.equals(com.getComStatus(), "Y")) {
+					
+					if (StringUtil.equals(userId, com.getUserId())) {
+						
+						if (comService.comUpdate(hashMap)) {
+							ajaxResponse.setResponse(200, "댓글이 수정됨");
+							
+						} else {
+							ajaxResponse.setResponse(500, "DB 정합성 오류");
+						}
+						
+					} else {
+						ajaxResponse.setResponse(403, "수정 권한이 없음");
+					}
+					
+				} else {
+					ajaxResponse.setResponse(410, "삭제되거나 존재하지 않는 댓글");
+				}
+		
+			} else {
+				ajaxResponse.setResponse(404, "삭제된 게시글");
+			}
+
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+		
+		return ajaxResponse;
+	}
+	
+	// 댓글 삭제하기
+	@RequestMapping(value = "/bbs/deleteCom", method = RequestMethod.POST)
+	@ResponseBody
+	public Response<Object> deleteCom(HttpServletRequest request) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+		long comSeq = HttpUtil.get(request, "comSeq", -1L);
+		long bbsSeq = HttpUtil.get(request, "bbsSeq", -1L);
+		String userId = HttpUtil.get(request, "userId", "");
+		
+		if (bbsSeq > 0 && !StringUtil.isEmpty(userId)) {
+			HashMap<String, Object> hashMap = new HashMap<>();
+			hashMap.put("userId", userId);
+			hashMap.put("bbsSeq", bbsSeq);
+			
+			Bbs bbs = bbsService.bbsSelect(hashMap);
+
+			if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
+				
+				Com com = comService.comSelect(comSeq);
+				
+				if (com != null && StringUtil.equals(com.getComStatus(), "Y")) {
+					
+					if (StringUtil.equals(userId, com.getUserId())) {
+						
+						if (comService.comDelete(comSeq)) {
+							ajaxResponse.setResponse(200, "댓글이 삭제됨");
+							
+						} else {
+							ajaxResponse.setResponse(500, "DB 정합성 오류");
+						}
+						
+					} else {
+						ajaxResponse.setResponse(403, "삭제 권한이 없음");
+					}
+					
+				} else {
+					ajaxResponse.setResponse(410, "삭제되거나 존재하지 않는 댓글");
+				}
+	         
+			} else {
+				ajaxResponse.setResponse(404, "삭제된 게시글");
+			}
+
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+		
+		return ajaxResponse;
+	}
 }

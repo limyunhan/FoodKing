@@ -338,4 +338,18 @@ public class BbsService {
 		
 		return (cnt == 0);
 	}
+	
+	// 게시글 리스트
+	public List<Bbs> bbsListForIndex(BbsSearch bbsSearch) {
+		List<Bbs> list = null;
+		
+		try {
+			list = bbsDao.bbsListForIndex(bbsSearch);
+			
+		} catch (Exception e) {
+			logger.error("[BbsService] bbsList Exception", e);
+		}
+		
+		return list;
+	}
 }

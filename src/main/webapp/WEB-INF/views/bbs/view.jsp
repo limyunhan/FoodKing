@@ -1,34 +1,51 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@include file="/WEB-INF/views/include/taglib.jsp" %>    
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+  pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/views/include/taglib.jsp"%>
 
 <!DOCTYPE html>
 <html lang="ko">
 
 <head>
-<%@include file="/WEB-INF/views/include/head.jsp" %>
+<%@include file="/WEB-INF/views/include/head.jsp"%>
 <script>
 $(document).ready(function() {
-   $("#list-btn").on("click", function(){
-       document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
+	$("#list-btn").on("click", function(){
+		document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
         document.bbsForm.submit();
-   });
+    });
    
-   <c:if test="${loginUser.userId == bbs.userId }">
-     $("#bbsEdit-btn").on("click", function() {
+    <c:if test="${loginUser.userId == bbs.userId or loginUser.userType == 'ADMIN' }">
+        $("#bbsEdit-btn").on("click", function() {
+            document.bbsForm.action = "/bbs/update";
+    	    document.bbsForm.submit();
+        });
         
-        
-        
-     });
-     
-     $("#bbsDelete-btn").on("click", function() {
-        
-        
-        
-     });
-   </c:if>
-   
-   $("#recom-btn").on("click", function() {
-       $.ajax({
+        $("#bbsDelete-btn").on("click", function() {
+        	if (confirm("정말로 게시글을 삭제하시겠습니까?")) {
+        		$.ajax({
+        			type: "POST",
+        			url: "/bbs/delete",
+        			data: {
+        				
+        			},
+        			dataType: "JSON",
+        	        beforeSend: function(xhr) {
+        	              xhr.setRequestHeader("AJAX", "true");
+        	        },
+        	        sucess: function(response) {
+
+        	        },
+        	        error: function(error) {
+        	        	alert("서버 응답오류가 발생하였습니다.");
+        	            icia.common.error(error);   
+        	        }
+        		});
+            }
+        });
+    </c:if>
+    
+    $("#recom-btn").on("click", function() {
+        $.ajax({
            type: "POST",
            url: "/bbs/recom",
            data: {
@@ -147,10 +164,10 @@ $(document).ready(function() {
                 $("#comCurPage").val(comRefresh.comCurPage);
                 $("#comOrderBy").val(comRefresh.comOrderBy);
                 
-                var comPagingHtml = getComPagingHtml(comRefresh.comPaging);
+                const comPagingHtml = getComPagingHtml(comRefresh.comPaging);
                 $(".pagination ul").html(comPagingHtml);
                 
-                var comListHtml = getComListHtml(comRefresh.comList);
+                const comListHtml = getComListHtml(comRefresh.comList);
                 $(".comment-list").html(comListHtml);
                 
                 $("#comContent").val("");
@@ -197,7 +214,7 @@ $(document).ready(function() {
 	        success: function(response) {
 	           if (response.code === 200) {
 	               
-	               var comRefresh = response.data;
+	               const comRefresh = response.data;
 	               
 	               if (comRefresh.bbsComCnt > 0) {
 	                   $(".comment-count").html("(" + comRefresh.bbsComCnt + ")");
@@ -206,10 +223,10 @@ $(document).ready(function() {
 	               $("#comCurPage").val(comRefresh.comCurPage);
 	               $("#comOrderBy").val(comRefresh.comOrderBy);
 	               
-	               var comPagingHtml = getComPagingHtml(comRefresh.comPaging);
+	               const comPagingHtml = getComPagingHtml(comRefresh.comPaging);
 	               $(".pagination ul").html(comPagingHtml);
 	               
-	               var comListHtml = getComListHtml(comRefresh.comList);
+	               const comListHtml = getComListHtml(comRefresh.comList);
 	               $(".comment-list").html(comListHtml);
 	               
 	           } else if (response.code === 404) {
@@ -233,7 +250,7 @@ $(document).ready(function() {
 });
 
 function getComPagingHtml(comPaging) {
-    var comPagingHtml = "";
+    let comPagingHtml = "";
     
     if (comPaging.prevBlockPage > 0) {
         comPagingHtml += "<li><a href='javascript:void(0)' onclick='fn_list(" + comPaging.prevBlockPage + ")'>이전</a></li>";
@@ -255,15 +272,14 @@ function getComPagingHtml(comPaging) {
 }
 
 function getComListHtml(comList) {
-	var loginUserId = "${loginUser.userId}";
-    var comListHtml = "";
+    const loginUserId = "${loginUser.userId}";
+    let comListHtml = "";
 
     comList.forEach(function(com) {
-        var indentStyle = "style='margin-left: " + (com.comIndent * 20) + "px;'";
-
-        var deletedClass = com.comStatus !== "Y" ? "deleted" : "";
-
-        var commentBody = "";
+        const indentStyle = "style='margin-left: " + (com.comIndent * 20) + "px;'";
+        const deletedClass = com.comStatus !== "Y" ? "deleted" : "";
+        
+        let commentBody = "";
         if (com.comStatus !== 'Y') {
             commentBody = 
                 "<div class='comment-body deleted-comment'>" +
@@ -272,16 +288,17 @@ function getComListHtml(comList) {
         } else {
             commentBody = 
                 "<div class='comment-item-header'>" +
+                    (com.comIndent !== 0 ? "<i class='fa-solid fa-reply flipped-icon'></i>" : "") +
                     "<span class='comment-author'>" + com.userName + "</span>" +
                     "<span class='comment-date'>" + com.comRegDate + "</span>" +
                 "</div>" +
                 "<div class='comment-body'>" +
                     "<p>" + com.comContent + "</p>" +
                     "<div class='comment-action'>" +
-                        "<button type='button' id='comReply-btn' class='action-btn' onclick='replyCom(" + com.comSeq + ")'>답글</button>" +
+                        "<button type='button' class='comReply-btn' onclick='replyCom(" + com.comSeq + ")'>답글</button>" +
                         (com.userId === loginUserId ? 
-                            "<button type='button' id='comEdit-btn' class='action-btn' onclick='editCom(" + com.comSeq + ")'>수정</button>" +
-                            "<button type='button' id='comDelete-btn' class='action-btn' onclick='deleteCom(" + com.comSeq + ")'>삭제</button>" 
+                            "<button type='button' class='comEdit-btn' onclick='editCom(" + com.comSeq + ")'>수정</button>" +
+                            "<button type='button' class='comDelete-btn' onclick='deleteCom(" + com.comSeq + ")'>삭제</button>"
                             : '') +
                     "</div>" +
                 "</div>";
@@ -313,7 +330,7 @@ function fn_list(comSeq) {
         success: function(response) {
            if (response.code === 200) {
         	   
-               var comRefresh = response.data;
+               const comRefresh = response.data;
                
                if (comRefresh.bbsComCnt > 0) {
                    $(".comment-count").html("(" + comRefresh.bbsComCnt + ")");
@@ -322,10 +339,10 @@ function fn_list(comSeq) {
                $("#comCurPage").val(comRefresh.comCurPage);
                $("#comOrderBy").val(comRefresh.comOrderBy);
                
-               var comPagingHtml = getComPagingHtml(comRefresh.comPaging);
+               const comPagingHtml = getComPagingHtml(comRefresh.comPaging);
                $(".pagination ul").html(comPagingHtml);
                
-               var comListHtml = getComListHtml(comRefresh.comList);
+               const comListHtml = getComListHtml(comRefresh.comList);
                $(".comment-list").html(comListHtml);
 
                $("html, body").animate({
@@ -369,7 +386,7 @@ function fn_refresh() {
        success: function(response) {
           if (response.code === 200) {
               
-              var comRefresh = response.data;
+              const comRefresh = response.data;
               
               if (comRefresh.bbsComCnt > 0) {
                   $(".comment-count").html("(" + comRefresh.bbsComCnt + ")");
@@ -378,10 +395,10 @@ function fn_refresh() {
               $("#comCurPage").val(comRefresh.comCurPage);
               $("#comOrderBy").val(comRefresh.comOrderBy);
               
-              var comPagingHtml = getComPagingHtml(comRefresh.comPaging);
+              const comPagingHtml = getComPagingHtml(comRefresh.comPaging);
               $(".pagination ul").html(comPagingHtml);
               
-              var comListHtml = getComListHtml(comRefresh.comList);
+              const comListHtml = getComListHtml(comRefresh.comList);
               $(".comment-list").html(comListHtml);
               
           } else if (response.code === 404) {
@@ -405,7 +422,7 @@ function fn_refresh() {
 }
 
 function replyCom(comSeq) {
-    var $comLi = $("li[data-seq='" + comSeq + "']");
+    const $comLi = $("li[data-seq='" + comSeq + "']");
 
     if ($comLi.find(".reply-box").length > 0) {
         return;
@@ -424,17 +441,15 @@ function replyCom(comSeq) {
 }
 
 function InsertReply(comSeq) {
-	var $comLi = $("li[data-seq='" + comSeq + "']");
-	var replyContent = $.trim($comLi.find("textarea[name='replyContent']").val());
-	    
-
+    const $comLi = $("li[data-seq='" + comSeq + "']");
+	const replyContent = $.trim($comLi.find("textarea[name='replyContent']").val());
+	
     if (replyContent.length === 0) {
         alert("답글 내용을 입력하세요.");
         $comLi.find("textarea[name='replyContent']").val(""); 
         $comLi.find("textarea[name='replyContent']").focus(); 
         return;
     }
-
     
     $.ajax({
     	type: "POST",
@@ -485,15 +500,131 @@ function cancelReply(button) {
     }
 }
 
-function editCom(comSeq) {
+function editCom(comSeq, comContent) {
+	const $comLi = $("li[data-seq='" + comSeq + "']");
+	const $comContent = $comLi.find(".comment-body p");
+	const $commentAction = $comLi.find(".comment-action");
+	const $existingButtons = $commentAction.find("button").hide();
 	
+	const $textarea = $("<textarea>", {
+		class: "edit-textarea",
+		rows: 4,
+		cols: 50,
+		placeholder: "댓글을 작성해주세요"
+	}).val(comContent);
 	
+	$comContent.replaceWith($textarea);
+	
+    const $cancelButton = $("<button>", {
+        type: "button",
+        class: "comEdit-cancel-btn",
+        text: "수정 취소",
+        click: function() {
+            $textarea.replaceWith($comContent); 
+            $cancelButton.remove(); 
+            $saveButton.remove(); 
+            $existingButtons.show();
+        }
+    });
+    
+    const $saveButton = $("<button>", {
+        type: "button",
+        class: "comEdit-save-btn",
+        text: "수정 저장",
+        click: function() {
+            const newContent = $textarea.val();
+            
+            $.ajax({
+            	type: "POST",
+            	url: "/bbs/updateCom",
+            	data: {
+            		comSeq: comSeq,
+                    userId: "${loginUser.userId}",
+                    bbsSeq: $("#bbsSeq").val(),
+                    comContent: newContent
+            	},
+            	beforeSend: function(xhr) {
+                    xhr.setRequestHeader("AJAX", "true");
+                },
+                success: function(response) {
+                    if (response.code === 200) {
+                        alert("댓글을 성공적으로 수정하였습니다.");
+                        fn_refresh();
+                        
+                    } else if (response.code === 500) {
+                        alert("DB 정합성 오류가 발생하였습니다.");
+           
+                    } else if (response.code === 403) {
+                    	alert("수정 권한이 없습니다.");
+                    
+                    } else if (response.code === 410) {
+                        alert("삭제되거나 존재하지 않는 댓글입니다.");
+                        
+                    } else if (response.code === 404) {
+                        alert("삭제된 게시글 입니다.");
+                        
+                    } else if (response.code === 400) {
+                        alert("비정상적인 접근입니다.");
+                        
+                    } else {
+                        alert("서버오류로 댓글 수정에 실패하였습니다.");          
+                    }
+                },
+                error: function(error) {
+                    alert("서버오류로 댓글 수정에 실패하였습니다.");         
+                    icia.common.error(error);
+                }
+            });
+        }
+    });
+    
+    $commentAction.append($saveButton);
+    $commentAction.append($cancelButton);
 }
 
 function deleteCom(comSeq) {
-	
-	
-	
+	if (confirm("정말로 삭제하시겠습니까?")) {	
+	    $.ajax({
+	        type: "POST",
+            url: "/bbs/deleteCom",
+            data: {
+                comSeq: comSeq,
+                userId: "${loginUser.userId}",
+                bbsSeq: $("#bbsSeq").val(),
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("AJAX", "true");
+            },
+            success: function(response) {
+                if (response.code === 200) {
+                    alert("댓글을 성공적으로 삭제하였습니다.");
+                    fn_refresh();
+                    
+                } else if (response.code === 500) {
+                    alert("DB 정합성 오류가 발생하였습니다.");
+       
+                } else if (response.code === 403) {
+                    alert("삭제 권한이 없습니다.");
+                
+                } else if (response.code === 410) {
+                    alert("이미 삭제되거나 존재하지 않는 댓글입니다.");
+                    
+                } else if (response.code === 404) {
+                    alert("삭제된 게시글 입니다.");
+                    
+                } else if (response.code === 400) {
+                    alert("비정상적인 접근입니다.");
+                    
+                } else {
+                    alert("서버오류로 댓글 삭제에 실패하였습니다.");          
+                }
+            },
+            error: function(error) {
+                alert("서버오류로 댓글 삭제에 실패하였습니다.");         
+                icia.common.error(error);
+            }
+        });
+	}
 }
 </script>
 </head>
@@ -527,7 +658,7 @@ function deleteCom(comSeq) {
               <div class="post-header-buttons">
                 <button class="list-btn" id="list-btn">리스트</button>
                 <button class="bookmark-btn" id="bookmark-btn">북마크</button>
-                <c:if test="${loginUser.userId == bbs.userId }">
+                <c:if test="${loginUser.userId == bbs.userId or loginUser.userType == 'ADMIN'}">
                   <button class="edit-btn" id="bbsEdit-btn">수정</button>
                   <button class="delete-btn" id="bbsDelete-btn">삭제</button>
                 </c:if>
@@ -574,16 +705,17 @@ function deleteCom(comSeq) {
                       </c:when>
                       <c:otherwise>
                         <div class="comment-item-header">
+                          <c:if test="${com.comIndent ne 0}"><i class="fa-solid fa-reply flipped-icon"></i></c:if>
                           <span class="comment-author">${com.userName}</span>
                           <span class="comment-date">${com.comRegDate}</span>
                         </div>
                         <div class="comment-body">
                           <p><c:out value="${com.comContent}" /></p>
                           <div class="comment-action">
-                            <button type="button" id="comReply-btn" class="action-btn" onclick="replyCom(${com.comSeq})">답글</button>
+                            <button type="button" class="comReply-btn" onclick="replyCom(${com.comSeq})">답글</button>
                             <c:if test="${com.userId == loginUser.userId }">
-                              <button type="button" id="comEdit-btn" class="action-btn" onclick="editCom(${com.comSeq})">수정</button>
-                              <button type="button" id="comDelete-btn" class="action-btn" onclick="deleteCom(${com.comSeq})">삭제</button>
+                              <button type="button" class="comEdit-btn" onclick="editCom(${com.comSeq}, '${fn:escapeXml(com.comContent)}')">수정</button>
+                              <button type="button" class="comDelete-btn" onclick="deleteCom(${com.comSeq})">삭제</button>
                             </c:if>
                           </div>
                         </div>
@@ -617,10 +749,8 @@ function deleteCom(comSeq) {
                 </c:if>
               </ul>
             </div>
-            
             <textarea id="comContent" name="comContent" rows="4" cols="50" placeholder="댓글을 작성해주세요" required></textarea>
             <button id="com-btn" class="com-btn">댓글 달기</button>
-            
           </div>
         </div>
       </div>

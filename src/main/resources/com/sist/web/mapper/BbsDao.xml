@@ -21,6 +21,24 @@
         <result column="IS_RECOMMENDED" property="isRecommended"></result>
     </resultMap>
     
+    <resultMap id="indexResultMap" type="com.sist.web.model.Bbs">
+        <id column="BBS_SEQ" property="bbsSeq"></id>
+        <result column="SUB_CATE_COMBINED_NUM" property="subCateCombinedNum"></result>
+        <result column="USER_ID" property="userId"></result>
+        <result column="BBS_TITLE" property="bbsTitle"></result>
+        <result column="BBS_CONTENT" property="bbsContent"></result>
+        <result column="BBS_PWD" property="bbsPwd"></result>
+        <result column="BBS_READ_CNT" property="bbsReadCnt"></result>
+        <result column="BBS_STATUS" property="bbsStatus"></result>
+        <result column="BBS_REG_DATE" property="bbsRegDate"></result>
+        <result column="BBS_UPDATE_DATE" property="bbsUpdateDate"></result>
+        <result column="USER_NAME" property="userName"></result>
+        <result column="BBS_COM_CNT" property="bbsComCnt"></result>
+        <result column="BBS_RECOM_CNT" property="bbsRecomCnt"></result>
+        <result column="BBS_MAIN_CATE_NAME" property="bbsMainCateName"></result>
+        <result column="BBS_SUB_CATE_NAME" property="bbsSubCateName"></result>
+    </resultMap>
+    
     <resultMap id="bbsFileResultMap" type="com.sist.web.model.BbsFile"> 
         <id column="BBS_FILE_SEQ" property="bbsFileSeq"></id>
         <id column="BBS_SEQ" property="bbsSeq"></id>
@@ -93,9 +111,13 @@
 		            WHERE S.MAIN_CATE_NUM = M.MAIN_CATE_NUM) E
 		        WHERE 
 		            A.BBS_STATUS = 'Y'
-		            <if test='myPageUserId != null and myPageUserId != ""'> AND A.USER_ID = #{myPageUserId}</if>
-		            <if test='recomUserId != null and recomUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
-		            <if test='bookmarkUserId != null and bookmarkUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
+		            <if test='myPage != null and myPage != ""'> 
+		                <choose>
+		                    <when test='myPage =="1"'> AND A.USER_ID = #{userId}</when>
+		                    <when test='myPage =="2"'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{userId})</when>
+		                    <when test='myPage =="3"'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{userId})</when>
+		                </choose>
+		            </if>
 		            <if test='isSecret != null and isSecret != ""'>
 		                <choose>
 		                    <when test='isSecret == "Y"'> AND (A.BBS_PWD IS NOT NULL AND A.BBS_PWD <![CDATA[<>]]> '')</when>
@@ -109,7 +131,7 @@
 		                    <when test='searchType == "3"'> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
 		                </choose>
 		            </if> 
-		            <if test='cateFilter != null and cateFilter != ""'> AND A.SUB_CATE_COMBINED_NUM LIKE '%' || #{cateFilter} || '%'</if>
+		            <if test='cateFilter != null and cateFilter != ""'> AND A.SUB_CATE_COMBINED_NUM LIKE #{cateFilter} || '%'</if>
 		            <if test='periodFilter != null and periodFilter !=""'>  
 		                <choose>
 		                    <when test='periodFilter == "1"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
@@ -140,9 +162,13 @@
         FROM BBS A, USER_TABLE U
         WHERE 
 	        A.BBS_STATUS = 'Y'
-	        <if test='myPageUserId != null and myPageUserId != ""'> AND A.USER_ID = #{myPageUserId}</if>
-	        <if test='recomUserId != null and recomUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{recomUserId})</if>
-	        <if test='bookmarkUserId != null and bookmarkUserId != ""'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{bookmarkUserId})</if>
+            <if test='myPage != null and myPage != ""'> 
+                <choose>
+                    <when test='myPage =="1"'> AND A.USER_ID = #{userId}</when>
+                    <when test='myPage =="2"'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM RECOM WHERE USER_ID = #{userId})</when>
+                    <when test='myPage =="3"'> AND A.BBS_SEQ IN (SELECT BBS_SEQ FROM BOOKMARK WHERE USER_ID = #{userId})</when>
+                </choose>
+            </if>
 	        <if test='isSecret != null and isSecret != ""'>
 	            <choose>
 	                <when test='isSecret == "Y"'> AND (A.BBS_PWD IS NOT NULL AND A.BBS_PWD <![CDATA[<>]]> '')</when>
@@ -156,7 +182,7 @@
 	                <when test='searchType == "3"'> AND B.USER_NAME LIKE '%' || #{searchValue} || '%'</when>
 	            </choose>
 	        </if> 
-	        <if test='cateFilter != null and cateFilter != ""'> AND A.SUB_CATE_COMBINED_NUM LIKE '%' || #{cateFilter} || '%'</if>
+	        <if test='cateFilter != null and cateFilter != ""'> AND A.SUB_CATE_COMBINED_NUM LIKE #{cateFilter} || '%'</if>
 	        <if test='periodFilter != null and periodFilter != ""'>  
 	            <choose>
 	                <when test='periodFilter == "1"'> AND TRUNC(A.BBS_REG_DATE) <![CDATA[>=]]> TRUNC(SYSDATE - 7)</when>
@@ -444,4 +470,49 @@
     <delete id="bookmarkDelete" parameterType="java.util.HashMap">
         DELETE FROM BOOKMARK WHERE USER_ID = #{userId} AND BBS_SEQ = #{bbsSeq}
     </delete>
+    
+    
+    <select id="bbsListForIndex" parameterType="com.sist.web.model.BbsSearch" resultMap="indexResultMap">
+        SELECT BBS_SEQ, SUB_CATE_COMBINED_NUM, USER_ID, BBS_TITLE, BBS_CONTENT, BBS_PWD, BBS_READ_CNT, BBS_STATUS, BBS_REG_DATE, BBS_UPDATE_DATE, USER_NAME, BBS_COM_CNT, BBS_RECOM_CNT, BBS_MAIN_CATE_NAME, BBS_SUB_CATE_NAME
+        FROM (
+            SELECT ROWNUM RNUM, BBS_SEQ, SUB_CATE_COMBINED_NUM, USER_ID, BBS_TITLE, BBS_CONTENT, BBS_PWD, BBS_READ_CNT, BBS_STATUS, BBS_REG_DATE, BBS_UPDATE_DATE, USER_NAME, BBS_COM_CNT, BBS_RECOM_CNT, BBS_MAIN_CATE_NAME, BBS_SUB_CATE_NAME
+            FROM ( 
+                SELECT 
+                    A.BBS_SEQ BBS_SEQ,
+                    A.SUB_CATE_COMBINED_NUM SUB_CATE_COMBINED_NUM,
+                    A.USER_ID USER_ID,
+                    NVL(A.BBS_TITLE, '') BBS_TITLE,
+                    NVL(A.BBS_CONTENT, '') BBS_CONTENT,
+                    NVL(A.BBS_PWD, '') BBS_PWD,
+                    NVL(A.BBS_READ_CNT, 0) BBS_READ_CNT,
+                    NVL(A.BBS_STATUS, 'N') BBS_STATUS,
+                    NVL(TO_CHAR(A.BBS_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_REG_DATE,
+                    NVL(TO_CHAR(A.BBS_UPDATE_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_UPDATE_DATE,
+                    NVL(U.USER_NAME, '') USER_NAME,
+                    NVL(C.BBS_COM_CNT, 0) BBS_COM_CNT,
+                    NVL(D.BBS_RECOM_CNT, 0) BBS_RECOM_CNT,
+                    NVL(E.MAIN_CATE_NAME, '') BBS_MAIN_CATE_NAME,
+                    NVL(E.SUB_CATE_NAME, '') BBS_SUB_CATE_NAME
+                FROM BBS A, USER_TABLE U,
+                    (SELECT BBS_SEQ, COUNT(COM_SEQ) BBS_COM_CNT 
+                    FROM (SELECT * FROM COM WHERE COM_STATUS = 'Y') 
+                    GROUP BY BBS_SEQ) C,
+                    (SELECT BBS_SEQ, COUNT(BBS_SEQ) BBS_RECOM_CNT 
+                    FROM RECOM 
+                    GROUP BY BBS_SEQ) D,
+                    (SELECT S.SUB_CATE_COMBINED_NUM SUB_CATE_COMBINED_NUM, S.SUB_CATE_NAME SUB_CATE_NAME, M.MAIN_CATE_NAME MAIN_CATE_NAME 
+                    FROM SUB_CATE S, MAIN_CATE M
+                    WHERE S.MAIN_CATE_NUM = M.MAIN_CATE_NUM) E
+                WHERE 
+                    A.BBS_STATUS = 'Y'
+                    <if test='cateFilter != null and cateFilter != ""'> AND A.SUB_CATE_COMBINED_NUM LIKE #{cateFilter} || '%'</if>
+                    AND A.USER_ID = U.USER_ID
+                    AND A.SUB_CATE_COMBINED_NUM = E.SUB_CATE_COMBINED_NUM
+                    AND A.BBS_SEQ = C.BBS_SEQ(+) 
+                    AND A.BBS_SEQ = D.BBS_SEQ(+)       
+                ORDER BY BBS_SEQ DESC           
+            ) 
+        )
+        WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+    </select>
 </mapper>

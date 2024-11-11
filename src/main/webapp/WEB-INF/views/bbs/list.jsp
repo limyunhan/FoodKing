@@ -6,68 +6,92 @@
 <head>
 <%@include file="/WEB-INF/views/include/head.jsp" %>
 <script>
-    $(document).ready(function() {
-        $("#write-button").on("click", function() {
-            document.bbsForm.action = "/bbs/write";
-            document.bbsForm.submit();
-        });
+$(document).ready(function() {
+    $("#write-button").on("click", function() {
+        document.bbsForm.action = "/bbs/write";
+        document.bbsForm.submit();
+    });
 
-        $("#btnSearch").on("click", function() {
-            document.bbsForm.searchType.value = $("#_searchType").val();
-            document.bbsForm.searchValue.value = $("#_searchValue").val();
-            document.bbsForm.periodFilter.value = $("#_periodFilter").val();
+    $("#btnSearch").on("click", function() {
+        document.bbsForm.searchType.value = $("#_searchType").val();
+        document.bbsForm.searchValue.value = $("#_searchValue").val();
+        document.bbsForm.periodFilter.value = $("#_periodFilter").val();
+        document.bbsForm.bbsCurPage.value = "1";
+        document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
+        document.bbsForm.submit();
+    });
+
+    $("#_searchType").on("change", function() {
+        $("#_searchValue").val("");
+        $("#_searchValue").focus();
+    });
+
+    <c:if test="${fn:length(cateNum) le 2}">
+        $("#_cateFilter").on("change", function() {
+            document.bbsForm.cateFilter.value = $("#_cateFilter").val();
             document.bbsForm.bbsCurPage.value = "1";
             document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
             document.bbsForm.submit();
         });
+    </c:if>
 
-        $("#_searchType").on("change", function() {
-            $("#_searchValue").val("");
-            $("#_searchValue").focus();
-        });
+    $("#_bbsListCount").on("change", function() {
+        document.bbsForm.bbsListCount.value = $("#_bbsListCount").val();
+        document.bbsForm.bbsCurPage.value = "1";
+        document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
+        document.bbsForm.submit();
+    });
 
-        <c:if test="${fn:length(cateNum) le 2}">
-            $("#_cateFilter").on("change", function() {
-                document.bbsForm.cateFilter.value = $("#_cateFilter").val();
-                document.bbsForm.bbsCurPage.value = "1";
-                document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
-                document.bbsForm.submit();
-            });
-        </c:if>
+    $("#_bbsOrderBy").on("change", function() {
+        document.bbsForm.bbsOrderBy.value = $("#_bbsOrderBy").val();
+        document.bbsForm.bbsCurPage.value = "1";
+        document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
+        document.bbsForm.submit();
+    });
 
-        $("#_bbsListCount").on("change", function() {
-            document.bbsForm.bbsListCount.value = $("#_bbsListCount").val();
-            document.bbsForm.bbsCurPage.value = "1";
-            document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
-            document.bbsForm.submit();
-        });
-
-        $("#_bbsOrderBy").on("change", function() {
-            document.bbsForm.bbsOrderBy.value = $("#_bbsOrderBy").val();
-            document.bbsForm.bbsCurPage.value = "1";
-            document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
-            document.bbsForm.submit();
-        });
-
-        $("#_isSecret").on("change", function() {
-            document.bbsForm.isSecret.value = $("#_isSecret").val();
-            document.bbsForm.bbsCurPage.value = "1";
-            document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
-            document.bbsForm.submit();
-        });
+    $("#_isSecret").on("change", function() {
+        document.bbsForm.isSecret.value = $("#_isSecret").val();
+        document.bbsForm.bbsCurPage.value = "1";
+        document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
+        document.bbsForm.submit();
     });
     
-    function fn_view(bbsSeq) {
-        document.bbsForm.bbsSeq.value = bbsSeq;
-        document.bbsForm.action = "/bbs/view";
-        document.bbsForm.submit();
-    }
+    $("#checkPasswordButton").on("click", function() {
+        var inputPwd = $("#inputPassword").val();
+        var bbsPwd = $("#passwordModal").data("bbsPwd");
+        var bbsSeq = $("#passwordModal").data("bbsSeq");
 
-    function fn_list(bbsCurPage) {
-        document.bbsForm.bbsCurPage.value = bbsCurPage;
-        document.bbsForm.action = "/bbs/list";
-        document.bbsForm.submit();
-    }
+        if (inputPwd === bbsPwd) {
+            fn_view(bbsSeq);
+            
+        } else {
+            alert("비밀번호가 틀렸습니다.");
+        }
+    });
+});
+
+function fn_view(bbsSeq) {
+    document.bbsForm.bbsSeq.value = bbsSeq;
+    document.bbsForm.action = "/bbs/view";
+    document.bbsForm.submit();
+}
+
+function fn_list(bbsCurPage) {
+    document.bbsForm.bbsCurPage.value = bbsCurPage;
+    document.bbsForm.action = "/bbs/list";
+    document.bbsForm.submit();
+}
+
+function openPasswordModal(bbsSeq, bbsPwd) {
+    $("#passwordModal").data("bbsSeq", bbsSeq); 
+    $("#passwordModal").data("bbsPwd", bbsPwd); 
+    $("#passwordModal").show();
+}
+
+function closePasswordModal() {
+    $("#passwordModal").hide();
+    $("#inputPassword").val(""); 
+}
 </script>
 </head>
 <body id="index-body">
@@ -151,7 +175,7 @@
               <c:choose>
                 <c:when test="${!empty bbsList}">
                   <c:forEach var="bbs" items="${bbsList}" varStatus="status">
-                    <tr class="text-center-view" onclick="fn_view(${bbs.bbsSeq})">
+                    <tr class="text-center-view" onclick="<c:choose><c:when test='${empty bbs.bbsPwd or loginUser.userType == "ADMIN" or loginUser.userId == bbs.userId}'>fn_view(${bbs.bbsSeq})</c:when><c:otherwise>openPasswordModal(${bbs.bbsSeq}, '${bbs.bbsPwd}')</c:otherwise></c:choose>">
                       <td class="text-center">
                         <c:choose>
                           <c:when test="${bbs.isBookmarked == 'Y' }"><i class="fa-solid fa-bookmark"></i></c:when>
@@ -166,7 +190,7 @@
                             <a href="javascript:void(0)"><c:out value="${bbs.bbsTitle}" /><c:if test="${bbs.bbsComCnt != 0}">(<fmt:formatNumber type="Number" maxFractionDigits="3" groupingUsed="true" value="${bbs.bbsComCnt}"/>)</c:if></a>
                           </c:when>
                           <c:otherwise>
-                            <a href="javascript:void(0)">🔑비밀글 입니다.</a>                            
+                            <a href="javascript:void(0)">🔑 비밀글 입니다.</a>                            
                           </c:otherwise>
                         </c:choose>
                       </td>
@@ -179,7 +203,7 @@
                 </c:when>
                 <c:otherwise>
                   <tr>
-                    <td colspan="7" class="text-center" colspan="4">게시글이 존재하지 않습니다.</td>
+                    <td colspan="8" class="text-center">게시글이 존재하지 않습니다.</td>
                   </tr>
                 </c:otherwise>
               </c:choose>
@@ -260,17 +284,18 @@
             <input type="text" name="_searchValue" id="_searchValue" value="${searchValue}" placeholder="검색어를 입력하세요">
             <button type="button" id="btnSearch">검색</button>
           </div>
-        </div>
-        <div id="passwordModal" style="display:none;">
-          <div class="modal-content">
-            <h3>비밀번호 입력</h3>
-            <input type="password" id="inputPassword" placeholder="비밀번호를 입력하세요" />
-            <button id="checkPasswordButton">확인</button>
-            <button id="closeModalButton">취소</button>
-          </div>
+          
         </div>
       </div>
       <%@ include file="/WEB-INF/views/include/footer.jsp"%>
+    </div>
+  </div>
+  <div id="passwordModal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closePasswordModal()">&times;</span>
+      <h3>비밀번호 입력</h3>
+      <input type="password" id="inputPassword" placeholder="비밀번호를 입력하세요" />
+      <button id="checkPasswordButton">확인</button>
     </div>
   </div>
   <form name="bbsForm" id="bbsForm" method="post">

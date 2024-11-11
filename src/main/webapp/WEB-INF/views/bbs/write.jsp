@@ -211,12 +211,12 @@ $(document).ready(function() {
     </div>
   </div>
   <form name="bbsForm" id="bbsForm" method="post">
-    <input type="hidden" name="listCount" value="${listCount}">
-    <input type="hidden" name="curPage" value="${curPage}">
+    <input type="hidden" name="bbsListCount" value="${bbsListCount}">
+    <input type="hidden" name="bbsCurPage" value="${bbsCurPage}">
     <input type="hidden" name="cateNum" value="${cateNum}">
     <input type="hidden" name="cateFilter" value="${cateFilter}">
     <input type="hidden" name="periodFilter" value="${periodFilter}">
-    <input type="hidden" name="orderBy" value="${orderBy}">  
+    <input type="hidden" name="bbsOrderBy" value="${bbsOrderBy}">  
     <input type="hidden" name="isSecret" value="${isSecret}">
     <input type="hidden" name="searchType" value="${searchType}">
     <input type="hidden" name="searchValue" value="${searchValue}">

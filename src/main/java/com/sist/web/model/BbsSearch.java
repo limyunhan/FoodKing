@@ -16,10 +16,8 @@ public class BbsSearch implements Serializable {
 	private long endRow;
 	
 	// 마이 페이지 게시글을 위한 멤버
-	private String myPageUserId;
-	private String recomUserId;
-	private String bookmarkUserId;
-		
+	private String myPage;
+
 	// 비밀글 필터링을 위한 멤버
 	private String isSecret;    // empty : 필터링 안함 1 : 비밀 글, 2 : 비밀 글 아님
 	
@@ -41,9 +39,7 @@ public class BbsSearch implements Serializable {
 		startRow = 0L;
 		endRow = 0L;
 		
-		myPageUserId = "";
-		recomUserId = "";
-		bookmarkUserId = "";
+		myPage = "";
 		
 		isSecret = "";
 		
@@ -59,12 +55,6 @@ public class BbsSearch implements Serializable {
 	public void setStartRow(long startRow) {this.startRow = startRow;}
 	public long getEndRow() {return endRow;}
 	public void setEndRow(long endRow) {this.endRow = endRow;}
-	public String getMyPageUserId() {return myPageUserId;}
-	public void setMyPageUserId(String myPageUserId) {this.myPageUserId = myPageUserId;}
-	public String getRecomUserId() {return recomUserId;}
-	public void setRecomUserId(String recomUserId) {this.recomUserId = recomUserId;}
-	public String getBookmarkUserId() {return bookmarkUserId;}
-	public void setBookmarkUserId(String bookmarkUserId) {this.bookmarkUserId = bookmarkUserId;}
 	public String getIsSecret() {return isSecret;}
 	public void setIsSecret(String isSecret) {this.isSecret = isSecret;}
 	public String getSearchType() {return searchType;}
@@ -79,4 +69,6 @@ public class BbsSearch implements Serializable {
 	public void setCateFilter(String cateFilter) {this.cateFilter = cateFilter;}
 	public String getUserId() {return userId;}
 	public void setUserId(String userId) {this.userId = userId;}
+	public String getMyPage() {return myPage;}
+	public void setMyPage(String myPage) {this.myPage = myPage;}
 }

@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -28,8 +29,12 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import com.sist.common.model.FileData;
 import com.sist.common.util.FileUtil;
 import com.sist.common.util.StringUtil;
+import com.sist.web.model.Bbs;
+import com.sist.web.model.BbsSearch;
+import com.sist.web.model.Paging;
 import com.sist.web.model.Response;
 import com.sist.web.model.User;
+import com.sist.web.service.BbsService;
 import com.sist.web.service.UserService;
 import com.sist.web.util.CookieUtil;
 import com.sist.web.util.HttpUtil;
@@ -54,10 +59,16 @@ public class UserController {
 	private UserService userService;
 	
 	@Autowired
+	private BbsService bbsService;
+	
+	@Autowired
 	private RedisCommands<String, String> redisCommands;
 	
 	@Autowired
 	JavaMailSenderImpl mailSender;
+	
+	private static final int MY_LIST_COUNT = 10;
+	private static final int MY_PAGE_COUNT = 5;
 	
 	// 회원 가입 페이지
 	@RequestMapping(value = "/user/register")
@@ -612,11 +623,45 @@ public class UserController {
 		return ajaxResponse;
 	}
 	
+	// 마이 페이지
 	@RequestMapping(value = "/user/myPage")
 	public String myPage(Model model, HttpServletRequest request) {
+		long bbsCurPage = HttpUtil.get(request, "bbsCurPage", 1L);
+		
+		String myPage = HttpUtil.get(request, "myPage", "1");
+		String periodFilter = HttpUtil.get(request, "periodFilter", "");
+		String searchType = HttpUtil.get(request, "searchType", "");
+		String searchValue = HttpUtil.get(request, "searchValue", "");
 		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
 		User user = userService.userSelect(cookieUserId);
 		model.addAttribute("user", user);
+		
+		BbsSearch bbsSearch = new BbsSearch();
+		bbsSearch.setUserId(user.getUserId());
+		bbsSearch.setMyPage(myPage);
+		bbsSearch.setperiodFilter(periodFilter);
+		bbsSearch.setBbsOrderBy("1");
+		bbsSearch.setSearchType(searchType);
+		bbsSearch.setSearchValue(searchValue);
+		
+		long totalCnt = bbsService.bbsListCnt(bbsSearch);
+		List<Bbs> bbsList = null;
+		Paging bbsPaging = null;
+		
+		if (totalCnt > 0) {
+			bbsPaging = new Paging("/user/myPage", totalCnt, MY_LIST_COUNT, MY_PAGE_COUNT, bbsCurPage, "bbsCurPage");
+			bbsSearch.setStartRow(bbsPaging.getStartRow());
+			bbsSearch.setEndRow(bbsPaging.getEndRow());
+			bbsList = bbsService.bbsList(bbsSearch);
+		}
+		
+		model.addAttribute("myPage", myPage);
+		model.addAttribute("bbsCurPage", bbsCurPage);
+		model.addAttribute("periodFilter", periodFilter);
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("searchValue", searchValue);
+		model.addAttribute("bbsList", bbsList);
+		model.addAttribute("bbsPaging", bbsPaging);
 		
 		return "/user/myPage";
 	}

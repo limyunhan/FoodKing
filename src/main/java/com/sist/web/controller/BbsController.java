@@ -384,5 +384,18 @@ public class BbsController {
 	    
 	    return ajaxResponse;
 	}
+	
+	@RequestMapping(value = "/bbs/update")
+	public String update(Model model, HttpServletRequest request) {
+		
+		
+		
+		
+		
+		
+		
+		
+		return "/bbs/update";
+	}
 
 }
