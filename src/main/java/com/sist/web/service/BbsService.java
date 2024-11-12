@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sist.common.util.FileUtil;
+import com.sist.common.util.StringUtil;
 import com.sist.web.dao.BbsDao;
 import com.sist.web.model.Bbs;
 import com.sist.web.model.BbsFile;
@@ -30,7 +31,6 @@ public class BbsService {
 	
 	@Value("#{env['upload.img.dir']}")
 	private String UPLOAD_IMG_DIR;
-	
 	
 	// 게시글 리스트
 	public List<Bbs> bbsList(BbsSearch bbsSearch) {
@@ -98,6 +98,33 @@ public class BbsService {
 		
 		return bbsFile;
 	}
+	
+	public List<BbsImage> bbsImageList(long bbsSeq) {
+		List<BbsImage> list = null;
+		
+		try {
+			list = bbsDao.bbsImageList(bbsSeq);
+			
+		} catch (Exception e) {
+			logger.error("[BbsService] bbsImageList Exception", e);
+		}
+		
+		return list;
+	}
+	
+	public BbsImage bbsImageSelect(HashMap<String, Object> hashMap) {
+		BbsImage bbsImage = null;
+		
+		try {
+			bbsImage = bbsDao.bbsImageSelect(hashMap);
+			
+		} catch (Exception e) {
+			logger.error("[BbsService] bbsImageSelect Exception", e);
+		}
+		
+		return bbsImage;
+	}
+	
 	
 	public Bbs bbsView(HashMap<String, Object> hashMap) {
 		Bbs bbs = null;
@@ -179,16 +206,6 @@ public class BbsService {
 		cnt = bbsDao.bbsUpdate(bbs);
 		
 		if (cnt == 1) {
-			List<BbsFile> oldFileList = bbsDao.bbsFileList(bbs.getBbsSeq());
-			if (oldFileList != null && oldFileList.size() > 0) {
-				for (BbsFile oldFile : oldFileList) {
-					StringBuilder srcFile = new StringBuilder();
-					srcFile.append(UPLOAD_SAVE_DIR).append(FileUtil.getFileSeparator()).append(oldFile.getBbsFileName());
-					FileUtil.deleteFile(srcFile.toString());
-				}
-				
-				bbsDao.bbsFileDelete(bbs.getBbsSeq());
-			}
 			
 			List<BbsFile> newFileList = bbs.getBbsFileList();
 			if (newFileList != null && newFileList.size() > 0) {
@@ -197,27 +214,6 @@ public class BbsService {
 					short bbsFileSeq = bbsDao.bbsFileSeq(bbs.getBbsSeq());
 					newFile.setBbsFileSeq(bbsFileSeq);
 					bbsDao.bbsFileInsert(newFile);
-				}
-			}
-			
-			List<BbsImage> oldImageList = bbsDao.bbsImageList(bbs.getBbsSeq());
-			if (oldImageList != null && oldImageList.size() > 0) {
-				for (BbsImage oldImage : oldImageList) {
-					StringBuilder srcFile = new StringBuilder();
-					srcFile.append(UPLOAD_IMG_DIR).append(FileUtil.getFileSeparator()).append(oldImage.getBbsImageName());
-					FileUtil.deleteFile(srcFile.toString());
-				}
-				
-				bbsDao.bbsFileDelete(bbs.getBbsSeq());
-			}
-			
-			List<BbsImage> newImageList = bbs.getBbsImageList();
-			if (newImageList != null && newImageList.size() > 0) {
-				for (BbsImage newImage : newImageList) {
-					newImage.setBbsSeq(bbs.getBbsSeq());
-					short bbsImageSeq = bbsDao.bbsFileSeq(bbs.getBbsSeq());
-					newImage.setBbsImageSeq(bbsImageSeq);
-					bbsDao.bbsImageInsert(newImage);
 				}
 			}
 			
@@ -232,7 +228,7 @@ public class BbsService {
 
 		Bbs bbs = bbsView(hashMap);
 		
-		if (bbs != null) {
+		if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
 			
 			if (bbs.getBbsComCnt() > 0) {
 				bbsDao.comDeleteByBbsDelete(bbs.getBbsSeq());
@@ -245,7 +241,7 @@ public class BbsService {
 					FileUtil.deleteFile(srcFile.toString());
 				}
 				
-				bbsDao.bbsFileDelete(bbs.getBbsSeq());
+				bbsDao.bbsFileDeleteByBbsDelete(bbs.getBbsSeq());
 			}
 			
 			if (bbs.getBbsImageList() != null && bbs.getBbsImageList().size() > 0) {
@@ -255,8 +251,10 @@ public class BbsService {
 					FileUtil.deleteFile(srcFile.toString());
 				}
 				
-				bbsDao.bbsFileDelete(bbs.getBbsSeq());
+				bbsDao.bbsFileDeleteByBbsDelete(bbs.getBbsSeq());
 			}
+			
+			cnt = bbsDao.bbsDelete(bbs.getBbsSeq());
 		}
 	
 		return (cnt == 1);
@@ -347,9 +345,49 @@ public class BbsService {
 			list = bbsDao.bbsListForIndex(bbsSearch);
 			
 		} catch (Exception e) {
-			logger.error("[BbsService] bbsList Exception", e);
+			logger.error("[BbsService] bbsListForIndex Exception", e);
 		}
 		
 		return list;
+	}
+	
+	public boolean bbsFileDelete(HashMap<String, Object> hashMap) {
+		int cnt = 0;
+		
+		try {
+			BbsFile bbsFile = bbsDao.bbsFileSelect(hashMap);
+			cnt = bbsDao.bbsFileDelete(hashMap);
+			
+			if (cnt == 1) {
+				StringBuilder srcFile = new StringBuilder();
+				srcFile.append(UPLOAD_SAVE_DIR).append(FileUtil.getFileSeparator()).append(bbsFile.getBbsFileName());
+				FileUtil.deleteFile(srcFile.toString());
+			}
+			
+		} catch (Exception e) {
+			logger.error("[BbsService] bbsFileDelete Exception", e);
+		}
+		
+		return (cnt == 1);
+	}
+	
+	public boolean bbsImageDelete(HashMap<String, Object> hashMap) {
+		int cnt = 0;
+		
+		try {
+			BbsImage bbsImage = bbsDao.bbsImageSelect(hashMap);
+			cnt = bbsDao.bbsImageDelete(hashMap);
+			
+			if (cnt == 1) {
+				StringBuilder srcFile = new StringBuilder();
+				srcFile.append(UPLOAD_IMG_DIR).append(FileUtil.getFileSeparator()).append(bbsImage.getBbsImageName());
+				FileUtil.deleteFile(srcFile.toString());
+			}
+			
+		} catch (Exception e) {
+			logger.error("[BbsService] bbsImageDelete Exception", e);
+		}
+		
+		return (cnt == 1);
 	}
 }

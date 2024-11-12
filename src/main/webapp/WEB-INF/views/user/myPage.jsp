@@ -43,7 +43,7 @@ $(document).ready(function() {
         $.ajax({
             type: "POST",
             enctype: "multipart/form-data",
-            url: "/bbs/updateImage",
+            url: "/user/updateImage",
             data: formData,
             processData: false,
             contentType: false,
@@ -65,10 +65,9 @@ $(document).ready(function() {
                 } else if (response.code === 400) {
                     alert("비정상적인 접근입니다.");
                     
-                }  else {
+                } else {
                     alert("서버 응답 오류로 프로필 사진 수정에 실패하였습니다.");
                 }
-                
             },
             error: function(error) {
                 alert("서버 응답 오류로 프로필 사진 수정에 실패하였습니다.");
@@ -248,7 +247,7 @@ function closePasswordModal() {
     <div class="modal-content">
       <span class="close" onclick="closeProfileModal()">&times;</span>
       <h2>프로필 사진 수정</h2>
-      <form id="profileForm" method="post" enctype="multipart/form-data" action="/user/updateImage">
+      <form id="profileForm">
         <input type="file" name="userImage" accept="image/*">
         <button id="checkImageButton">변경</button>
       </form>

@@ -12,11 +12,12 @@
       </div>
     </c:when>
     <c:otherwise>
+      <c:set var="profileImage" value="defaultProfile.png" />
+      <c:if test="${!empty loginUser.userImageName}">
+        <c:set var="profileImage" value="${loginUser.userImageName}" />
+      </c:if>
       <div class="member-info-user">
         <div class="user-info">
-          <c:if test="${!empty loginUser.userImageName}">
-          <c:set var="profileImage" value="${not empty loginUser.userImageName ? loginUser.userImageName : 'defaultProfile.png'}" />
-          </c:if>
           <img src="/resources/profile/${profileImage}" alt="프로필 사진" class="profile-image">
           <div class="user-details">
             <h3 class="user-info-h3">${loginUser.userName}</h3>

@@ -26,10 +26,10 @@ public interface BbsDao {
 	public abstract int bbsUpdate(Bbs bbs);
 	public abstract int bbsDelete(long bbsSeq);
 	public abstract int comDeleteByBbsDelete(long bbsSeq);
-	public abstract int bbsFileDelete(long bbsSeq);
-	public abstract int bbsImageDelete(long bbsSeq);
+	public abstract int bbsFileDeleteByBbsDelete(long bbsSeq);
+	public abstract int bbsImageDeleteByBbsDelete(long bbsSeq);
 	public abstract List<BbsImage> bbsImageList(long bbsSeq);
-	public abstract BbsImage bbsImageSelect(long bbsSq);
+	public abstract BbsImage bbsImageSelect(HashMap<String, Object> hashMap);
 	public abstract int recomInsert(HashMap<String, Object> hashMap);
 	public abstract int recomDelete(HashMap<String, Object> hashMap);
 	public abstract int bookmarkInsert(HashMap<String, Object> hashMap);
@@ -37,4 +37,6 @@ public interface BbsDao {
 	public abstract int isRecommendable(HashMap<String, Object> hashMap);
 	public abstract int isBookmarkable(HashMap<String, Object> hashMap);
 	public abstract List<Bbs> bbsListForIndex(BbsSearch bbsSearch);
+	public abstract int bbsFileDelete(HashMap<String, Object> hashMap);
+	public abstract int bbsImageDelete(HashMap<String, Object> hashMap);
 }

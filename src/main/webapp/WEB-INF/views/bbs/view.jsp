@@ -26,17 +26,35 @@ $(document).ready(function() {
         			type: "POST",
         			url: "/bbs/delete",
         			data: {
-        				
+        				bbsSeq: $("#bbsSeq").val()
         			},
         			dataType: "JSON",
         	        beforeSend: function(xhr) {
         	              xhr.setRequestHeader("AJAX", "true");
         	        },
-        	        sucess: function(response) {
-
+        	        success: function(response) {
+        	            if (response.code === 200) {
+        	            	alert("게시글이 성공적으로 삭제되었습니다.");
+        	            	location.href = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
+        	            
+        	            } else if (response.code === 500) {
+        	            	alert("DB 정합성 오류가 발생하였습니다.");
+        	            
+        	            } else if (response.code === 404) {
+        	            	alert("이미 삭제되었거나 존재하지 않는 게시글 입니다.");
+        	            	
+        	            } else if (response.code === 400) {
+        	            	alert("비정상적인 접근입니다.");
+        	            	
+        	            } else if (response.code === 403) {
+        	            	alert("삭제 권한이 없는 유저입니다.");
+        	            
+        	            } else {
+        	            	alert("서버 응답 오류로 게시글 삭제에 실패하였습니다.");
+        	            }
         	        },
         	        error: function(error) {
-        	        	alert("서버 응답오류가 발생하였습니다.");
+        	        	alert("서버 응답 오류로 게시글 삭제에 실패하였습니다.");
         	            icia.common.error(error);   
         	        }
         		});
@@ -49,7 +67,6 @@ $(document).ready(function() {
            type: "POST",
            url: "/bbs/recom",
            data: {
-              userId : "${loginUser.userId}",
               bbsSeq : "${bbs.bbsSeq}"
            },
            dataType: "JSON",
@@ -96,7 +113,6 @@ $(document).ready(function() {
             type: "POST",
             url: "/bbs/bookmark",
             data: {
-                userId: "${loginUser.userId}",
                 bbsSeq: "${bbs.bbsSeq}"
             },
             dataType: "JSON",
@@ -107,6 +123,7 @@ $(document).ready(function() {
                 if (response.code === 200) {
                    alert("북마크에 추가되었습니다.");
                    $("h1 .fa-bookmark").show(); 
+                   
                 } else if (response.code === 201) {
                    alert("북마크에서 삭제되었습니다.");
                    $("h1 .fa-bookmark").hide(); 
@@ -141,7 +158,6 @@ $(document).ready(function() {
           type: "POST",
           url: "/bbs/writeCom",
           data: {
-              userId: "${loginUser.userId}",
               bbsSeq: "${bbs.bbsSeq}",
               comContent: $("#comContent").val(),   
               comOrderBy: $("#comOrderBy").val(),
@@ -202,7 +218,6 @@ $(document).ready(function() {
 	         type: "POST",
 	         url: "/bbs/refreshCom",
 	         data: {
-	             userId: "${loginUser.userId}",
 	             bbsSeq: "${bbs.bbsSeq}",
 	             comOrderBy: $("#comOrderBy").val(),
 	             comCurPage: $("#comCurPage").val()
@@ -273,6 +288,8 @@ function getComPagingHtml(comPaging) {
 
 function getComListHtml(comList) {
     const loginUserId = "${loginUser.userId}";
+    const loginUserType = "${loginUser.userType}";
+    
     let comListHtml = "";
 
     comList.forEach(function(com) {
@@ -296,8 +313,8 @@ function getComListHtml(comList) {
                     "<p>" + com.comContent + "</p>" +
                     "<div class='comment-action'>" +
                         "<button type='button' class='comReply-btn' onclick='replyCom(" + com.comSeq + ")'>답글</button>" +
-                        (com.userId === loginUserId ? 
-                            "<button type='button' class='comEdit-btn' onclick='editCom(" + com.comSeq + ")'>수정</button>" +
+                        (com.userId === loginUserId || loginUserType === 'ADMIN' ? 
+                        		"<button type='button' class='comEdit-btn' onclick='editCom(" + com.comSeq + ", \"" + com.comContent.replace(/"/g, "&quot;") + "\" )'>수정</button>" +
                             "<button type='button' class='comDelete-btn' onclick='deleteCom(" + com.comSeq + ")'>삭제</button>"
                             : '') +
                     "</div>" +
@@ -318,7 +335,6 @@ function fn_list(comSeq) {
          type: "POST",
          url: "/bbs/refreshCom",
          data: {
-             userId: "${loginUser.userId}",
              bbsSeq: "${bbs.bbsSeq}",
              comOrderBy: $("#comOrderBy").val(),
              comCurPage: comSeq
@@ -374,7 +390,6 @@ function fn_refresh() {
         type: "POST",
         url: "/bbs/refreshCom",
         data: {
-            userId: "${loginUser.userId}",
             bbsSeq: "${bbs.bbsSeq}",
             comOrderBy: $("#comOrderBy").val(),
             comCurPage: $("#comCurPage").val()
@@ -456,7 +471,6 @@ function InsertReply(comSeq) {
     	url: "/bbs/writeComReply",
     	data: {
     		comSeq: comSeq,
-    		userId: "${loginUser.userId}",
     		bbsSeq: $("#bbsSeq").val(),
     		comContent: replyContent
     	},
@@ -539,7 +553,6 @@ function editCom(comSeq, comContent) {
             	url: "/bbs/updateCom",
             	data: {
             		comSeq: comSeq,
-                    userId: "${loginUser.userId}",
                     bbsSeq: $("#bbsSeq").val(),
                     comContent: newContent
             	},
@@ -589,8 +602,7 @@ function deleteCom(comSeq) {
             url: "/bbs/deleteCom",
             data: {
                 comSeq: comSeq,
-                userId: "${loginUser.userId}",
-                bbsSeq: $("#bbsSeq").val(),
+                bbsSeq: $("#bbsSeq").val()
             },
             beforeSend: function(xhr) {
                 xhr.setRequestHeader("AJAX", "true");
@@ -653,6 +665,12 @@ function deleteCom(comSeq) {
               <c:if test="${!empty bbs.bbsUpdateDate}"><p><b>최근 수정일:</b> ${bbs.bbsUpdateDate}</p></c:if>
               <p><b>조회수:</b> <fmt:formatNumber type="Number" maxFractionDigits="3" groupingUsed="true" value="${bbs.bbsReadCnt}" /></p>
               <p><b>카테고리:</b> ${bbs.bbsSubCateName}</p>
+              <c:if test="${!empty bbs.bbsFileList}">
+                <p><b>첨부파일</b><a href="/bbs/download?bbsSeq=${bbs.bbsSeq}">&nbsp;[전체 첨부파일]</a></p>
+                <c:forEach var="bbsFile" items="${bbs.bbsFileList}" varStatus="status">
+                  <p><a href="/bbs/download?bbsSeq=${bbsFile.bbsSeq}&bbsFileSeq=${bbsFile.bbsFileSeq}" style="margin-left: 2px"><c:out value="${bbsFile.bbsFileOrgName}" /></a><p>
+                </c:forEach>
+              </c:if>
             </div>
             <div style="display: flex; flex-direction: column;">
               <div class="post-header-buttons">
@@ -713,7 +731,7 @@ function deleteCom(comSeq) {
                           <p><c:out value="${com.comContent}" /></p>
                           <div class="comment-action">
                             <button type="button" class="comReply-btn" onclick="replyCom(${com.comSeq})">답글</button>
-                            <c:if test="${com.userId == loginUser.userId }">
+                            <c:if test="${com.userId == loginUser.userId or loginUser.userType == 'ADMIN'}">
                               <button type="button" class="comEdit-btn" onclick="editCom(${com.comSeq}, '${fn:escapeXml(com.comContent)}')">수정</button>
                               <button type="button" class="comDelete-btn" onclick="deleteCom(${com.comSeq})">삭제</button>
                             </c:if>

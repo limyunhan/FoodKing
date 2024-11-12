@@ -262,6 +262,7 @@
 		FROM
 		    BBS_FILE
 		WHERE BBS_SEQ = #{value}
+		ORDER BY BBS_FILE_SEQ
     </select>
     
     <!-- 특정 게시글의 특정 첨부파일 조회 -->
@@ -292,6 +293,7 @@
         FROM
             BBS_IMAGE
         WHERE BBS_SEQ = #{value}
+        ORDER BY BBS_IMAGE_SEQ
     </select>
     
     <!-- 특정 게시글의 특정 이미지 조회 -->
@@ -376,7 +378,6 @@
 	
 	<!-- 게시글 이미지 삽입(트랜잭션) -->
 	<insert id="bbsImageInsert" parameterType="com.sist.web.model.BbsImage">
-	
 	    INSERT INTO BBS_IMAGE (
 	        BBS_IMAGE_SEQ,
 	        BBS_SEQ,
@@ -418,14 +419,22 @@
 	</update>
 	
 	<!-- 게시글 파일, 이미지 삭제(게시글 삭제시 적용, 트랜잭션) -->
-	<delete id="bbsFileDelete" parameterType="long">
+	<delete id="bbsFileDeleteByBbsDelete" parameterType="long">
 	    DELETE FROM BBS_FILE WHERE BBS_SEQ = #{value}
 	</delete>
 	
-	<delete id="bbsImageDelete" parameterType="long">
+	<delete id="bbsImageDeleteByBbsDelete" parameterType="long">
 	    DELETE FROM BBS_IMAGE WHERE BBS_SEQ = #{value}
 	</delete>
 	
+	<!-- 게시글 파일, 이미지 삭제(개별적) -->
+	<delete id="bbsFileDelete" parameterType="java.util.HashMap">
+        DELETE FROM BBS_FILE WHERE BBS_FILE_SEQ = #{bbsFileSeq} AND BBS_SEQ =  #{bbsSeq}
+    </delete>
+    
+    <delete id="bbsImageDelete" parameterType="java.util.HashMap">
+        DELETE FROM BBS_IMAGE WHERE BBS_IMAGE_SEQ = #{bbsImageSeq} AND BBS_SEQ = #{bbsSeq}
+    </delete>
 	<!-- 게시글 추천 -->
 	<insert id="recomInsert" parameterType="java.util.HashMap">
 	    INSERT INTO RECOM (

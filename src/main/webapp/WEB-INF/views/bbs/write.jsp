@@ -28,8 +28,6 @@ $(document).ready(function() {
 	    fontNamesIgnoreCheck: ['을지로체', 'Nanum Gothic', 'Noto Sans KR', 'Spoqa Han Sans'], 
 	    callbacks: {
 	        onInit: function() {
-	            // 초기 폰트 및 폰트 크기 설정
-	            $("#bbsContent").summernote("fontName", "을지로체");
 	            $("#bbsContent").summernote("fontSize", "18");
 	            $("#bbsTitle").focus();
 	        },
@@ -52,11 +50,18 @@ $(document).ready(function() {
 	    }
 	});
 	
-	$("#bbsFile").on("change", function() {
-	    var fileName = $(this).get(0).files.length > 0 ? $(this).get(0).files[0].name : "선택된 파일 없음";
-	    $('#fileName').text(fileName);
-	});
-	
+    $("#bbsFile").on("change", function() {
+        var files = $(this).get(0).files;
+        if (files.length > 0) {
+            var fileName = files[0].name;
+            var additionalFileCount = files.length - 1;
+            var displayText = additionalFileCount > 0 ? fileName + " 외 " + additionalFileCount + "건" : fileName;
+            $("#fileName").text(displayText);
+            
+        } else {
+            $("#fileName").text("선택된 파일 없음");
+        }
+    });
 	
 	$("#secretCheck").on("change", function(){
 	    $("#bbsPwd").prop("disabled", !this.checked);		
@@ -109,8 +114,7 @@ $(document).ready(function() {
 	        success: function(response) {
 	        	if (response.code === 200) {
 	        	    alert("게시글을 성공적으로 작성하였습니다.");
-	        	    document.bbsForm.action = "/bbs/list" 
-	        	    document.bbsForm.action = "/bbs/list?cateNum=" + "${cateNum}";
+	        	    document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
 	                document.bbsForm.submit();
 	                
 	        	} else if (response.code === 500) {
@@ -134,6 +138,31 @@ $(document).ready(function() {
 	    });
 	});
 });
+
+function uploadImage(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    $.ajax({
+        type: "POST",
+        url: "/bbs/uploadImage",
+        enctype: "multipart/form-data",
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: false,
+        success: function(response) {
+        	console.log(response); 
+            const imageUrl = response.url;
+            console.log(imageUrl);
+            $("#bbsContent").summernote("insertImage", imageUrl);
+        },
+        error: function(error) {
+            alert("이미지 업로드에 실패하였습니다.");
+            icia.common.error(error);
+        }
+    });
+}
 </script>
 </head>
 <body id="index-body">
@@ -145,7 +174,7 @@ $(document).ready(function() {
         <div class="write-container">
           <form name="writeForm" id="writeForm" method="post" enctype="multipart/form-data">
             <div class="write-header">
-              <h1>글쓰기</h1>
+              <h1>글 쓰기</h1>
               <div class="write-section">
                 <button type="button" class="listbtn" id="listbtn">리스트</button>
                 <button type="button" class="write-btn" id="write-btn">등록</button>
