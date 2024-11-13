@@ -2369,7 +2369,7 @@ public final class FileUtil
 		
 		return fileName;
 	}
-	
+		
 	// 파일 사이즈 단위 열거형
 	public enum FileSizeUnit
 	{

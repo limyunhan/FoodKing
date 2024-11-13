@@ -37,11 +37,10 @@
 		        FROM 
 		            COM C, 
 		            USER_TABLE U,
-		            (SELECT COM_GROUP, COUNT(COM_SEQ) GROUP_REPLY_CNT
+		            (SELECT COM_GROUP, COUNT(COM_SEQ) - 1 GROUP_REPLY_CNT
 		            FROM (
 		              SELECT COM_GROUP, COM_SEQ, COM_PARENT
 		              FROM COM
-		              WHERE COM_PARENT = 0
 		              START WITH COM_PARENT = 0
 		              CONNECT BY PRIOR COM_SEQ = COM_PARENT
 		              AND LEVEL > 1

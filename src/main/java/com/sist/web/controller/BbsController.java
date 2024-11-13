@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +58,9 @@ public class BbsController {
 	
 	@Value("#{env['upload.img.temp.dir']}")
 	private String UPLOAD_IMG_TEMP_DIR;
+	
+	@Value("#{env['upload.img.dir']}")
+	private String UPLOAD_IMG_DIR;
 	
 	@Autowired
 	private BbsService bbsService;
@@ -247,6 +252,29 @@ public class BbsController {
 				bbs.setBbsTitle(bbsTitle);
 				bbs.setBbsContent(bbsContent);
 				
+				List<FileData> ImageDataList = moveTempImage(bbsContent, UPLOAD_IMG_TEMP_DIR, UPLOAD_IMG_DIR);
+				
+				if (ImageDataList != null) {
+					bbs.setBbsContent(bbsContent.replace("/resources/bbs/temp/", "/resources/bbs/images/"));
+					List<BbsImage> bbsImageList = new ArrayList<>();
+					
+					for (FileData ImageData : ImageDataList) {
+						if (ImageData.getFileSize() > 0) {
+							BbsImage bbsImage = new BbsImage();
+							bbsImage.setBbsImageExt(ImageData.getFileExt());
+							bbsImage.setBbsImageName(ImageData.getFileName());
+							bbsImage.setBbsImageOrgName(ImageData.getFileOrgName());
+							bbsImage.setBbsImageSize(ImageData.getFileSize());
+							bbsImageList.add(bbsImage);
+						}
+						
+					}
+					
+					if (ImageDataList.size() > 0) {
+						bbs.setBbsImageList(bbsImageList);
+					}
+				}
+				
 				if (!StringUtil.isEmpty(bbsPwd)) {
 					bbs.setBbsPwd(bbsPwd);
 				}
@@ -272,7 +300,7 @@ public class BbsController {
 					}
 
 				}
-				
+							
 				try {
 					if (bbsService.bbsInsert(bbs)) {
 						ajaxResponse.setResponse(200, "게시글 작성 성공");
@@ -478,6 +506,29 @@ public class BbsController {
 					bbs.setBbsTitle(bbsTitle);
 					bbs.setBbsContent(bbsContent);
 					
+					List<FileData> ImageDataList = moveTempImage(bbsContent, UPLOAD_IMG_TEMP_DIR, UPLOAD_IMG_DIR);
+					
+					if (ImageDataList != null) {
+						bbs.setBbsContent(bbsContent.replace("/resources/bbs/temp/", "/resources/bbs/images/"));
+						List<BbsImage> bbsImageList = new ArrayList<>();
+						
+						for (FileData ImageData : ImageDataList) {
+							if (ImageData.getFileSize() > 0) {
+								BbsImage bbsImage = new BbsImage();
+								bbsImage.setBbsImageExt(ImageData.getFileExt());
+								bbsImage.setBbsImageName(ImageData.getFileName());
+								bbsImage.setBbsImageOrgName(ImageData.getFileOrgName());
+								bbsImage.setBbsImageSize(ImageData.getFileSize());
+								bbsImageList.add(bbsImage);
+							}
+							
+						}
+						
+						if (ImageDataList.size() > 0) {
+							bbs.setBbsImageList(bbsImageList);
+						}
+					}
+					
 					if (!StringUtil.isEmpty(bbsPwd)) {
 						bbs.setBbsPwd(bbsPwd);
 					}
@@ -637,60 +688,6 @@ public class BbsController {
 		return ajaxResponse;
 	}
 	
-	@RequestMapping(value = "/bbs/deleteImage", method = RequestMethod.POST) 
-	@ResponseBody
-	public Response<Object> deleteImage(HttpServletRequest request) {
-		Response<Object> ajaxResponse = new Response<>();
-		
-		String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
-		long bbsSeq = HttpUtil.get(request, "bbsSeq", -1L);
-		short bbsImageSeq = (short) HttpUtil.get(request, "bbsImageSeq", -1);
-		
-		if (bbsSeq > 0 && bbsImageSeq > 0) {
-			HashMap<String, Object> hashMap = new HashMap<>();
-			hashMap.put("bbsSeq", bbsSeq);
-			hashMap.put("bbsImageSeq", bbsImageSeq);
-			hashMap.put("userId", cookieUserId);
-			
-			Bbs bbs = bbsService.bbsSelect(hashMap);
-			
-			if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
-				
-				if (!StringUtil.equals(cookieUserId, bbs.getUserId())) {
-					User user = userService.userSelect(cookieUserId);
-					
-					if (user == null || StringUtil.equals(user.getUserStatus(), "Y") || !StringUtil.equals(user.getUserType(), "ADMIN")) {
-						ajaxResponse.setResponse(401, "삭제 권한이 없음");
-						return ajaxResponse;
-					}
-				}
-				
-				BbsImage bbsImage = bbsService.bbsImageSelect(hashMap);
-				
-				if (bbsImage != null && bbsImage.getBbsImageSize() > 0) {
-					
-					if (bbsService.bbsImageDelete(hashMap)) {
-						ajaxResponse.setResponse(200, "이미지 삭제 성공");
-						
-					} else {
-						ajaxResponse.setResponse(500, "DB 정합성 오류");
-					}
-					
-				} else {
-					ajaxResponse.setResponse(404, "존재하지 않는 이미지");
-				}
-				
-			} else {
-				ajaxResponse.setResponse(404, "존재하지 않는 게시글");
-			}
-		
-		} else {
-			ajaxResponse.setResponse(400, "비정상적인 접근");
-		}
-		
-		return ajaxResponse;
-	}
-	
 	@RequestMapping(value = "/bbs/download")
 	public ModelAndView download(HttpServletRequest request) {
 		ModelAndView modelAndView = null;
@@ -758,7 +755,130 @@ public class BbsController {
 		
 		srcFile.append("/resources/bbs/temp/").append(fileData.getFileName());
 		jsonObject.addProperty("url", srcFile.toString());
+		jsonObject.addProperty("orgName", fileData.getFileOrgName());
 	
 		return jsonObject;
+	}
+	
+	@RequestMapping(value = "/bbs/deleteImage", method = RequestMethod.POST) 
+	@ResponseBody
+	public Response<Object> deleteImage(HttpServletRequest request) {
+		Response<Object> ajaxResponse = new Response<>();
+		
+        String cookieUserId = CookieUtil.getHexValue(request, AUTH_COOKIE_NAME);
+		String delImageUrl = HttpUtil.get(request, "delImageUrl", "");
+        long bbsSeq = HttpUtil.get(request, "bbsSeq", -1L);
+        
+		if (!StringUtil.isEmpty(delImageUrl)) {
+	        if (delImageUrl.startsWith("/temp/")) {
+	            String imageName = delImageUrl.substring("/temp/".length()); 
+	            
+	            StringBuilder srcFile = new StringBuilder();
+	            srcFile.append(UPLOAD_IMG_TEMP_DIR).append(FileUtil.getFileSeparator()).append(imageName);
+	            FileUtil.deleteFile(srcFile.toString());
+	            
+	            ajaxResponse.setResponse(200, "이미지 삭제 성공");
+	         
+	        } else if (delImageUrl.startsWith("/images/")) {
+	            String imageName = delImageUrl.substring("/images/".length()); 
+
+	            if (bbsSeq > 0) {
+	    			HashMap<String, Object> hashMap = new HashMap<>();
+	    			hashMap.put("bbsSeq", bbsSeq);
+	    			hashMap.put("userId", cookieUserId);
+	            	
+	    			Bbs bbs = bbsService.bbsSelect(hashMap);
+	    			
+	    			if (bbs != null && StringUtil.equals(bbs.getBbsStatus(), "Y")) {
+	    				if (!StringUtil.equals(cookieUserId, bbs.getUserId())) {
+	    					User user = userService.userSelect(cookieUserId);
+	    					
+	    					if (user == null || StringUtil.equals(user.getUserStatus(), "Y") || !StringUtil.equals(user.getUserType(), "ADMIN")) {
+	    						ajaxResponse.setResponse(401, "삭제 권한이 없음");
+	    						return ajaxResponse;
+	    					}
+	    				}
+	    				
+	    				BbsImage bbsImage = bbsService.bbsImageSelect(imageName);
+	    				String oldBbsContent = bbs.getBbsContent();
+	    				String newBbsContent = oldBbsContent.replace("/resources/bbs" + delImageUrl, "");
+	    				bbs.setBbsContent(newBbsContent);
+	    				
+	    				try {
+							bbsService.bbsUpdate(bbs);
+							
+						} catch (Exception e) {
+							ajaxResponse.setResponse(500, "DB 정합성 오류");
+						}
+	    				
+	    				if (bbsImage != null && bbsImage.getBbsImageSize() > 0) {
+	    					
+	    					if (bbsService.bbsImageDelete(imageName)) {
+	    						ajaxResponse.setResponse(200, "이미지 삭제 성공");
+	    						
+	    					} else {
+	    						ajaxResponse.setResponse(500, "DB 정합성 오류");
+	    					}
+	    					
+	    				} else {
+	    					ajaxResponse.setResponse(404, "존재하지 않는 게시글 이미지");
+	    				}
+	    				
+	    			} else {
+	    				ajaxResponse.setResponse(404, "존재하지 않는 게시글");
+	    			}
+	            	
+	            } else {
+	            	ajaxResponse.setResponse(400, "비정상적인 접근");
+	            }
+	            
+	        } else {
+	            ajaxResponse.setResponse(400, "비정상적인 접근");
+	        }
+			
+		} else {
+			ajaxResponse.setResponse(400, "비정상적인 접근");
+		}
+
+		return ajaxResponse;
+	}
+
+	public static List<FileData> moveTempImage(String bbsContent, String tempDirectory, String actualDirectory) {
+	    String imgTagPattern = "<img[^>]+src=\"/resources/bbs/temp/([^\"]+)\"[^>]*alt=\"([^\"]+)\"";
+	    Pattern pattern = Pattern.compile(imgTagPattern);
+	    Matcher matcher = pattern.matcher(bbsContent);
+
+	    List<FileData> imageDataList = null;
+
+	    if (matcher.find()) {
+	        imageDataList = new ArrayList<>(); 
+
+	        do {
+	            String tempImageName = matcher.group(1);  
+	            String originalImageName = matcher.group(2); 
+
+	            File tempFile = new File(tempDirectory + FileUtil.getFileSeparator() + tempImageName);
+	            File actualFile = new File(actualDirectory + FileUtil.getFileSeparator() + tempImageName);
+
+	            if (tempFile.exists() && tempFile.renameTo(actualFile)) {
+	                FileData imageData = new FileData();
+
+	                imageData.setFileOrgName(originalImageName);  
+	                imageData.setFileName(actualFile.getName()); 
+	                imageData.setFileSize(actualFile.length());  
+	                imageData.setFilePath(actualFile.getAbsolutePath());  
+
+	                String strFileExt = FileUtil.getFileExtension(imageData.getFileOrgName());
+	                if (!StringUtil.isEmpty(strFileExt)) {
+	                    imageData.setFileExt(strFileExt);  // 파일 확장자
+	                }
+
+	                imageDataList.add(imageData);
+	            }
+
+	        } while (matcher.find());
+	    }
+
+	    return (imageDataList != null && !imageDataList.isEmpty()) ? imageDataList : null;
 	}
 }

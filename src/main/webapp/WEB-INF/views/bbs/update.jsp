@@ -11,8 +11,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/lang/summernote-ko-KR.min.js"></script>
 <script>
 $(document).ready(function() {
-	const bbsContent = "${fn:replace(bbs.bbsContent, '\"', '&quot;')}";
-
+	const bbsContent = '${bbs.bbsContent}'; 
+	
     $("#bbsContent").summernote({
         lang: 'ko-KR',
         toolbar: [
@@ -38,6 +38,10 @@ $(document).ready(function() {
                 for (let i = 0; i < files.length; i++) {
                     uploadImage(files[i]);
                 }
+            },
+            onMediaDelete: function($image) {
+            	var delImageUrl = $image.attr("src").split("/resources/bbs").pop(); 
+                deleteImage(delImageUrl); 
             },
             onPaste: function(e) {
                 var clipbbsData = e.originalEvent.clipboardData;
@@ -119,6 +123,8 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.code === 200) {
                     alert("게시글을 성공적으로 수정하였습니다.");
+                    document.bbsForm.action = "/bbs/view";
+                    document.bbsForm.submit();
 
                 } else if (response.code === 500) {
                 	alert("DB 정합성 오류가 발생하였습니다.");
@@ -193,6 +199,73 @@ function fn_removeFile(bbsFileSeq) {
     }
 }
 
+function uploadImage(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    $.ajax({
+        type: "POST",
+        url: "/bbs/uploadImage",
+        enctype: "multipart/form-data",
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: false,
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("AJAX", "true");
+        },
+        success: function(response) {
+            const imageUrl = response.url;
+            const altText = response.orgName;
+            
+            const imgTag = document.createElement("img");
+            imgTag.src = imageUrl;
+            imgTag.alt = altText;
+            
+            $("#bbsContent").summernote("insertNode", imgTag);
+        },
+        error: function(error) {
+            alert("이미지 업로드에 실패하였습니다.");
+            icia.common.error(error);
+        }
+    });
+}
+
+function deleteImage(delImageUrl) {
+    $.ajax({
+        type: "POST",
+        url: "/bbs/deleteImage",
+        data: {
+            bbsSeq: $("#bbsSeq").val(),   	
+            delImageUrl: delImageUrl
+        },
+        dataType: "JSON",
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("AJAX", "true");
+        },
+        success: function(response) {
+            if (response.code === 200) {
+                alert("이미지를 삭제하였습니다.");
+                
+            } else if (response.code === 500) {
+            	alert("DB 정합성 오류입니다.");
+            	
+            } else if (response.code === 404) {
+                alert("존재하지 않는 게시글 혹은 이미지 삭제입니다");
+                
+            } else if (response.code === 401) {
+            	alert("삭제 권한이 없습니다.");
+            	
+            } else {
+            	alert("서버 응답 오류로 이미지 삭제에 실패하였습니다.");
+            }
+        },
+        error: function(error) {
+            alert("서버 응답 오류로 이미지 삭제에 실패하였습니다.");
+            icia.common.error(error);
+        }
+    });
+}
 </script>
 </head>
 <body id="index-body">
@@ -281,7 +354,7 @@ function fn_removeFile(bbsFileSeq) {
               <input type="text" id="bbsTitle" name="bbsTitle" placeholder="제목을 입력해 주세요." value="<c:out value='${bbs.bbsTitle}'/>" />
             </div>
             <div class="update-content">
-              <textarea class="summernote" id="bbsContent" name="bbsContent" placeholder="내용을 입력하세요.">${bbs.bbsContent}</textarea>
+              <textarea class="summernote" id="bbsContent" name="bbsContent" placeholder="내용을 입력하세요."></textarea>
             </div>
           </form>
         </div>

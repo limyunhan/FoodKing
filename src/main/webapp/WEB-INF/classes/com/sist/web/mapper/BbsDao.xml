@@ -120,10 +120,10 @@
 		            </if>
 		            <if test='isSecret != null and isSecret != ""'>
 		                <choose>
-		                    <when test='isSecret == "Y"'> AND (A.BBS_PWD IS NOT NULL AND A.BBS_PWD <![CDATA[<>]]> '')</when>
+		                    <when test='isSecret == "Y"'> AND A.BBS_PWD IS NOT NULL</when>
 		                    <otherwise> AND (A.BBS_PWD IS NULL OR A.BBS_PWD = '')</otherwise>
 		                </choose>
-		            </if> 
+		            </if>  
 		            <if test='searchType != null and searchType != "" and searchValue != null and searchValue != ""'>
 		                <choose>
 		                    <when test='searchType == "1"'> AND A.BBS_TITLE LIKE '%' || #{searchValue} || '%'</when>
@@ -171,7 +171,7 @@
             </if>
 	        <if test='isSecret != null and isSecret != ""'>
 	            <choose>
-	                <when test='isSecret == "Y"'> AND (A.BBS_PWD IS NOT NULL AND A.BBS_PWD <![CDATA[<>]]> '')</when>
+	                <when test='isSecret == "Y"'> AND A.BBS_PWD IS NOT NULL</when>
 	                <otherwise> AND (A.BBS_PWD IS NULL OR A.BBS_PWD = '')</otherwise>
 	            </choose>
 	        </if>  
@@ -297,7 +297,7 @@
     </select>
     
     <!-- 특정 게시글의 특정 이미지 조회 -->
-    <select id="bbsImageSelect" parameterType="java.util.HashMap" resultMap="bbsImageResultMap">
+    <select id="bbsImageSelect" parameterType="string" resultMap="bbsImageResultMap">
         SELECT
             BBS_IMAGE_SEQ,
             BBS_SEQ,
@@ -308,9 +308,9 @@
             NVL(TO_CHAR(BBS_IMAGE_REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') BBS_IMAGE_REG_DATE
         FROM
             BBS_IMAGE
-        WHERE BBS_SEQ = #{bbsSeq} AND BBS_IMAGE_SEQ = #{bbsImageSeq}
+        WHERE BBS_IMAGE_NAME = #{value}
     </select>
-
+    
     <!-- 특정 게시글의 조회수 1 증가 -->
     <update id="bbsReadCntPlus" parameterType="long">
         UPDATE BBS SET BBS_READ_CNT = BBS_READ_CNT + 1 WHERE BBS_SEQ = #{value}
@@ -432,8 +432,8 @@
         DELETE FROM BBS_FILE WHERE BBS_FILE_SEQ = #{bbsFileSeq} AND BBS_SEQ =  #{bbsSeq}
     </delete>
     
-    <delete id="bbsImageDelete" parameterType="java.util.HashMap">
-        DELETE FROM BBS_IMAGE WHERE BBS_IMAGE_SEQ = #{bbsImageSeq} AND BBS_SEQ = #{bbsSeq}
+    <delete id="bbsImageDelete" parameterType="string">
+        DELETE FROM BBS_IMAGE WHERE BBS_IMAGE_NAME = #{value}
     </delete>
 	<!-- 게시글 추천 -->
 	<insert id="recomInsert" parameterType="java.util.HashMap">

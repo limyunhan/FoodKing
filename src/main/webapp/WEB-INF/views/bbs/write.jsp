@@ -36,17 +36,21 @@ $(document).ready(function() {
 	                uploadImage(files[i]);
 	            }
 	        },
-	        onPaste: function(e) {
-	            var clipbbsData = e.originalEvent.clipboardData;
+	        onMediaDelete: function($image) {
+                var delImageUrl = $image.attr("src").split("/resources/bbs").pop(); 
+                deleteImage(delImageUrl); 
+            },
+            onPaste: function(e) {
+                var clipbbsData = e.originalEvent.clipboardData;
 
-	            if (clipbbsData && clipbbsData.items && clipbbsData.items.length) {
-	                var item = clipbbsData.items[0];
+                if (clipbbsData && clipbbsData.items && clipbbsData.items.length) {
+                    var item = clipbbsData.items[0];
 
-	                if (item.kind === "file" && item.type.indexOf("image/") !== -1) {
-	                    e.preventDefault();
-	                }
-	            }
-	        }
+                    if (item.kind === "file" && item.type.indexOf("image/") !== -1) {
+                        e.preventDefault();
+                    }
+                }
+            }
 	    }
 	});
 	
@@ -151,14 +155,47 @@ function uploadImage(file) {
         contentType: false,
         processData: false,
         cache: false,
+        beforeSend: function(xhr) {
+        	xhr.setRequestHeader("AJAX", "true");
+        },
         success: function(response) {
-        	console.log(response); 
             const imageUrl = response.url;
-            console.log(imageUrl);
-            $("#bbsContent").summernote("insertImage", imageUrl);
+            const altText = response.orgName;
+            
+            const imgTag = document.createElement("img");
+            imgTag.src = imageUrl;
+            imgTag.alt = altText;
+            
+            $("#bbsContent").summernote("insertNode", imgTag);
         },
         error: function(error) {
             alert("이미지 업로드에 실패하였습니다.");
+            icia.common.error(error);
+        }
+    });
+}
+
+function deleteImage(delImageUrl) {
+	$.ajax({
+        type: "POST",
+        url: "/bbs/deleteImage",
+        data: {
+            delImageUrl: delImageUrl
+        },
+        dataType: "JSON",
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("AJAX", "true");
+        },
+        success: function(response) {
+            if (response.code === 200) {
+                alert("이미지를 삭제하였습니다.");
+                
+            } else {
+                alert("서버 응답 오류로 이미지 삭제에 실패하였습니다.");
+            }
+        },
+        error: function(error) {
+            alert("서버 응답 오류로 이미지 삭제에 실패하였습니다.");
             icia.common.error(error);
         }
     });

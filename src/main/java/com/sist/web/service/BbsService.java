@@ -112,11 +112,11 @@ public class BbsService {
 		return list;
 	}
 	
-	public BbsImage bbsImageSelect(HashMap<String, Object> hashMap) {
+	public BbsImage bbsImageSelect(String bbsImageName) {
 		BbsImage bbsImage = null;
 		
 		try {
-			bbsImage = bbsDao.bbsImageSelect(hashMap);
+			bbsImage = bbsDao.bbsImageSelect(bbsImageName);
 			
 		} catch (Exception e) {
 			logger.error("[BbsService] bbsImageSelect Exception", e);
@@ -214,6 +214,16 @@ public class BbsService {
 					short bbsFileSeq = bbsDao.bbsFileSeq(bbs.getBbsSeq());
 					newFile.setBbsFileSeq(bbsFileSeq);
 					bbsDao.bbsFileInsert(newFile);
+				}
+			}
+			
+			List<BbsImage> newImageList = bbs.getBbsImageList();
+			if (newImageList != null && newImageList.size() > 0) {
+				for (BbsImage newImage : newImageList) {
+					newImage.setBbsSeq(bbs.getBbsSeq());
+					short bbsImageSeq = bbsDao.bbsImageSeq(bbs.getBbsSeq());
+					newImage.setBbsImageSeq(bbsImageSeq);
+					bbsDao.bbsImageInsert(newImage);
 				}
 			}
 			
@@ -371,12 +381,12 @@ public class BbsService {
 		return (cnt == 1);
 	}
 	
-	public boolean bbsImageDelete(HashMap<String, Object> hashMap) {
+	public boolean bbsImageDelete(String bbsImageName) {
 		int cnt = 0;
 		
 		try {
-			BbsImage bbsImage = bbsDao.bbsImageSelect(hashMap);
-			cnt = bbsDao.bbsImageDelete(hashMap);
+			BbsImage bbsImage = bbsDao.bbsImageSelect(bbsImageName);
+			cnt = bbsDao.bbsImageDelete(bbsImageName);
 			
 			if (cnt == 1) {
 				StringBuilder srcFile = new StringBuilder();

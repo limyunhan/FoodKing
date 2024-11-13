@@ -87,23 +87,23 @@ $(document).ready(function() {
                    $("#recom-btn").html("<i class='fas fa-thumbs-up'></i> 추천 (" + formattedRecomCnt + ")");
                    
                } else if (response.code === 404) {
-                  alert("삭제된 게시글입니다.");
+                   alert("삭제된 게시글입니다.");
                    document.bbsForm.action = "/bbs/list<c:if test="${!empty cateNum}">?cateNum=${cateNum}</c:if>";
                    document.bbsForm.submit();
                    
                } else if (response.code === 500) {
-                  alert("DB 정합성 오류가 발생하였습니다.");
+                   alert("DB 정합성 오류가 발생하였습니다.");
                   
                } else if (response.code === 400){
-                  alert("비정상적인 접근입니다.");
+                   alert("비정상적인 접근입니다.");
                
                } else {
-                  alert("서버 응답오류가 발생하였습니다.");
+                   alert("서버 응답오류가 발생하였습니다.");
                }
            },
            error: function(error) {
-              alert("서버 응답오류가 발생하였습니다.");
-              icia.common.error(error);   
+               alert("서버 응답오류가 발생하였습니다.");
+               icia.common.error(error);   
            }
        });
    });
@@ -265,6 +265,10 @@ $(document).ready(function() {
 });
 
 function getComPagingHtml(comPaging) {
+    if (!comPaging || Object.keys(comPaging).length === 0) {
+        return ""; 
+    }
+	
     let comPagingHtml = "";
     
     if (comPaging.prevBlockPage > 0) {
@@ -289,6 +293,10 @@ function getComPagingHtml(comPaging) {
 function getComListHtml(comList) {
     const loginUserId = "${loginUser.userId}";
     const loginUserType = "${loginUser.userType}";
+    
+    if (!comList || comList.length === 0) {
+        return ""; 
+    }
     
     let comListHtml = "";
 

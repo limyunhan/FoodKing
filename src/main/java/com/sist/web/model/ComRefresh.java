@@ -7,7 +7,6 @@ public class ComRefresh implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private long comCurPage;
 	private String comOrderBy;
-	// private Bbs bbs;
 	private Paging comPaging;
 	private List<Com> comList;	
 	private int bbsComCnt;
@@ -28,14 +27,6 @@ public class ComRefresh implements Serializable {
 	public void setComOrderBy(String comOrderBy) {this.comOrderBy = comOrderBy;}
 	public Paging getComPaging() {return comPaging;}
 	public void setComPaging(Paging comPaging) {this.comPaging = comPaging;}
-
-	public int getBbsComCnt() {
-		return bbsComCnt;
-	}
-
-	public void setBbsComCnt(int bbsComCnt) {
-		this.bbsComCnt = bbsComCnt;
-	}
-	
-
+	public int getBbsComCnt() {return bbsComCnt;}
+	public void setBbsComCnt(int bbsComCnt) {this.bbsComCnt = bbsComCnt;}
 }
