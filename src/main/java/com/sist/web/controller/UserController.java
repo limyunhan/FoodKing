@@ -324,7 +324,8 @@ public class UserController {
 		
 		if (!StringUtil.isEmpty(userEmail) && !StringUtil.isEmpty(userTel) && !StringUtil.isEmpty(userName)) {
 			Map<String, String> hashMap = new HashMap<>();
-	        hashMap.put("userName", userName);
+	        
+			hashMap.put("userName", userName);
 	        hashMap.put("userEmail", userEmail);
 	        hashMap.put("userTel", userTel);
 	        
